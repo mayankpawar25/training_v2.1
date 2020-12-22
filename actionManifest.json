@@ -1,0 +1,54 @@
+{
+    "schemaVersion": 1,
+    "tag": "training-teams-app",
+    "id": "<packageId>",
+    "name": "Training",
+    "description": "Training",
+    "developer": {
+        "name": "<name>",
+        "websiteUrl": "<websiteUrl>",
+        "privacyUrl": "<privacyUrl>",
+        "termsOfUseUrl": "<termsOfUseUrl>"
+    },
+    "icon": "images/appIcon.png",
+    "version": "1.0.0",
+    "actionModel": "actionModel.json",
+    "views": {
+        "CardView": {
+            "sourceLocation": "json/cardView.json"
+        },
+        "LaunchView": {
+            "sourceLocation": "createView.html",
+            "header": "Create a new training"
+        },
+        "UpdateView": {
+            "sourceLocation": "updateView.html",
+            "header": "Respond training"
+        },
+        "DetailView": {
+            "sourceLocation": "detailView.html",
+            "header": "Summary View"
+        }
+    },
+    "msTeamsProps": {
+        "name": {
+            "short": "Training-mayank",
+            "full": "Training-mayank"
+        },
+        "description": {
+            "short": "Create Training",
+            "full": "Create Training"
+        },
+        "icons": {
+            "outline": "images/outline.png",
+            "color": "images/appIcon.png"
+        },
+        "accentColor": "#4464ee"
+    },
+    "localizationInfo": {
+        "defaultLocale": "en-us",
+        "localeFiles": {
+            "en-us": "strings/strings.json"
+        }
+    }
+}

@@ -1,0 +1,61 @@
+{
+    "id": "com.microsoft.sample.training.03",
+    "name": "Training(Webcraft)",
+    "$schema": "https://int.actions.office365.com/ActionCommon/jsons/ActionManifest.schema.json",
+    "description": "Training Version1",
+    "developer": {
+        "name": "Microsoft",
+        "websiteUrl": "https://www.microsoft.com/",
+        "privacyUrl": "https://www.microsoft.com/privacy",
+        "termsOfUseUrl": "https://www.microsoft.com/app-tos"
+    },
+    "icon": "images/appIcon.png",
+    "actionModel": "actionModel.json",
+    "version": "1.0.2",
+    "views": {
+        "CardView": {
+            "sourceLocation": "json/cardView.json"
+        },
+        "LaunchView": {
+            "sourceLocation": "html/createView.html",
+            "header": "Create Training"
+        },
+        "UpdateView": {
+            "sourceLocation": "html/updateView.html",
+            "header": "Respond Training"
+        },
+        "DetailView": {
+            "sourceLocation": "html/detailView.html",
+            "header": "Results Training"
+        }
+    },
+    "localizationInfo": {
+        "defaultLocale": "en-us",
+        "localeFiles": {
+            "en-us": "strings/strings.json"
+        }
+    },
+    "showLoadingIndicator": true,
+    "msTeamsProps": {
+        "name": {
+            "short": "Training(Webcraft)",
+            "full": "Training(Webcraft)"
+        },
+        "description": {
+            "short": "Create Training",
+            "full": "Create Training"
+        },
+        "icons": {
+            "outline": "images/outline.png",
+            "color": "images/appIcon.png"
+        },
+        "accentColor": "#4464ee"
+    },
+    "whitelistedUrlDomains": [
+        "ajax.googleapis.com",
+        "cdnjs.cloudflare.com",
+        "maxcdn.bootstrapcdn.com",
+        "ajax.aspnetcdn.com",
+        "int.actions.office365.com"
+    ]
+}

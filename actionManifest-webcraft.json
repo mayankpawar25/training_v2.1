@@ -1,0 +1,55 @@
+{
+    "schemaVersion": 1,
+    "tag": "training-teams-app",
+    "id": "com.microsoft.sample.training.mike2407202018",
+    "name": "Training-mayank",
+    "description": "Training",
+    "developer": {
+        "name": "Microsoft",
+        "websiteUrl": "https://www.microsoft.com/",
+        "privacyUrl": "https://www.microsoft.com/privacy",
+        "termsOfUseUrl": "https://www.microsoft.com/app-tos"
+    },
+    "icon": "images/appIcon.png",
+    "version": "1.0.25",
+    "actionModel": "actionModel.json",
+    "views": {
+        "CardView": {
+            "sourceLocation": "json/cardView.json"
+        },
+        "LaunchView": {
+            "sourceLocation": "html/createView.html",
+            "header": "Create training"
+        },
+        "UpdateView": {
+            "sourceLocation": "html/updateView.html",
+            "header": "Respond training"
+        },
+        "DetailView": {
+            "sourceLocation": "html/detailView.html",
+            "header": "Summary View"
+        }
+    },
+    "localizationInfo": {
+        "defaultLocale": "en-us",
+        "localeFiles": {
+            "en-us": "strings/strings.json"
+        }
+    },
+    "showLoadingIndicator": true,
+    "msTeamsProps": {
+        "name": {
+            "short": "Training-mayank",
+            "full": "Training-mayank"
+        },
+        "description": {
+            "short": "Create Training",
+            "full": "Create Training"
+        },
+        "icons": {
+            "outline": "images/outline.png",
+            "color": "images/appIcon.png"
+        },
+        "accentColor": "#4464ee"
+    }
+}
