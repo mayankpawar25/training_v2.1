@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 import { Localizer, ActionHelper } from "../common/ActionSdkHelper";
 import { UxUtils } from "../common/utils/UxUtils";
 import { Utils } from "../common/utils/Utils";
@@ -50,6 +53,7 @@ let addDescriptionPlaceholderKey = "";
 let uploadFileLabelKey = "";
 let uploadVideoLabelKey = "";
 let contentLimitExceedKey = "";
+let maxTenOptionKey = "";
 
 /***********************************  Manage Questions *********************************/
 
@@ -242,7 +246,7 @@ $(document).on("click", ".remove-option", function(eve) {
             });
 
     } else {
-        Localizer.getString("two_option_error").then(function(result) {
+        Localizer.getString("twoOptionError").then(function(result) {
             $("div.card-box:visible").append(`<div class="mt--8 mb--8 text-danger error-msg">${result}</div>`);
         });
     }
@@ -1357,7 +1361,7 @@ async function getStringKeys() {
         uploadFileLabelKey = result;
     });
 
-    Localizer.getString("tap_upload_video").then(function(result) {
+    Localizer.getString("tapUploadVideo").then(function(result) {
         $(".tap-upload-video-label").text(result);
         uploadVideoLabelKey = result;
     });
@@ -1396,7 +1400,7 @@ async function getStringKeys() {
         $(".done-label").text(result);
     });
 
-    Localizer.getString("tap_upload_photo").then(function(result) {
+    Localizer.getString("tapUploadPhoto").then(function(result) {
         $(".tap-upload-label").text(result);
         uploadImageLabelKey = result;
     });
@@ -2702,10 +2706,12 @@ $(document).on({
                 });
             });
         } else {
-            $(this).parents("div.question-container")
-                .find("div.d-flex-ques")
-                .after(`<label class="text-danger d-block question-required-err"><font class="mb--4 d-block">For quiz atleast one question is required.</font></label>`);
+            Localizer.getString("atleastOneQuestion").then(function(result) {
+                $(this).parents("div.question-container")
+                    .find("div.d-flex-ques")
+                    .after(`<label class="text-danger d-block question-required-err"><font class="mb--16 mt--16 d-block">${result}</font></label>`);
 
+            });
             $([document.documentElement, document.body]).animate({
                 scrollTop: $(".text-danger.d-block:first").offset().top - 200
             }, 2000);
@@ -2726,7 +2732,11 @@ $(document).on({
         e.preventDefault();
         if ($(this).parents("div#options").find(`div.option-div input[type="text"][id^=option]`).length >= 10) {
             $(this).parents(".question-container").find(".add-options").hide();
-            $(this).parents(".question-container").find(".add-options").after(`<div class="max-option-err-box">${maxTenOptionKey}</div>`);
+
+            Localizer.getString("maximumTenOptions").then(function(result) {
+                $(this).parents(".question-container").find(".add-options").after(`<div class="max-option-err-box">${result}</div>`);
+            });
+
 
             $([document.documentElement, document.body]).animate({
                 scrollTop: $(this).parents(".question-container").find(".max-option-err-box").offset().top - 200

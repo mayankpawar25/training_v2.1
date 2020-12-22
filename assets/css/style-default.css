@@ -2757,10 +2757,6 @@ button.close {
     margin-top: -2px;
 }
 
-.card-box-question .option-sec .card-box:last-child {
-    margin-bottom: 0px !important;
-}
-
 .content-menu .dropdown-menu a {
     float: left;
     width: 100%;
@@ -2844,6 +2840,15 @@ button.close {
     height: 16px;
 }
 
+.question-section-div .option-div:last-child {
+    margin-bottom: 0px !important;
+}
+
+#back-text svg {
+    fill: var(--app-gray-02);
+    margin-top: -2px;
+}
+
 @media screen and (max-width: 576px) {
      ::-webkit-scrollbar {
         width: 4px;
@@ -2897,6 +2902,9 @@ button.close {
     .body-outer {
         bottom: 0px;
         padding-bottom: 80px;
+    }
+    .discardContent .d-flex-alert .pl--8 {
+        margin-top: 8px !important;
     }
 }
 

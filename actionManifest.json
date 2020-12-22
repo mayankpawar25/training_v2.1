@@ -32,12 +32,12 @@
     },
     "msTeamsProps": {
         "name": {
-            "short": "Training-mayank",
-            "full": "Training-mayank"
+            "short": "Training",
+            "full": "Training"
         },
         "description": {
-            "short": "Create Training",
-            "full": "Create Training"
+            "short": "Training description",
+            "full": "Training description"
         },
         "icons": {
             "outline": "images/outline.png",

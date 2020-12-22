@@ -1,4 +1,5 @@
 {
+    "schemaVersion": 1,
     "view": {
         "type": "AdaptiveCard",
         "version": "1.0",
