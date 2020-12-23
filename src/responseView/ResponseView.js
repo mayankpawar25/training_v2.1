@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import {
     Localizer,
     ActionHelper
@@ -47,6 +49,7 @@ let previousKey = "";
 let footerSection1 = "";
 let footerSection2 = "";
 let footerSection3 = "";
+let countn = "";
 
 /* Async method for fetching localization strings */
 /**
@@ -169,7 +172,7 @@ async function getTheme(request) {
     $("form.section-1").show();
     let theme = context.theme;
     $("link#theme").attr("href", "css/style-" + theme + ".css");
-    $("div.section-1").append(`<div class="row"><div class="col-12"><div id="root"></div></div></div>`);
+    $("div.section-1").append(UxUtils.getThemeSection());
     $root = $("#root");
     setTimeout(() => {
         $("div.section-1").show();
@@ -248,9 +251,9 @@ function createBody() {
     /*  Check Expiry date time  */
     let currentTime = new Date().getTime();
     if (actionInstance.expiryTime <= currentTime) {
-        let $card = $('<div class="card"></div>');
-        let $spDiv = $('<div class="col-sm-12"></div>');
-        let $sDiv = $(`<div class="form-group">${trainingExpired}</div>`);
+        let $card = $(UxUtils.getBodyCardSection());
+        let $spDiv = $(UxUtils.getBodySpanSection());
+        let $sDiv = $(UxUtils.getTrainingExpiredTitle(trainingExpired));
         $card.append($spDiv);
         $spDiv.append($sDiv);
         $root.append($card);
@@ -259,22 +262,20 @@ function createBody() {
         $("div.section-1").append(headSection1);
         $("#section1-training-title").html(actionInstance.displayName);
         $("#section1-training-description").html(actionInstance.customProperties[0].value);
-        let allowMultipleAttempt = actionInstance.customProperties[5].value;
+        let allowMultipleAttempt = actionInstance.customProperties[Constants.getMultipleAttemptIndex()].value;
         $("#multiple-attempt").hide();
         $("#quiz-title-image").hide();
-
         if ($.inArray(myUserId, memberIds) !== -1) {
             $("#multiple-attempt").show();
             if (allowMultipleAttempt == "No") {
                 Localizer.getString("multipleAttemptNo").then(function(result) {
-                    $("#allow-multiple-attempt").append(`<div><b> ${result} </b></div`);
+                    $("#allow-multiple-attempt").append(UxUtils.getMultipleAttemptSection(result));
                     $("#start:button").prop("disabled", true);
                 });
             }
-
             if (allowMultipleAttempt == "Yes") {
                 Localizer.getString("multipleAttemptYes").then(function(result) {
-                    $("#allow-multiple-attempt").append(`<div><b> ${result} </b></div`);
+                    $("#allow-multiple-attempt").append(UxUtils.getMultipleAttemptSection(result));
                 });
             }
         }
@@ -401,7 +402,7 @@ function createBody() {
                         $("#question-counter").text(questionCounter);
                     }
                     Localizer.getString("question_with", Utils.numbertowords(Object.keys(data.options).length)).then(function(result) {
-                        //$("div.desc-box p#contain-" + counterDescbox).find("span.training-type").text(result);
+
                     });
                     /* Question Attachments */
                     if (data.attachments.length > 0) {
@@ -436,10 +437,9 @@ function createBody() {
 
         });
 
-        //$("div.section-1").append(`<div class="container pb-100"></div>`);
         $("div.section-1").after(footerSection1);
         $("#start").addClass("disabled");
-        $("#start").prepend(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
+        $("#start").prepend(UxUtils.getLoaderSpinner());
         let tid = setInterval(() => {
             if (imageCounter == successDownLoadImageCounter) {
                 $("#start").find(".spinner-border").remove();
@@ -505,24 +505,8 @@ function createQuestionView(indexNum, questionNumber) {
 
             if (ind == indexNum) {
                 let count = ind + 1;
-                let $card = $('<div class="card-box card-blank card-box-question"></div>');
-                let $questionHeading = `<div class="d-table mb--8 pre-none">
-                        <label class="font-12">
-                            <strong class="question-number-title bold>
-                                <label class="font-12">
-                                    <span class="training-type question-number">Question</span>&nbsp;#&nbsp;
-                                <span class="">${questionNumber}</span>
-                                </label>
-                            </strong>
-                        </label>
-                        <label class="float-right result-status" id="status-1"></label>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="quiz-updated-img cover-img min-max-132 mb--8 bg-none bdr-none" style="display:none">
-                        <img src="" class="image-responsive question-template-image heightfit" style="">
-                    </div>
-                    <div class="semi-bold font-14 mb--16 question-title"><p class="">${question.displayName}</p></div>`;
-
+                let $card = $(UxUtils.getQuestionCardBoxSection());
+                let $questionHeading = UxUtils.getQuestionHeadingSection(questionNumber, question.displayName);
                 $card.append($questionHeading);
                 //add radio button
                 if (question.valueType == "SingleOption") {
@@ -556,7 +540,7 @@ function createQuestionView(indexNum, questionNumber) {
 
         count++;
     });
-    if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+    if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
         $("#next").text("Check").attr("id", "check");
     }
 }
@@ -568,16 +552,7 @@ function createQuestionView(indexNum, questionNumber) {
  * @param id string identifier
  */
 function getRadioButton(text, name, id, attachmentURL) {
-    let $divData = $(` <div class="option-sec">
-        <div class="card-box card-bg card-border mb--8">
-            <div class="radio-section custom-radio-outer" id="${id}" columnId="${name}" >
-                <label class="custom-radio d-block font-14 cursor-pointer selector-inp">
-                    <input type="radio" name="${name}" id="${id}">
-                        <span class="radio-block"></span>  <div class="pr--32 check-in-div">${text}</div>
-                </label>
-            </div>
-        </div>
-    </div>`);
+    let $divData = $(UxUtils.getRadioButtonSection(text, name, id));
     if (attachmentURL != "") {
         $divData.find(".custom-check").prepend(UxUtils.getOptionImageWithLoader(attachmentURL));
     }
@@ -591,16 +566,7 @@ function getRadioButton(text, name, id, attachmentURL) {
  * @param id string identifier
  */
 function getCheckboxButton(text, name, id, attachmentURL) {
-    let $divData = $(`<div class="option-sec">
-        <div class="card-box card-bg card-border mb--8">
-            <div class="radio-section custom-check-outer selector-inp" id="${id}" columnId="${name}" >
-                <label class="custom-check form-check-label d-block">
-                    <input type="checkbox" class="radio-block" name="${name}" id="${id}">
-                        <span class="checkmark"></span> <div class="pr--32 check-in-div">${text}</div>
-                </label>
-            </div>
-        </div>
-    </div>`);
+    let $divData = $(UxUtils.getCheckboxButtonSection(text, name, id));
     if (attachmentURL != "") {
         $divData.find(".custom-check").prepend(UxUtils.getOptionImageWithLoader(attachmentURL));
     }
@@ -613,11 +579,10 @@ function getCheckboxButton(text, name, id, attachmentURL) {
 function loadSummaryView() {
     $("div.section-2").hide();
     $("div.section-2-footer").hide();
-    isShowAnswerEveryQuestion = actionInstance.customProperties[3].value;
+    isShowAnswerEveryQuestion = actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value;
     if ($(".section-3").length <= 0) {
-        $("div.section-2").after(`<div class="section-3"><div class="container"><label><strong>${trainingSummary}</strong></label></div></div>`);
+        $("div.section-2").after(UxUtils.getTrainingSummaryViewSection(trainingSummary));
         $("div.section-3 .container:first").append(headSection1);
-
         /* Main Heading and Description */
         $("div.section-3 #multiple-attempt").hide();
         $("div.section-3 #quiz-title-image").hide();
@@ -630,18 +595,12 @@ function loadSummaryView() {
             let questCount = 1;
             dataTable.dataColumns.forEach((data, ind) => {
                 $("div.section-3").show();
-                //$("div.section-3").append(textSection2);
                 if (data.valueType == "LargeText") {
-                    //$("div.section-3 .container:first").append(textSection2);
                     let counter = $("div.card-box").length;
                     let counterDescbox = $("div.desc-box").length;
                     /* Call Text Section 1 */
-                    //let counter = $(".section-3 div.card-box").length;
-                    //let textTitle = data.displayName;
                     let textDescription = data.options[0].displayName;
-
                     let textTitle = data.displayName;
-                    //$("div.section-3 .container:first").append(textSection1);
                     $("div.section-3 #desc-section").append(textSection1);
                     $("div.desc-box p:last").attr("id", "contain-" + counterDescbox);
                     $("div.desc-box p#contain-" + counterDescbox).find("span.counter").text(counterDescbox);
@@ -652,40 +611,36 @@ function loadSummaryView() {
 
                     if (data.name.indexOf("photo") >= 0) {
                         Localizer.getString("photo").then(function(result) {
-                            //$("div.card-box#content-" + counter).find(".training-type").text(result);
                             $("div.desc-box p#contain-" + counterDescbox).find("span.training-type").text(result);
                             $("div.desc-box p#contain-" + counterDescbox).text(textTitle);
                         });
                         let attachments = data.attachments;
-                        let $carousel = $(`<div id="carouselExampleIndicators" class="carousel slide max-min-220" data-ride="carousel"></div>`);
-                        let $olSection = $(`<ol class="carousel-indicators"></ol>`);
-                        let $carouselInner = $(`<div class="carousel-inner"></div>`);
+                        let $carousel = $(UxUtils.getResponseViewCarouselSection());
+                        let $olSection = $(UxUtils.getCarouselOlSection());
+                        let $carouselInner = $(UxUtils.getCarouselInnerSection());
 
                         if (attachments.length > 0) {
                             let count = 0;
                             $carousel.append($olSection);
                             $carousel.append($carouselInner);
                             attachments.forEach(function(att, i) {
-                                let $imgDiv = $(`<div class="carousel-item ${count == 0 ? "active" : ""}">
-                                                        <img class="d-block w-100" src="${att.url}" alt="${count + 1} slide">
-                                                    </div>`);
+                                let $imgDiv = $(UxUtils.getCarousalImages(count, att.url));
                                 $carouselInner.append($imgDiv);
                                 $carousel.append(UxUtils.getCarouselSection());
                                 count++;
                             });
                             $("div.card-box#content-" + counter).find("#text-description").after($carousel);
                             $(".carousel").carousel();
-                            //$(".carousel").after("<hr>");
                         }
                     } else if (data.name.indexOf("video") >= 0) {
                         Localizer.getString("video").then(function(result) {
                             $("div.card-box#content-" + counter).find(".training-type").text(result);
                         });
-                        $("div.card-box#content-" + counter).find("#text-description").after('<div class="embed-responsive embed-responsive-4by3"><video controls="" playsinline class="video" id="' + data.name + '" src="' + data.attachments[0].url + '"></video></div>');
+                        $("div.card-box#content-" + counter).find("#text-description").after(UxUtils.getTrainingVideoSection(data.name, data.attachments[0].url));
                     } else if (data.name.indexOf("document") >= 0) {
                         Localizer.getString("document").then(function(result) {
                             $("div.card-box#content-" + counter).find(".training-type").text(result);
-                            $("div.card-box#content-" + counter).find("#text-description").after(`<p><a href="${data.attachments[0].url}" class="font-14 semi-bold teams-link a-link" download>${data.attachments[0].name}</a></p>`);
+                            $("div.card-box#content-" + counter).find("#text-description").after(UxUtils.getTrainingDocumentSection(data.attachments[0].url, data.attachments[0].name));
                         });
                     }
                 } else if (data.valueType == "SingleOption" || data.valueType == "MultiOption") {
@@ -777,7 +732,6 @@ function loadSummaryView() {
             }
         });
         $("div.section-3 .container:first").after(footerSection3);
-        //$("div.section-3 .container:first").after(UxUtils.getSummarySectionFooter(completeTrainingKey));
     }
 
 }
@@ -864,30 +818,27 @@ function createTrainingSection(indexNum) {
                                 $("div.section-2 > .container:first > div.card-box:last").find("span.section-type-title").text(result);
                             });
                             let attachments = data.attachments;
-                            let $carousel = $('<div id="carouselExampleIndicators" class="carousel slide max-min-220" data-ride="carousel"></div>');
-                            let $olSection = $('<ol class="carousel-indicators"></ol>');
-                            let $carouselInner = $('<div class="carousel-inner"></div>');
+                            let $carousel = $(UxUtils.getResponseViewCarouselSection());
+                            let $olSection = $(UxUtils.getCarouselOlSection());
+                            let $carouselInner = $(UxUtils.getCarouselInnerSection());
                             if (attachments.length > 0) {
                                 let count = 0;
                                 $carousel.append($olSection);
                                 $carousel.append($carouselInner);
                                 attachments.forEach(function(att, i) {
-                                    let $imgDiv = $(`<div class="carousel-item ${count == 0 ? "active" : ""}">
-                                                        <img class="d-block w-100" src="${att.url}" alt="${count + 1} slide">
-                                                    </div>`);
+                                    let $imgDiv = $(UxUtils.getCarousalImages(count, att.url));
                                     $carouselInner.append($imgDiv);
                                     $carousel.append(UxUtils.getCarouselSection());
                                     count++;
                                 });
                                 $("div.section-2 .container:first div.card-box:visible").find("#text-description").after($carousel);
                                 $(".carousel").carousel();
-                                //$(".carousel").after("<hr>");
                             }
                         } else if (data.name.indexOf("document") >= 0) {
                             Localizer.getString("document").then(function(result) {
                                 $("div.section-2 > .container:first > div.card-box:last").find("span.section-type-title").text(result);
                             });
-                            $("div.section-2 > .container:first > div.card-box:last").find("#text-description").after(`<p class="doc-name">${Constants.getDocumentIcon()} <a href="${data.attachments[0].url}" class="font-14 semi-bold teams-link a-link" download>${data.attachments[0].name}</a></p>`);
+                            $("div.section-2 > .container:first > div.card-box:last").find("#text-description").after(UxUtils.getTrainingDocumentSection(data.attachments[0].url, data.attachments[0].name));
                         } else if (data.name.indexOf("video") >= 0) {
                             let textTitle = data.displayName;
                             let textDescription = data.options[0].displayName;
@@ -900,7 +851,7 @@ function createTrainingSection(indexNum) {
                                 $("div.section-2 > .container:first > div.card-box:last").find("img.image-sec").remove();
                                 $("div.section-2 > .container:first > div.card-box:last").attr("id", data.name);
                             });
-                            $("div.section-2 > .container:first > div.card-box:last").find("#text-description").after('<div class="embed-responsive embed-responsive-4by3"><video controls="" playsinline class="video" id="' + data.name + '" src="' + data.attachments[0].url + '"></video></div>');
+                            $("div.section-2 > .container:first > div.card-box:last").find("#text-description").after(UxUtils.getTrainingVideoSection(data.name, data.attachments[0].url));
                         } else {
                             /* text */
                             $("div.section-1").append(textSection1);
@@ -922,9 +873,7 @@ function createTrainingSection(indexNum) {
                                     let imageUrl = opt.attachments[0].url;
                                     $("div.section-2 > .container:first > div.card-box.card-box-question")
                                         .find(`input#question${questCounter}option${i + 1}`)
-                                        .before(`<div class="option-image-section cover-img min-max-132 mb--4" id="quiz-ans-image">
-                                                <img src="${imageUrl}" class="opt-image img-responsive heightfit">
-                                            </div>`);
+                                        .before(UxUtils.getQuizOptionImage(imageUrl));
                                 }
                             });
                         }
@@ -958,14 +907,9 @@ $(document).on("click", ".done-key", function() {
 $(document).on("click", "#start", function() {
     $("div.section-1").hide();
     $("div.section-1-footer").hide();
-    $("div.section-1").after(`<div class="section-2"><div class="container"></div></div>`);
-
+    $("div.section-1").after(UxUtils.getTrainingSection());
     /* Show first section */
     $("div.section-2").after(footerSection2);
-    //$("div.section-2").after(UxUtils.getResponseTrainingSectionFooter(previousKey, nextKey));
-
-    //$("div.section-2").append(`<div class="container pb-100"></div>`);
-
     createTrainingSection(pagination);
     $("#back").prop("disabled", true);
     $("#back").addClass("disabled");
@@ -1059,10 +1003,10 @@ $(document).on("click", "#check", function() {
         });
 
         let correctValue = correctAnsArr.join();
-        if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+        if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
             if (correctAnswer == true) {
                 $("div.card-box:last").find(".result").remove();
-                $(".result-status").append('<span class="text-success semi-bold">Correct</span>');
+                $(".result-status").append(UxUtils.getCorrectArea(correctKey));
 
                 $.each(answerKeys[(attrName - 1)], function(ii, subarr) {
                     correctAnsArr.push($.trim($("#" + subarr).text()));
@@ -1078,7 +1022,7 @@ $(document).on("click", "#check", function() {
 
             } else {
                 $("div.card-box:last").find(".result").remove();
-                $(".result-status").append('<span class="text-danger semi-bold">Incorrect</span>');
+                $(".result-status").append(UxUtils.getIncorrectArea(incorrectKey));
                 $.each(answerKeys[(attrName - 1)], function(ii, subarr) {
                     correctAnsArr.push($.trim($("#" + subarr).text()));
                     $("#" + subarr).find("div.check-in-div").append(`&nbsp;<i class="success-with-img">${Constants.getSuccessTickIcon()}</i>`);
@@ -1109,7 +1053,6 @@ $(document).on("click", "#check", function() {
         });
     }
 
-
 });
 
 /**
@@ -1130,8 +1073,6 @@ $(document).on("change", "input[type='radio'], input[type='checkbox']", function
  */
 $(document).on("click", "#next", function() {
 
-    //$("#back").addClass("disabled");
-    //$("#back").removeClass("disabled");
     let data = [];
     let limit = $("#y").text();
 
@@ -1210,7 +1151,7 @@ $(document).on("click", "#next", function() {
 
             let correctValue = correctAnsArr.join();
 
-            if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+            if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
                 if (correctAnswer == true) {
                     /* If Correct Answer */
                     pagination++;
@@ -1229,7 +1170,7 @@ $(document).on("click", "#next", function() {
                             setTimeout(
                                 function() {
                                     if ($("div.card-box:visible").find(".training-type").text() == "Question") {
-                                        if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+                                        if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
                                             $("#next").text("Check").attr("id", "check");
                                         }
                                     }
@@ -1245,8 +1186,7 @@ $(document).on("click", "#next", function() {
 
                     if (pagination < limit) {
                         $("#next").prop("disabled", false).removeClass("disabled");
-                        $("#back").prop("disabled", false).removeClass("disabled");;
-
+                        $("#back").prop("disabled", false).removeClass("disabled");
                         $("div.section-2 > .container:first > div.card-box:nth-child(" + pagination + ")").hide();
                         if ($("div.section-2 > .container:first > div.card-box").length <= pagination) {
                             createTrainingSection(pagination);
@@ -1255,7 +1195,7 @@ $(document).on("click", "#next", function() {
                             setTimeout(
                                 function() {
                                     if ($("div.card-box:visible").find(".training-type").text() == "Question") {
-                                        if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+                                        if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
                                             $("#next").text("Check").attr("id", "check");
                                         }
                                     }
@@ -1285,7 +1225,7 @@ $(document).on("click", "#next", function() {
                         setTimeout(
                             function() {
                                 if ($("div.card-box:visible").find(".training-type").text() == "Question") {
-                                    if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+                                    if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
                                         $("#next").text("Check").attr("id", "check");
                                     }
                                 }
@@ -1319,8 +1259,6 @@ $(document).on("click", "#next", function() {
         /* Not Question Type */
         pagination++;
         limit = $("#y").text();
-        //row[pagination] = "question" + pagination;
-
         if (pagination < limit) {
             $("#next").prop("disabled", false).removeClass("disabled");
             $("#back").prop("disabled", false).removeClass("disabled");
@@ -1333,7 +1271,7 @@ $(document).on("click", "#next", function() {
                 setTimeout(
                     function() {
                         if ($("div.card-box:visible").find(".training-type").text() == "Question") {
-                            if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+                            if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
                                 $("#next").text("Check").attr("id", "check");
                             }
                         }
@@ -1363,7 +1301,15 @@ $(document).on("click", "#next", function() {
  * @event click on back button
  */
 $(document).on("click", "#back", function() {
-    $("#next").text("Next");
+    let $countn = 0;
+    if ($countn >= 1) {
+        $("#next").after(UxUtils.getNextBtnSpan).find(".next-btn-sec").text("Next");
+        countn++;
+    }
+    if ($("#next").text() === "Done") {
+        $("#next").text("");
+        $("#next").append(`<span class="next-btn-sec"></span>${Constants.getNextCaratIcon()}`).find(".next-btn-sec").text("Next");
+    }
     $("#next").removeClass("done-key");
     if ($(".error-msg").length > 0) {
         $(".error-msg").remove();
@@ -1381,7 +1327,7 @@ $(document).on("click", "#back", function() {
         setTimeout(
             function() {
                 if ($("div.card-box:visible").find(".training-type").text() == "Question") {
-                    if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+                    if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
                         $("#next").text("Check").attr("id", "check");
                     }
                 }
@@ -1390,7 +1336,7 @@ $(document).on("click", "#back", function() {
         pagination--;
     }
     if ($("#x").text() == $("#y").text()) {
-        $(".footer.section-2-footer .check-key").text(doneKey);
+        $(".footer.section-2-footer .check-key").after(`<span class="next-btn-sec"></span>`).text(doneKey);
         $(".footer.section-2-footer #next").text(doneKey);
         $(".footer.section-2-footer #next").addClass("done-key");
         $(".footer.section-2-footer #check").text(doneKey);

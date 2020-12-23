@@ -1,6 +1,3 @@
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.
-
 import { Localizer, ActionHelper } from "../common/ActionSdkHelper";
 import { UxUtils } from "../common/utils/UxUtils";
 import { Utils } from "../common/utils/Utils";
@@ -47,14 +44,16 @@ let addContentKey = "";
 let ok = "";
 let close = "";
 let saveAttachmentData = new Array(); // Add Training Banner Image
-let uploadImageLabelKey = "";
 let addTitlePlaceholderKey = "";
 let addDescriptionPlaceholderKey = "";
+let uploadImageLabelKey = "";
 let uploadFileLabelKey = "";
 let uploadVideoLabelKey = "";
 let contentLimitExceedKey = "";
 let maxTenOptionKey = "";
-
+let correctChoiceKey = "";
+let invalidFileFormatKey = "";
+let atleastOneErrorKey = "";
 /***********************************  Manage Questions *********************************/
 
 /**
@@ -103,7 +102,7 @@ $(document).on("click", "#add-questions", function() {
     let textNumber = parseInt($("div.training-card-section.section-div").length);
     if (textNumber == 30) {
         Localizer.getString("contentLimitExceed").then(function(result) {
-            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(`<span class="text-danger content-limit-exceed">${result}</span>`);
+            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(UxUtils.getContentLimitExceed(result));
         });
     }
     $(".error-msg").remove();
@@ -224,6 +223,9 @@ $(document).on("click", "#delete-question", function() {
 
 $(document).on("click", ".remove-option", function(eve) {
     $("div.question-section").find("div.error-msg").remove();
+
+    $(this).parents("div.question-container").find('buttons.add-options').show();
+
     if ($(this).parents("div.question-container").find("div.option-div").length > 2) {
         let selector = $(this).closest("div.container");
         $(this).parents("div.option-div").remove();
@@ -247,7 +249,7 @@ $(document).on("click", ".remove-option", function(eve) {
 
     } else {
         Localizer.getString("twoOptionError").then(function(result) {
-            $("div.card-box:visible").append(`<div class="mt--8 mb--8 text-danger error-msg">${result}</div>`);
+            $("div.card-box:visible").append(UxUtils.getOptionError(result));
         });
     }
 });
@@ -281,9 +283,7 @@ $(document).on("click", "#question-done", function() {
             let questionId = qind;
             $(quest)
                 .find("div.d-flex-ques")
-                .after(`<div class="clearfix"></div>
-                    <label class="label-alert d-block option-required-err text-left pull-left mt--8 mb--16"><font>Please select correct choice for the question</font></label>
-                    <div class="clearfix"></div>`);
+                .after(UxUtils.checkCorrectOptionError(correctChoiceKey));
             $(quest)
                 .find("div.card-box")
                 .removeClass("card-box")
@@ -510,7 +510,7 @@ $(document).on("click", "#add-text", function() {
     let textNumber = parseInt($("div.training-card-section.section-div").length);
     if (textNumber == 30) {
         Localizer.getString("contentLimitExceed").then(function(result) {
-            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(`<span class="text-danger content-limit-exceed">${result}</span>`);
+            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(UxUtils.getContentLimitExceed(result));
         });
     }
 
@@ -604,7 +604,7 @@ $(document).on("click", "#add-photo", function() {
     let textNumber = parseInt($("div.training-card-section").length);
     if (textNumber > 29) {
         Localizer.getString("contentLimitExceed").then(function(result) {
-            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(`<span class="text-danger content-limit-exceed">${result}</span>`);
+            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(UxUtils.getContentLimitExceed(result));
         });
     }
     $(".error-msg").remove();
@@ -621,7 +621,6 @@ $(document).on("click", "#add-photo", function() {
     $("form.sec1 div.section-2 div#root div.training-card-section:last").after(UxUtils.getAddImageSection(textNumber, textData));
     $("form.sec1").append(addPhotoSection);
     $("form.sec1").append(addPhotoFooter);
-    $("#upload-photo").click();
 });
 
 /**
@@ -651,11 +650,11 @@ $(document).on("click", "#photo-done", function() {
         let photoTitle = $("input#image-training-text").val();
         let photoDesc = $("textarea#photo-description").val();
         let photoAttachments = $("textarea#photo-attachments").val();
+        let carasoulImage = $('.update-carasoul').html();
         $(".text-section").hide();
         $(".text-footer").hide();
         $(".section-2").show();
         $(".section-2-footer").show();
-        $("div.photo-section-div").find("span.type").text(" " + photoTitle);
         $("form.sec1 div.section-2:visible div#root div.training-card-section").each(function(index, obj) {
             $(this).attr({
                 "data-id": "text-section-" + index
@@ -667,36 +666,11 @@ $(document).on("click", "#photo-done", function() {
                 $(this).find("span.counter").text(index);
             }
         });
-
-        /* File reader */
-        let input = $("input[type='file']#upload-photo")[0];
-        if (input.files) {
-            $("#submit").attr("disabled", true);
-            $(".body-outer").before(loader);
-            let filesAmount = input.files.length;
-            let count = 0;
-            for (let j = 0; j < filesAmount; j++) {
-                let reader = new FileReader();
-                reader.onload = function(event) {
-                    if (count == 0) {
-                        $("#section-" + textNumber).find("#image-sec-" + textNumber).attr({
-                            "src": event.target.result
-                        });
-                        if (filesAmount > 1) {
-                            $("#section-" + textNumber).find("#image-sec-" + textNumber).after(`<span class="file-counter">+${filesAmount-1}</span>`);
-                        }
-                    }
-                    count++;
-                };
-                reader.readAsDataURL(input.files[j]);
-            }
-            $(".change-link").find(`.label-alert .d-block`).remove();
-            let carasoulId = $("div.carousel:last").attr("id");
-            $("#section-" + textNumber).find("div.img-thumbnail-new").html(UxUtils.getCarousalSliders($("div.carousel:last").html(), carasoulId));
-        }
+        $("#section-" + textNumber).find("span.type").text(photoTitle);
         $("#section-" + textNumber).find(".textarea-photo-title").val(photoTitle);
         $("#section-" + textNumber).find(".textarea-photo-description").val(photoDesc);
         $("#section-" + textNumber).find(".photo-description-preview").text(photoDesc);
+        $("#section-" + textNumber).find('.img-thumbnail-new').html(carasoulImage);
         if (photoDesc.length < 1) {
             $("#section-" + textNumber).find(".photo-description-preview").parent(".col-12").addClass("d-none");
         }
@@ -721,7 +695,7 @@ $(document).on("click", "#add-video", function() {
 
     if (textNumber > 29) {
         Localizer.getString("contentLimitExceed").then(function(result) {
-            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(`<span class="text-danger content-limit-exceed">${result}</span>`);
+            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(UxUtils.getContentLimitExceed(result));
         });
     }
 
@@ -741,7 +715,6 @@ $(document).on("click", "#add-video", function() {
     $("form.sec1").append(addVideoSection);
     $("form.sec1").append(addVideoFooter);
     $("form.sec1 div.section-2 div#root div.training-card-section:last").after(UxUtils.getAddVideoSection(textNumber, textData));
-    $("#upload-video").click();
 });
 
 /**
@@ -816,7 +789,7 @@ $(document).on("click", "#add-document", function() {
 
     if (textNumber > 29) {
         Localizer.getString("contentLimitExceed").then(function(result) {
-            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(`<span class="text-danger content-limit-exceed">${result}</span>`);
+            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(UxUtils.getContentLimitExceed(result));
         });
     }
 
@@ -833,7 +806,6 @@ $(document).on("click", "#add-document", function() {
     $("form.sec1 div.section-2 div#root div.training-card-section:last").after(UxUtils.getAddDownloadSection(textNumber, textData));
     $("form.sec1").append(addDocumentSection);
     $("form.sec1").append(addDocumentFooter);
-    $("#upload-document").click();
 });
 
 /**
@@ -863,7 +835,6 @@ $(document).on("click", "#document-done", function() {
         $(".text-footer").hide();
         $(".section-2").show();
         $(".section-2-footer").show();
-        $("div.document-section-div").find("span.type").text(" " + docTitle);
         $("form.sec1 div.section-2:visible div#root div.training-card-section").each(function(index, obj) {
             $(this).attr({
                 "data-id": "text-section-" + index
@@ -877,7 +848,7 @@ $(document).on("click", "#document-done", function() {
             }
 
         });
-
+        $("#section-" + textNumber).find("span.type").text(docTitle);
         $("#section-" + textNumber).find("textarea.textarea-document").val(docTitle);
         $("#section-" + textNumber).find(".document-description-preview").text(docDescription);
         $("#section-" + textNumber).find("textarea.textarea-document-description").val(docDescription);
@@ -900,7 +871,7 @@ $(document).on("click", "#document-done", function() {
         fileTypeIcon = Constants.getDocumentIcon();
         $("#section-" + textNumber).find("#image-sec-" + textNumber).parents("div.row").find("p.document-description-preview").before(`<p class="mb0 doc-name">${fileTypeIcon}&nbsp;<span class="semi-bold teams-link a-link font-14">` + $("input[type='file']#upload-document")[0].files[0].name + ` (` + Math.round(docfilesize) + ` Kb)</span></p>`);
     }
-    $("#section-" + textNumber).find("textarea:last").after(`<textarea id="attachment-id" class="d-none" ></textarea>`);
+    $("#section-" + textNumber).find("textarea:last").after(UxUtils.createTextArea("", "", "attachment-id", "", "d-none"));
 });
 
 /**
@@ -932,7 +903,7 @@ let imagesPreview = function(input, placeToInsertImagePreview) {
             Localizer.getString("maximum_images_allowed").then(function(result) {
                 let msg = result;
                 Localizer.getString("alert").then(function(result) {
-                    $("div.text-section:visible div.relative").before(`<span class="text-danger error-msg float-right"> ${msg}</span><div class="clearfix"></div>`);
+                    $("div.text-section:visible div.relative").before(UxUtils.getMaxImageAlert(result));
                 });
             });
             return false;
@@ -948,7 +919,7 @@ let imagesPreview = function(input, placeToInsertImagePreview) {
                 if (isSuccess) {
                     isSuccess = true;
                 } else {
-                    $("div.text-section:visible div.relative").before(`<span class="text-danger float-right">Invalid file formate</span><div class="clearfix"></div>`);
+                    $("div.text-section:visible div.relative").before(UxUtils.getMaxImageAlert(invalidFileFormatKey));
                     return false;
                 }
             }
@@ -964,13 +935,17 @@ let imagesPreview = function(input, placeToInsertImagePreview) {
         let count = 0;
         let newPhotos = new Array();
         let photoUploadCounter = 0;
+        console.log('1');
+
         for (let i = 0; i < filesAmount; i++) {
             let reader = new FileReader();
             let $liList = $(`<li data-target="#carouselExampleIndicators${uniqueCarouselId}" data-slide-to="${i}" class="${i == 0 ? "active": ""}"></li>`);
             $olSection.append($liList);
             reader.onload = function(event) {
+                $(`#carouselExampleIndicators${uniqueCarouselId}`).find("carousel-inner").append(UxUtils.getCarousalImages(count, event.target.result));
                 let $imgDiv = $(UxUtils.getCarousalImages(count, event.target.result));
                 $carouselInner.append($imgDiv);
+                console.log('2', event.target.result);
                 count++;
             };
             reader.readAsDataURL(input.files[i]);
@@ -1036,11 +1011,11 @@ $(document).on("change", "#upload-video", function() {
         let inputVideoSize = fileInput.files[0].size;
         let sizeOf1MB = 1048576;
         if ((inputVideoSize / sizeOf1MB) > videoSize) {
-            $(".video-box").parent(".relative").before(`<span class="text-danger font-12 pull-right">${Constants.getInvalidFileSizeMsg()}</span><div class="clearfix"></div>`);
+            $(".video-box").parent(".relative").before(UxUtils.getMaxImageAlert(Constants.getInvalidFileSizeMsg()));
             return false;
         }
         if ($.inArray(fileInput.files[0].type, videoFormate) == -1) {
-            $(".video-box").parent(".relative").before(`<span class="text-danger font-12 pull-right">${Constants.getInvalidFileMsg()}</span><div class="clearfix"></div>`);
+            $(".video-box").parent(".relative").before(UxUtils.getMaxImageAlert(Constants.getInvalidFileMsg()));
             return false;
         }
         $("button#video-done").addClass("disabled");
@@ -1351,12 +1326,12 @@ async function getStringKeys() {
         coverImageKey = result;
     });
 
-    Localizer.getString("tap_upload_image").then(function(result) {
+    Localizer.getString("tapUploadImage").then(function(result) {
         $(".tap-upload-label").text(result);
         uploadImageLabelKey = result;
     });
 
-    Localizer.getString("tap_upload_file").then(function(result) {
+    Localizer.getString("tapUploadFile").then(function(result) {
         $(".tap-upload-files-label").text(result);
         uploadFileLabelKey = result;
     });
@@ -1401,15 +1376,15 @@ async function getStringKeys() {
     });
 
     Localizer.getString("tapUploadPhoto").then(function(result) {
-        $(".tap-upload-label").text(result);
+        $(".tap-upload-photo-label").text(result);
         uploadImageLabelKey = result;
     });
 
-    Localizer.getString("upload_photo").then(function(result) {
+    Localizer.getString("uploadPhoto").then(function(result) {
         $(".upload-photo-label").text(result);
     });
 
-    Localizer.getString("description_content_about").then(function(result) {
+    Localizer.getString("descriptionContentAbout").then(function(result) {
         $(".desc-content-about-placeholder").attr("placeholder", result);
     });
 
@@ -1462,11 +1437,25 @@ async function getStringKeys() {
 
     Localizer.getString("addTitlePlaceholder").then(function(result) {
         addTitlePlaceholderKey = result;
+        $('#image-training-text').attr('placeholder', result);
     });
 
     Localizer.getString("addDescriptionPlaceholder").then(function(result) {
         addDescriptionPlaceholderKey = result;
     });
+
+    Localizer.getString("correctChoice").then(function(result) {
+        correctChoiceKey = result;
+    });
+
+    Localizer.getString("invalidFileFormat").then(function(result) {
+        invalidFileFormatKey = result;
+    });
+
+    Localizer.getString("atleastOneQuestion").then(function(result) {
+        atleastOneErrorKey = result;
+    });
+
 }
 
 /**
@@ -1890,21 +1879,20 @@ async function getTheme() {
                 ActionHelper.executeApi(req2)
                     .then(function(response) {
                         $("#training-title-image").attr("src", `${response.attachmentInfo.downloadUrl}`);
-                        $("#training-title-image").addClass('heightfit');
+                        $("#training-title-image").addClass("heightfit");
                         $("#training-title-image").parent().show();
                         $("#training-img-preview").attr("src", `${response.attachmentInfo.downloadUrl}`);
                         $(".section-1").find(".training-updated-img").show();
                         $(".section-1").find(".photo-box").hide();
                         $(".section-2").find(".img-thumbnail").show();
                         $(".section-2").find("#training-title-image").show();
-                        $('.training-clear').show();
+                        $(".training-clear").show();
                     })
                     .catch(function(error) {
                         console.error("AttachmentAction - Error: sasasa" + JSON.stringify(error));
                     });
                 $("#cover-image").after(`<textarea name="training_title" class="training-title" style="display:none">${$("#training-title").val()}</textarea>`);
                 $("#cover-image").after(`<textarea name="training_description" class="training-description" style="display:none">${$("#training-description").val()}</textarea>`);
-                // $("#cover-image").after(`<span name="is_edit" class="training-is_edit" >Edit</span>`);
             }
 
             /* Create Text and Question summary */
@@ -1958,32 +1946,6 @@ async function getTheme() {
                                 $("#section-" + counter).find(".photo-description-preview").addClass("show-text");
                                 $("#section-" + counter).find(".photo-description-preview").css({ "-webkit-line-clamp": Constants.webkitLineClampCssCount() });
                                 $("#section-" + counter).find(".photo-description-preview").after(Constants.getLoadMoreLink());
-                            }
-
-                            let dname = Utils.isJson(data.options[0].displayName) ? JSON.parse(data.options[0].displayName) : data.options[0].displayName;
-                            let attachment = Utils.isJson(dname.attachmentId) ? JSON.parse(dname.attachmentId) : dname.attachmentId;
-                            if (attachment != undefined) {
-                                $("#text-section-" + counter + " textarea#attachment-id").val(attachment);
-
-                                let attachmentImg = "";
-                                $.each(attachment, function(ind, att) {
-                                    attachmentImg = att;
-                                    return false;
-                                });
-                                let req = ActionHelper.getAttachmentInfo(attachmentImg);
-                                let filesAmount = Object.keys(attachment).length;
-                                ActionHelper.executeApi(req)
-                                    .then(function(response) {
-                                        console.info("Attachment - Response: " + JSON.stringify(response));
-                                        $("img#image-sec-" + counter).attr("src", response.attachmentInfo.downloadUrl);
-                                        if (filesAmount > 1) {
-                                            $("img#image-sec-" + counter).after(`<span class="file-counter">+${filesAmount-1}</span>`);
-                                        }
-                                    })
-                                    .catch(function(error) {
-                                        console.error("AttachmentAction - Error: " + JSON.stringify(error));
-                                    });
-
                             }
 
                         } else if (data.name.indexOf("document") >= 0) {
@@ -2183,30 +2145,33 @@ $(document).on("click", "#next1", function() {
 
                 if (element.attr("id") == "training-title") {
                     $("#training-title").addClass("danger");
-                    $("#training-title").before(`<label class="label-alert d-block mb--4">${requiredKey}</label>`);
+                    $("#training-title").before(UxUtils.getRequiredError(requiredKey));
                 }
             } else {
+
+                let trainingTitle = $("#training-title").val();
+                let trainingDesc = $("#training-description").val();
                 $(".section-1").hide();
                 $("div.section-1-footer").hide();
 
                 $(".section-2").show();
                 $("div.section-2-footer").show();
 
-                $("#training-title-content").text($("#training-title").val());
-                if ($("#training-description").val()) {
-                    $("#training-description-content").text($("#training-description").val());
+                $("#training-title-content").text(trainingTitle);
+                if (trainingDesc) {
+                    $("#training-description-content").text(trainingDesc);
                 }
 
                 if ($(".training-title").length > 0) {
-                    $(".training-title").val($("#training-title").val());
+                    $(".training-title").val(trainingTitle);
                 } else {
-                    $("#cover-image").after(`<textarea name="training_title" class="training-title" style="display:none">${$("#training-title").val()}</textarea>`);
+                    $("#cover-image").after(UxUtils.createTextArea('training_title', 'training-title', '', trainingTitle, 'd-none'));
                 }
                 if ($(".training-description").length > 0) {
-                    $(".training-description").val($("#training-description").val());
-                    $("#cover-image").after(`<textarea name="training_description" class="training-description" style="display:none">${$("#training-description").val()}</textarea>`);
+                    $(".training-description").val(trainingDesc);
+                    $("#cover-image").after(UxUtils.createTextArea('training_description', 'training-description', '', trainingDesc, 'd-none'));
                 } else {
-                    $("#cover-image").after(`<textarea name="training_description" class="training-description" style="display:none">${$("#training-description").val()}</textarea>`);
+                    $("#cover-image").after(UxUtils.createTextArea('training_description', 'training-description', '', trainingDesc, 'd-none'));
                 }
             }
         });
@@ -2241,7 +2206,7 @@ $(document).on("change", "#cover-image", function() {
             $(".training-clear").show();
             if (!$("#next1").hasClass("disabled")) {
                 $("#next1").addClass("disabled");
-                $("#next1").prepend(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
+                $("#next1").prepend(UxUtils.getLoaderSpinner());
             }
 
             /* Perform image upload for quiz template */
@@ -2263,7 +2228,7 @@ $(document).on("change", "#cover-image", function() {
                         saveAttachmentData.push(attachmentData);
                         $("#next1").removeClass("disabled");
                         $("#next1").find(`span.spinner-border.spinner-border-sm`).remove();
-                        $("div.section-2").find("div.training-card-section").after(`<textarea id="training-attachment-id" class="d-none">${JSON.stringify(attachmentData)}</textarea>`);
+                        $("div.section-2").find("div.training-card-section").after(UxUtils.createTextArea('', '', 'training-attachment-id', JSON.stringify(attachmentData), 'd-none'));
                         attachmentSet.push(attachmentData);
                     })
                     .catch(function(error) {
@@ -2279,7 +2244,7 @@ $(document).on("change", "#cover-image", function() {
             $("#training-title-image").hide();
             $(".training-clear").hide();
 
-            $(".cover-image-loader").parent().before(`<span class="text-danger pull-right">Invalid file formate</span><div class="clearfix"></div>`);
+            $(".cover-image-loader").parent().before(UxUtils.getMaxImageAlert(invalidFileFormatKey));
         }
     }
 });
@@ -2311,12 +2276,12 @@ $(document).on("click", ".upvj", function(event) {
     event.preventDefault();
     if ($(this).parents("div.section-1").length > 0) {
         $(".section-2").find("div.training-card-section:first").find(`
-                                    input[type = "file"]
-                                    `).click();
+                        input[type = "file"]
+                        `).click();
     } else {
         $(".section-2").find("div.training-card-section:last").find(`
-                                    input[type = "file"]
-                                    `).click();
+                        input[type = "file"]
+                        `).click();
     }
 });
 
@@ -2326,8 +2291,13 @@ $(document).on("click", ".upvj", function(event) {
 /**
  * @event when change on setting inputs
  */
-$(document).on("change", `input[name="expiry_date"], input[name="expiry_time"], .visible-to, #show-correct-answer`, function() {
-    let end = new Date($(`input[name="expiry_date"]`).val() + " " + $(`input[name="expiry_time"]`).val());
+$(document).on("change", `
+                        input[name = "expiry_date"], input[name = "expiry_time"], .visible - to, #show - correct - answer `, function() {
+    let end = new Date($(`
+                        input[name = "expiry_date"]
+                        `).val() + " " + $(`
+                        input[name = "expiry_time"]
+                        `).val());
     let start = new Date();
     let days = calc_date_diff(start, end);
     $(this).parents("div.row").find(".error-msg").remove();
@@ -2515,7 +2485,8 @@ $(document).on({
  * @event Change when question cover image changes
  */
 $(document).on("change", `input[name="question_image"]`, function() {
-    $(".invalid-file-question").remove();
+    // $(".invalid-file-question").remove();
+    $(this).parents('div.form-group-question').find("span.text-danger.error-msg").remove();
     let urlReturn = readURL(this, $(this).parents("div.form-group-question").find(".question-preview-image"));
     if (urlReturn == true) {
         if (!$("#question-done").hasClass("disabled")) {
@@ -2531,7 +2502,7 @@ $(document).on("change", `input[name="question_image"]`, function() {
         if ($(fileData).val() != "") {
             if (!$("#submit").hasClass("disabled")) {
                 $("#submit").addClass("disabled");
-                $("#submit").prepend(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
+                $("#submit").prepend(UxUtils.getLoaderSpinner());
             }
             let coverImage = fileData.files[0];
             let attachment = ActionHelper.attachmentUpload(coverImage, coverImage["type"]);
@@ -2564,7 +2535,8 @@ $(document).on("change", `input[name="question_image"]`, function() {
     } else {
         $(".question-preview-image").attr("src", "");
         $(".question-preview").hide();
-        $(this).parents(".form-group-question").find(".question-preview").before(`<label class="label-alert d-block mb--4 invalid-file-question"><font class="invalid-file-key">${invalidFileFormatKey}</font></label>`);
+        $(this).parents(".form-group-question").find(".question-preview").before(UxUtils.getMaxImageAlert(invalidFileFormatKey));
+        // $(this).parents(".form-group-question").find(".question-preview").before(`<label class="label-alert d-block mb--4 invalid-file-question"><font class="invalid-file-key">${invalidFileFormatKey}</font></label>`);
         $(this).parents("div.input-group-append").find("#question-attachment-id").remove();
         $(this).parents("div.input-group-append").find("#question-attachment-set").remove();
     }
@@ -2574,7 +2546,7 @@ $(document).on("change", `input[name="question_image"]`, function() {
  * @event Change when option cover image changes
  */
 $(document).on("change", `input[name="option_image"]`, function() {
-    $(".invalid-file-option").remove();
+    $(this).parents('div.option-div').find("span.text-danger.error-msg").remove();
     let urlReturn = readURL(this, $(this).parents("div.row").find(".option-preview-image"));
     $(this).parents("div.row").find(".option-preview-image").show();
     $(this).parents("div.row").find("div.option-preview").show();
@@ -2588,7 +2560,7 @@ $(document).on("change", `input[name="option_image"]`, function() {
         if ($(fileData).val() != "") {
             if (!$("#submit").hasClass("disabled")) {
                 $("#submit").addClass("disabled");
-                $("#submit").prepend(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
+                $("#submit").prepend(UxUtils.getLoaderSpinner());
             }
             let coverImage = fileData.files[0];
             let attachment = ActionHelper.attachmentUpload(coverImage, coverImage["type"]);
@@ -2621,7 +2593,8 @@ $(document).on("change", `input[name="option_image"]`, function() {
     } else {
         $(".option-preview-image").attr("src", "");
         $(".option-preview").hide();
-        $(this).parents("div.option-div").prepend(`<label class="label-alert d-block mb--4 invalid-file-option"><font class="invalid-file-key">${invalidFileFormatKey}</font></label>`);
+        $(this).parents("div.option-div").prepend(UxUtils.getMaxImageAlert(invalidFileFormatKey));
+        // $(this).parents("div.option-div").prepend(`<label class="label-alert d-block mb--4 invalid-file-option"><font class="invalid-file-key">${invalidFileFormatKey}</font></label>`);
         $(this).parents("div.option-div").find("#question-attachment-id").remove();
         $(this).parents("div.option-div").find("#question-attachment-set").remove();
     }
@@ -2667,24 +2640,10 @@ $(document).on({
         let element = $(this);
         $(this).parents(".question-container").find(".confirm-box").remove();
         $(this).parents(".question-container").find(".question-required-err").remove();
-
+        let dataId = $(this).parents(".question-container").attr("id");
         if ($("div.question-container:visible").length > 1) {
-            $(this).parents(".question-container").find(".add-options").hide();
-            $(this).parents(".question-container").find(".form-group-opt").after(`
-            <div class="confirm-box">
-                <div class="clearfix"></div>
-                <div class="d-flex-alert  mb--8">
-                    <div class="pr--8">
-                        <label class="confirm-box text-danger">Are you sure you want to delete?</label>
-                    </div>
-                    <div class="pl--8 text-right">
-                        <button type="button" class="btn btn-primary-outline btn-sm cancel-question-delete mr--8">Cancel</button>
-                        <button type="button" class="btn btn-primary btn-sm" id="delete-question">Ok</button>
-                    </div>
-                </div>
-            </div>
-        `);
-
+            // $(this).parents(".question-container").find(".add-options").hide();
+            $(this).parents(".question-container").find(".form-group-opt").after(UxUtils.getDeleteQuestionConfirmBox(dataId, ok, close));
             $([document.documentElement, document.body]).animate({
                 scrollTop: $(this).parents(".question-container").find(".confirm-box").offset().top - 200
             }, 1000);
@@ -2706,15 +2665,9 @@ $(document).on({
                 });
             });
         } else {
-            Localizer.getString("atleastOneQuestion").then(function(result) {
-                $(this).parents("div.question-container")
-                    .find("div.d-flex-ques")
-                    .after(`<label class="text-danger d-block question-required-err"><font class="mb--16 mt--16 d-block">${result}</font></label>`);
-
-            });
-            $([document.documentElement, document.body]).animate({
-                scrollTop: $(".text-danger.d-block:first").offset().top - 200
-            }, 2000);
+            $(this).parents("div.question-container")
+                .find("div.d-flex-ques")
+                .after(`<label class="text-danger d-block question-required-err"><font class="mb--16 mt--16 d-block">${atleastOneErrorKey}</font></label>`);
         }
     }
 }, ".remove-question");
@@ -2730,17 +2683,14 @@ KeyboardUtils.keydownClick(document, ".add-options");
 $(document).on({
     click: function(e) {
         e.preventDefault();
+        $(".max-option-err-box").addClass('d-none');
         if ($(this).parents("div#options").find(`div.option-div input[type="text"][id^=option]`).length >= 10) {
             $(this).parents(".question-container").find(".add-options").hide();
-
+            $(this).parents(".question-container").find(".max-option-err-box").hide();
             Localizer.getString("maximumTenOptions").then(function(result) {
-                $(this).parents(".question-container").find(".add-options").after(`<div class="max-option-err-box">${result}</div>`);
+                $(".max-option-err-box").text(result);
             });
-
-
-            $([document.documentElement, document.body]).animate({
-                scrollTop: $(this).parents(".question-container").find(".max-option-err-box").offset().top - 200
-            }, 1000);
+            $(".max-option-err-box").removeClass('d-none');
             return false;
         }
         $(this).parents(".container").find("div.option-div:last").after(opt.clone());

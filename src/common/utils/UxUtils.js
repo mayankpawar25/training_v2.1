@@ -391,7 +391,7 @@ export class UxUtils {
     /**
      * @Method to get Text Section Edit Area
      * @param counter string contains div counter
-     * @param displayName string contains div Title 
+     * @param displayName string contains div Title
      * @param description string contains div Title Description
      * @param loaderClass string contains Load more Class
      * @param loaderCss string contains Load More Css
@@ -454,7 +454,7 @@ export class UxUtils {
                 <div id="root" class="">
                     <div class="">
                         <div class="form-group mb--16">
-                            <input type="url" class="form-control in-t semi-bold" name="image_text_title" id="image-training-text" value="" placeholder="Add content title">
+                            <input type="url" class="form-control in-t semi-bold" name="image_text_title" id="image-training-text" value="" placeholder="${addTitlePlaceholderKey}">
                         </div>
                         <div class="form-group mb--16">
                             <span class="float-right"><a class="upvj cursor-pointer change-link theme-color mb--4 d-block font-12 semi-bold" style="display:none!important">Edit</a></span>
@@ -499,8 +499,8 @@ export class UxUtils {
                 <div class="container ">
                     <div class="row">
                         <div class="col-9 d-table">
-                            <a class=" cursor-pointer" id="back-photo">
-                                <span tabindex="0" role="button" data-id="back-photo">
+                            <a>
+                                <span tabindex="0" role="button" data-id="back-photo" class="cursor-pointer" id="back-photo">
                                     ${Constants.getRightCaratIcon()} <span class="back-key">Back</span>
                                 </span>
                             </a>
@@ -569,8 +569,8 @@ export class UxUtils {
                 <div class="container ">
                     <div class="row">
                         <div class="col-9 d-table">
-                            <a class=" cursor-pointer" id="back-video">
-                                <span tabindex="0" role="button" data-id="back-video">
+                            <a>
+                                <span tabindex="0" role="button" data-id="back-video" class="cursor-pointer" id="back-video">
                                     ${Constants.getRightCaratIcon()} <span class="back-key">Back</span>
                                 </span>
                             </a>
@@ -739,8 +739,8 @@ export class UxUtils {
                             <div class="row">
                                 <div class="col-9">
                                     <div class="d-table">
-                                        <a id="back">
-                                            <span tabindex="0" class="cursor-pointer" role="button" data-id="back">
+                                        <a>
+                                            <span tabindex="0" class="cursor-pointer" role="button" data-id="back" id="back">
                                                 ${Constants.getRightCaratIcon()} <span class="back-key">Back</span>
                                             </span>
                                         </a>
@@ -1071,8 +1071,8 @@ export class UxUtils {
 
     /**
      * @Method to get Add Download Section
-     * @param {*} textNumber 
-     * @param {*} textData 
+     * @param {*} textNumber
+     * @param {*} textData
      */
     static getAddDownloadSection(textNumber, textData) {
         return `<div class="card-box card-bg card-border training-card-section section-div document-section-div">
@@ -1163,7 +1163,7 @@ export class UxUtils {
      */
     static getCarousalImages(count, resultLocale) {
         return `<div class="carousel-item 12456 ${count == 0 ? "active" : ""}">
-            <img class="d-block w-100" src="${resultLocale}" alt="${count+1} slide">
+            <img class="d-block w-100" src="${resultLocale}" alt="${count + 1} slide">
         </div>`;
     }
 
@@ -1228,8 +1228,8 @@ export class UxUtils {
                             <a userid-data="${userId}" id="hide2">
                                 <span class="cursor-pointer back1"  tabindex="0" role="button">
                                     ${Constants.getRightCaratIcon()}
-                                <span class="back-key"> 
-                                    ${resultLocale}
+                                    <span class="back-key">
+                                        ${resultLocale}
                                     </span>
                                 </span>
                             </a>
@@ -1253,7 +1253,7 @@ export class UxUtils {
                         <a id="hide2">
                             <span class="cursor-pointer back" tabindex="0" role="button">
                                 ${Constants.getRightCaratIcon()}
-                                <span class="back-key"> 
+                                <span class="back-key">
                                     ${resultLocale}
                                 </span>
                             </span>
@@ -1306,6 +1306,24 @@ export class UxUtils {
     }
 
     /**
+     * @Method getNonRespondersInitials contains initals section area
+     * @param initials string non repsonders initials
+     * @param name string contains non responders name
+     */
+    static getNonRespondersInitials(initials, name) {
+        return `<tr>
+            <td>
+                <div class="d-flex">
+                    <div class="avtar">
+                        ${initials}
+                    </div>
+                    <div class="avtar-txt">${name}</div>
+                </div>
+            </td>
+        </tr>`;
+    }
+
+    /**
      * @Method contains total people responded area in summary view
      * @param xofy string total number of responders out of total members in the group
      */
@@ -1321,13 +1339,11 @@ export class UxUtils {
      * @param participationPercentage Float contains participation percentage
      */
     static getParticipationProgress(resultLocale, participationPercentage) {
-        return `<label class="mb--8">
-            <strong classs="semi-bold">
-                ${resultLocale}
-            </strong>
-        </label>
-        <div class="progress mb--8">
-            <div class="progress-bar bg-primary" role="progressbar" style="width: ${participationPercentage}%" aria-valuenow="${participationPercentage}" aria-valuemin="0" aria-valuemax="100">
+        return `<label class="mb--4">
+                <strong>${resultLocale} </strong>
+            </label>
+            <div class="progress mb-2">
+                <div class="progress-bar bg-primary" role="progressbar" style="width:${participationPercentage}%" aria-valuenow="${participationPercentage}" aria-valuemin="0" aria-valuemax="100">
             </div>
         </div>`;
     }
@@ -2006,7 +2022,7 @@ export class UxUtils {
      * @param displayName string question title
      */
     static getQuestionTitleContainer(displayName) {
-        return `<div class="semi-bold font-16 mb--16 ">${displayName}</div>`;
+        return `<div class="semi-bold font-16 mb--16">${displayName}</div>`;
     }
 
     /**
@@ -2219,7 +2235,7 @@ export class UxUtils {
      * @Param trainingName contains training title
      */
     static trainingTitle(displayName) {
-        return `<p class="mt--16 font-16 semi-bold">${displayName}</p>`;
+        return `<p class="mt--16 font-16 semi-bold text-break">${displayName}</p>`;
     }
 
     /**
@@ -2299,4 +2315,430 @@ export class UxUtils {
         </div>`;
     }
 
+    /**
+     * @Method to get error div when remove option
+     * @param errorText string contains error text
+     */
+    static getOptionError(errorText) {
+        return `<div class="mt--8 mb--8 text-danger error-msg">${errorText}</div>`;
+    }
+
+    /**
+     * @Method contains correct option error section
+     * @param errorText string contains error text
+     */
+    static checkCorrectOptionError(errorText) {
+        return `<div class="clearfix"></div>
+                <label class="label-alert d-block option-required-err text-left pull-left mt--8 mb--16"><font>${errorText}</font></label>
+                <div class="clearfix"></div>`;
+    }
+
+    /**
+     * @Method contains textarea content
+     * @param name string  contains name value
+     * @param className string  contains Class value
+     * @param id string  contains id value
+     * @param value string  contains name value
+     * @param style string  contains style value
+     */
+    static createTextArea(name, className, id, value, style) {
+        return `<textarea name="${name}" class="${className} ${style}" id="${id}">${value}</textarea>`;
+    }
+
+    /**
+     * @Method contains response view launch section
+     *
+     */
+    static getThemeSection() {
+        return `<div class="row"><div class="col-12"><div id="root"></div></div></div>`;
+    }
+
+    /**
+     * @Method contains Body Card section
+     *
+     */
+    static getBodyCardSection() {
+        return `<div class="card"></div>`;
+    }
+
+    /**
+     * @Method contains Body Span section
+     *
+     */
+    static getBodySpanSection() {
+        return `<div class="col-sm-12"></div>`;
+    }
+
+    /**
+     * @Method contains training expired title
+     * @param trainingExpired string contains training Expired text
+     */
+    static getTrainingExpiredTitle(trainingExpired) {
+        return `<div class="form-group">${trainingExpired}</div>`;
+    }
+
+    /**
+     * @Method contains Multiple attempt string section
+     * @param result string contains multiple attempt section text
+     */
+    static getMultipleAttemptSection(result) {
+        return `<div><b> ${result} </b></div`;
+    }
+
+    /**
+     * @Method contains loader spinner section
+     *
+     */
+    static getLoaderSpinner() {
+        return `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`;
+    }
+
+    /**
+     * @Method contains radio button section
+     * @param text string contains Radio Button text
+     * @param name contains Radio Button name
+     * @param id string identifire
+     */
+    static getRadioButtonSection(text, name, id) {
+        return `<div class="option-sec">
+        <div class="card-box card-bg card-border mb--8">
+            <div class="radio-section custom-radio-outer" id="${id}" columnId="${name}" >
+                <label class="custom-radio d-block font-14 cursor-pointer selector-inp">
+                    <input type="radio" name="${name}" id="${id}">
+                        <span class="radio-block"></span>  <div class="pr--32 check-in-div">${text}</div>
+                </label>
+            </div>
+        </div>
+    </div>`;
+    }
+
+    /**
+     * @Method contains CheckBox button section
+     * @param text string contains Checkbox Button text
+     * @param name contains Checkbox Button name
+     * @param id string identifire
+     */
+    static getCheckboxButtonSection(text, name, id) {
+        return `<div class="option-sec">
+        <div class="card-box card-bg card-border mb--8">
+            <div class="radio-section custom-check-outer selector-inp" id="${id}" columnId="${name}" >
+                <label class="custom-check form-check-label d-block">
+                    <input type="checkbox" class="radio-block" name="${name}" id="${id}">
+                        <span class="checkmark"></span> <div class="pr--32 check-in-div">${text}</div>
+                </label>
+            </div>
+        </div>
+    </div>`;
+    }
+
+    /**
+     * @Method contains question card-box section
+     */
+    static getQuestionCardBoxSection() {
+        return `<div class="card-box card-blank card-box-question"></div>`;
+    }
+
+    /**
+     * @Method contains question heading section
+     * @param questionNumber contains question counter
+     * @param questiondisplayName contains question display name text
+     */
+    static getQuestionHeadingSection(questionNumber, questiondisplayName) {
+        return `<div class="d-table mb--8 pre-none">
+                        <label class="font-12">
+                            <strong class="question-number-title bold>
+                                <label class="font-12">
+                                    <span class="training-type question-number">Question</span>&nbsp;#&nbsp;
+                                <span class="">${questionNumber}</span>
+                                </label>
+                            </strong>
+                        </label>
+                        <label class="float-right result-status" id="status-1"></label>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="quiz-updated-img cover-img min-max-132 mb--8 bg-none bdr-none" style="display:none">
+                        <img src="" class="image-responsive question-template-image heightfit" style="">
+                    </div>
+                    <div class="semi-bold font-14 mb--16 question-title"><p class="">${questiondisplayName}</p></div>`;
+    }
+
+    /**
+     * @Method contains question heading section
+     * @param trainingSummary string contains training summary text
+     */
+    static getTrainingSummaryViewSection(trainingSummary) {
+        return `<div class="section-3"><div class="container"><label><strong>${trainingSummary}</strong></label></div></div>`;
+    }
+
+    /**
+     * @Method contains Response View carousel section
+     */
+    static getResponseViewCarouselSection() {
+        return `<div id="carouselExampleIndicators" class="carousel slide max-min-220" data-ride="carousel"></div>`;
+    }
+
+    /**
+     * @Method contains Response View carousel ol section
+     */
+    static getCarouselOlSection() {
+        return `<ol class="carousel-indicators"></ol>`;
+    }
+
+    /**
+     * @Method contains Response View carousel Inner section
+     */
+    static getCarouselInnerSection() {
+        return `<div class="carousel-inner"></div>`;
+    }
+
+    /**
+     * @Method contains Response View Training Document section
+     * @param url contains Document url
+     * @param documentName string contains Document name
+     */
+    static getTrainingDocumentSection(url, documentName) {
+        return `<p class="doc-name">${Constants.getDocumentIcon()} <a href="${url}" class="font-14 semi-bold teams-link a-link" download>${documentName}</a></p>`;
+    }
+
+    /**
+     * @Method contains contains Response View Training Video section
+     * @param url contains Video url
+     * @param videoName string contains video name
+     */
+    static getTrainingVideoSection(videoName, url) {
+        return `<div class="embed-responsive embed-responsive-4by3"><video controls="" playsinline class="video" id="${videoName}" src="${url}"></video></div>`;
+
+    }
+
+    /**
+     * @Method contains contains Response View Quiz Option Images Section
+     * @param videoName contains quiz option image url
+     */
+    static getQuizOptionImage(imageUrl) {
+        return `<div class="option-image-section cover-img min-max-132 mb--4" id="quiz-ans-image">
+                    <img src="${imageUrl}" class="opt-image img-responsive heightfit">
+                </div>`;
+
+    }
+
+    /**
+     * @Method contains contains Response View Training section
+     */
+    static getTrainingSection() {
+        return `<div class="section-2"><div class="container"></div></div>`;
+
+    }
+
+    /**
+     * @Method contains Response View Next Button Span
+     */
+    static getNextBtnSpan() {
+        return `<span class="next-btn-sec"></span>`;
+
+    }
+
+    /**
+     * @Method to get Maximum image upload error
+     */
+    static getMaxImageAlert(errorText) {
+        return `<span class="text-danger error-msg float-right"> ${errorText}</span><div class="clearfix"></div>`;
+    }
+
+    /**
+     * @Method to get content limit
+     * @param errorText string contains error text
+     */
+    static getContentLimitExceed(errorText) {
+        return `<span class="text-danger content-limit-exceed">${errorText}</span>`;
+    }
+
+    /**
+     * @Method to create div with class
+     * @param classData string contains html class value
+     * @param icData string contains html id value
+     */
+    static divTemplate(classData, idData="") {
+        return `<div class="${classData}" id="${idData}"></div>`;
+    }
+
+    /**
+     * @Method to create div with class
+     * @param classData string contains html class value
+     * @param icData string contains html id value
+     */
+    static labelTemplate(classData, idData="") {
+        return `<label class="${classData}" id="${idData}"></label>`;
+    }
+
+    /**
+     * @Method to clear html
+     * @param selector string contains html identifier selector
+     */
+    static clearHtml(selector) {
+        return $(selector).html("");
+    }
+
+    /**
+     * @Method to get responders inital with date
+     * @param myUserId string Identifier contains user name
+     * @param initials string contains user initals
+     * @param name string name contains user name
+     * @param respondeDate Date contains respond date
+     */
+    static getRespondersInitials(myUserId, initials, name, respondeDate) {
+        return `<table class="table" cellspacing="0" id="responder-table">
+            <tbody>
+                <tr id="${myUserId}" class="getresult cursor-pointer">
+                    <td>
+                        <div class="d-flex ">
+                            <div class="avtar">
+                                ${initials}
+                            </div>
+                            <div class="avtar-txt">${name}</div>
+                        </div>
+                    </td>
+                    <td class="text-right avtar-txt">
+                        ${respondeDate}
+                        ${Constants.getLeftCaratIcon()}
+                    </td>
+                </tr>
+            </tbody>
+        </table>`;
+    }
+
+    /**
+     * @Method to get content title with counter
+     * @param count Integer content number
+     * @param resultLocale string contains localization string
+     * @param displayName string name contains user name
+     */
+    static contentSection(count, resultLocale, displayName) {
+        return `<label class="mb0"><strong><span class="counter">${count}</span>.
+            <span class="training-type">${resultLocale}</span></strong>
+        </label>
+        <span class="float-right result"></span>
+        <p class="mb0 text-description text-justify">${displayName}</p>`;
+    }
+
+    /**
+     * @Method to get question title for result view
+     * @param count Integer content number
+     * @param displayName string name contains question title
+     */
+    static getQuestionTileWithCounter(count, displayName) {
+        return `"<strong>${count}. ${displayName}</strong>`;
+    }
+
+    /**
+     * @Method to get question identifier label
+     * @param id string for unique label identification
+     */
+    static questionIdentifierSection(id) {
+        return `<label class="float-right mb0" id="status-${id}"></label>`;
+    }
+
+    /**
+     * @Method to get correc or incorrct section
+     * @param answerIs string for correct or incorrect identificaiton
+     * @param resultLocale string for correct and incorrect locale
+     */
+    static getQuestionCorrectIncorrectSection(answerIs, resultLocale) {
+        return `<span class="${answerIs.toLowerCase() == "correct" ? "text-success" : "text-danger"}">${resultLocale}</span>`;
+    }
+
+    /**
+     * @Method to get content title at result view
+     * @param resultLocale string for content
+     */
+    static getContentTitleSection(resultLocale) {
+        return `<P class="font-16 semi-bold mt--16 text-break" id="question-msg">${resultLocale}</P>`;
+    }
+
+    /**
+     * @Method to set html block inside the html selector
+     * @param selector object html
+     * @param content string for content
+     */
+    static setHtml(selector, content) {
+        $(selector).html(content);
+    }
+
+    /**
+     * @Method to set text inside the html selector
+     * @param selector object html
+     * @param content string for content
+     */
+    static setText(selector, content) {
+        $(selector).text(content);
+    }
+
+    /**
+     * @Method to set html block after the html selector
+     * @param selector object html
+     * @param content string for content
+     */
+    static setAfter(selector, content) {
+        $(selector).after(content);
+    }
+
+    /**
+     * @Method to set html block before the html selector
+     * @param selector object html
+     * @param content string for content
+     */
+    static setBefore(selector, content) {
+        $(selector).before(content);
+    }
+
+    /**
+     * @Method to set html block append the html selector
+     * @param selector object html
+     * @param content string for content
+     */
+    static setAppend(selector, content) {
+        $(selector).append(content);
+    }
+
+    /**
+     * @Method to set html block prepend the html selector
+     * @param selector object html
+     * @param content string for content
+     */
+    static setPrepend(selector, content) {
+        $(selector).append(content);
+    }
+
+    /**
+     * @Method to get option section with success tickmark for correct selected option
+     * @param text string for option text
+     */
+    static getSuccessOptionSection(text) {
+        return `<div class="form-group alert alert-success">
+            <p class="mb0"> ${text} ${Constants.getSuccessTickIcon()} </p>
+        </div>`;
+    }
+
+    /**
+     * @Method to get option section with normal tickmark for correct but not selected option
+     * @param text string for option text
+     */
+    static getNormalCorrectOptionSection(text) {
+        return `<div class="form-group alert alert-normal"><p class="mb0"> ${text} ${Constants.getSuccessTickIcon()}</p></div>`;
+    }
+
+    /**
+     * @Method to get option section with danger for incorrect
+     * @param text string for option text
+     */
+    static getDangerOptionSection(text) {
+        return `<div class="alert alert-danger"><p class="mb0"> ${text} <i class="fa fa-pull-right fa-close"></i></p></div>`;
+    }
+
+    /**
+     * @Method to get option section with normal block
+     * @param text string for option text
+     */
+    static getNormalOptionSection(text) {
+        return `<div class="alert alert-danger"><p class="mb0"> ${text} <i class="fa fa-pull-right fa-close"></i></p></div>`;
+    }
 }
