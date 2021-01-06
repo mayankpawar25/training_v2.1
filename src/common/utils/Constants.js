@@ -254,6 +254,24 @@ export class Constants {
     }
 
     /**
+     * @Method for get Checked Tick Icon
+     */
+    static getCheckedTickIcon() {
+        return `<i class="success-with-img"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
+            <defs>
+                <clipPath id="clip-Custom_Size_1">
+                <rect width="16" height="16"/>
+                </clipPath>
+            </defs>
+            <g id="Custom_Size_1" data-name="Custom Size – 1" clip-path="url(#clip-Custom_Size_1)">
+                <rect width="16" height="16" fill="none"/>
+                <path id="Path_1" data-name="Path 1" d="M16.026,0a.535.535,0,0,1,.392.165.535.535,0,0,1,.165.392.535.535,0,0,1-.165.392L7.23,10.136a.546.546,0,0,1-.783,0l-5.29-5.29a.546.546,0,0,1,0-.783.546.546,0,0,1,.783,0l4.9,4.889,8.8-8.787A.535.535,0,0,1,16.026,0Z" transform="translate(-0.787 2.475)" />
+            </g>
+        </svg></i>`;
+
+    }
+
+    /**
      * @Method for get Plus Icon
      */
     static getPlusIcon() {
@@ -418,8 +436,8 @@ export class Constants {
     /**
      * @Method for getting Load More for description text
      */
-    static getLoadMoreLink() {
-        return `<a class="moreless-button cursor-pointer a-link font-12 semi-bold teams-link">Load more...</a>`;
+    static getLoadMoreLink(loadMoreKey) {
+        return `<a class="moreless-button cursor-pointer a-link font-12 semi-bold teams-link">${loadMoreKey}</a>`;
     }
 
     /**
@@ -524,6 +542,52 @@ export class Constants {
      */
     static getCorrectAnswerIndex() {
         return 6;
+    }
+
+    /**
+     * @Method to get Multiple Attempt index Value
+     */
+    static getMultipleAttemptIndex() {
+        return 5;
+    }
+
+    /**
+     * @Method to get Show Answer Every Question index Value
+     */
+    static getisShowAnswerEveryQuestionIndex() {
+        return 3;
+    }
+
+    /**
+     * @Method for get Next carat icon
+     */
+    static getNextCaratIcon() {
+        return `<svg role="presentation" focusable="false" viewBox="8 8 16 16 " class="next-btn">
+                                <path class="ui-icon__outline gr" d="M16.38 20.85l7-7a.485.485 0 0 0 0-.7.485.485 0 0 0-.7 0l-6.65 6.64-6.65-6.64a.485.485 0 0 0-.7 0 .485.485 0 0 0 0 .7l7 7c.1.1.21.15.35.15.14 0 .25-.05.35-.15z"></path>
+                                <path class="ui-icon__filled" d="M16.74 21.21l7-7c.19-.19.29-.43.29-.71 0-.14-.03-.26-.08-.38-.06-.12-.13-.23-.22-.32s-.2-.17-.32-.22a.995.995 0 0 0-.38-.08c-.13 0-.26.02-.39.07a.85.85 0 0 0-.32.21l-6.29 6.3-6.29-6.3a.988.988 0 0 0-.32-.21 1.036 1.036 0 0 0-.77.01c-.12.06-.23.13-.32.22s-.17.2-.22.32c-.05.12-.08.24-.08.38 0 .28.1.52.29.71l7 7c.19.19.43.29.71.29.28 0 .52-.1.71-.29z"></path>
+                            </svg>`;
+    }
+
+    static getCorrectString() {
+        return `Correct`;
+    }
+
+    static getIncorrectString() {
+        return `Incorrect`;
+    }
+
+    /**
+     * @Method cpntains loader section div
+     * @param className string contains Div class name
+     */
+    static getLoaderCover(className) {
+        return `<div class="loader-cover ${className}" style="display: none;">
+                <div class="d-table-cell">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </div>`;
     }
 
 }

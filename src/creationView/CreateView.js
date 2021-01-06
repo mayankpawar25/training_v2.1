@@ -1,40 +1,32 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-
 import { Localizer, ActionHelper } from "../common/ActionSdkHelper";
 import { UxUtils } from "../common/utils/UxUtils";
 import { Utils } from "../common/utils/Utils";
 import { Constants } from "../common/utils/Constants";
 import { KeyboardUtils } from "../common/utils/KeyboardUtils";
+import "../../assets/js/bootstrap-localefile";
 
 let questions = new Array();
-let validate = true;
 let settingText = "";
 let opt = "";
 let request;
 let lastSession = null;
-
-let addMoreOptionsKey = "";
 let choicesKey = "";
 let checkMeKey = "";
 let nextKey = "";
 let backKey = "";
 let requiredKey = "";
 let dueByKey = "";
-let questionLeftBlankKey = "";
 let submitKey = "";
 let resultVisibleToKey = "";
-let resultEveryoneKey = "";
-let resultMeKey = "";
 let correctAnswerKey = "";
 let everyoneKey = "";
 let onlyMeKey = "";
 let showCorrectAnswerKey = "";
 let answerCannotChangeKey = "";
-let questionCount = 0;
 let questionTitleKey = "";
 let questionKey = "";
-let optionKey = "";
 let clearKey = "";
 let atleastOneContentKey = "";
 let allowMultipleAttemptKey = "";
@@ -44,16 +36,38 @@ let trainingTitleKey = "";
 let assigneeTakeMultipleTraining = "";
 let trainingDescriptionOptionalKey = "";
 let addContentKey = "";
-let ok = "";
-let close = "";
+let okKey = "";
+let closeKey = "";
 let saveAttachmentData = new Array(); // Add Training Banner Image
-let uploadImageLabelKey = "";
 let addTitlePlaceholderKey = "";
 let addDescriptionPlaceholderKey = "";
+let addTextDescriptionPlaceholderKey = "";
+let uploadImageLabelKey = "";
 let uploadFileLabelKey = "";
 let uploadVideoLabelKey = "";
-let contentLimitExceedKey = "";
-let maxTenOptionKey = "";
+let correctChoiceKey = "";
+let invalidFileFormatKey = "";
+let atleastOneErrorKey = "";
+let buttonCounter = 0;
+let loadMoreKey = "";
+let loadLessKey = "";
+let enterTheChioceKey = "";
+let addMoreOptionsKey = "";
+let addQuestionsKey = "";
+let doneKey = "";
+let confirmDeleteMsgKey = "";
+let confirmDeleteContentMsgKey = "";
+let cancelKey = "";
+let discardKey = "";
+
+let nweekKey = "";
+let weekKey = "";
+let hourKey = "";
+let hoursKey = "";
+let minuteKey = "";
+let minutesKey = "";
+let daysKey = "";
+let questionsKey = "";
 
 /***********************************  Manage Questions *********************************/
 
@@ -64,14 +78,15 @@ let maxTenOptionKey = "";
  */
 $(document).on("click", ".moreless-button", function() {
     $(".more-text").slideToggle();
-    if ($(this).text() == "Load more...") {
-        $(this).text("Load less");
+    if ($(this).text() == loadMoreKey) {
+        UxUtils.setText(this, loadLessKey);
         $(this).parent().find(".show-text").css({ "-webkit-line-clamp": "" });
     } else {
-        $(this).text("Load more...");
+        UxUtils.setText(this, loadMoreKey);
         $(this).parent().find(".show-text").css({ "-webkit-line-clamp": Constants.webkitLineClampCssCount() });
     }
 });
+
 
 /**
  * @event to increase textarea height
@@ -91,7 +106,7 @@ $(document).on("focusin", `.option-div, .input-group-append, .input-group, .inpu
 /**
  * @event Focusout to hide trash on focusout at input
  */
-$(document).on("focusout", ".option-div, .input-tpt, .input-tpt .remove-option, .check-me-title, .input-group input[type='text']", function() {
+$(document).on("focusout", `.option-div, .input-tpt, .input-tpt .remove-option, .check-me-title, .input-group input[type="text"]`, function() {
     $(this).parents("div.row").find(".remove-option").hide();
 });
 
@@ -101,10 +116,12 @@ $(document).on("focusout", ".option-div, .input-tpt, .input-tpt .remove-option, 
 $(document).on("click", "#add-questions", function() {
     getStringKeys();
     let textNumber = parseInt($("div.training-card-section.section-div").length);
+    $("form.sec1").find("div.content-limit-exceed").remove();
     if (textNumber == 30) {
         Localizer.getString("contentLimitExceed").then(function(result) {
-            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(`<span class="text-danger content-limit-exceed">${result}</span>`);
+            UxUtils.setAfter($("form.sec1 div.section-2 div.container:last"), UxUtils.getContentLimitExceed(result));
         });
+        return true;
     }
     $(".error-msg").remove();
     $(".section-2").hide();
@@ -115,10 +132,13 @@ $(document).on("click", "#add-questions", function() {
         $("form.sec1 > .question_button").remove();
         $("form.sec1 > div.question-footer").remove();
     }
+    questionsSection = UxUtils.getQuestionArea(questionKey, questionTitleKey, checkMeKey, enterTheChioceKey, addMoreOptionsKey);
+    addQuestionButton = UxUtils.getAddQuestionButton(addQuestionsKey);
+    questionFooter = UxUtils.getQuestionAreaFooter(doneKey);
 
-    $("form.sec1").append(questionsSection);
-    $("form.sec1").append(addQuestionButton);
-    $("form.sec1").append(questionFooter);
+    UxUtils.setAppend("form.sec1", questionsSection);
+    UxUtils.setAppend("form.sec1", addQuestionButton);
+    UxUtils.setAppend("form.sec1", questionFooter);
 
     let questionCounter = 0;
     $("div.question-section-div:visible").each(function(index, elem) {
@@ -137,22 +157,29 @@ $(document).on("click", "#add-questions", function() {
  * @event to add question to same section when new question added
  */
 $(document).on("click", "#add-questions-same-section", function() {
+    $("form.sec1").find("div.content-limit-exceed").remove();
+    let questionDivLength = parseInt($("div.question-section").length);
+    let contentDivLength = parseInt($("div.training-card-section.section-div").length);
+    let textNumber = questionDivLength + contentDivLength;
+    if (textNumber == 30) {
+        Localizer.getString("contentLimitExceed").then(function(result) {
+            UxUtils.setAfter($("form.sec1").find("div.question_button"), UxUtils.getContentLimitExceed(result));
+        });
+        return true;
+    }
     let questionCounter;
-    $("form.sec1").append(questionsSection);
+    questionsSection = UxUtils.getQuestionArea(questionKey, questionTitleKey, checkMeKey, enterTheChioceKey, addMoreOptionsKey);
+    UxUtils.setAppend("form.sec1", questionsSection);
     $("form > .question_button").remove();
-
     $("div.question-container:visible").each(function(index, elem) {
         questionCounter = index + 1;
-        $(elem)
-            .find("span.question-number")
-            .html(UxUtils.getQuestionNumber(questionKey, questionCounter));
+        UxUtils.setHtml($(elem).find("span.question-number"), UxUtils.getQuestionNumber(questionKey, questionCounter));
         $(elem).attr({
             id: "question" + questionCounter
         });
     });
-    questionCount++;
-    $("form.sec1").append(addQuestionButton);
-
+    addQuestionButton = UxUtils.getAddQuestionButton(addQuestionsKey);
+    UxUtils.setAppend("form.sec1", addQuestionButton);
     /* Focus to last question input */
     $("#question" + questionCounter + " #question-title").focus();
     return false;
@@ -169,16 +196,14 @@ $(document).on("click", "#back-question", function() {
  * @event to remove sections
  */
 $(document).on("click", ".remove-image-section", function() {
-    let element = $(this);
     let dataId = $(this).parents(".question-container").attr("id");
     $("div.question-section").find("div.error-msg").remove();
     if ($("div.question-container:visible").length > 1) {
-        let confirmBox = UxUtils.getDeleteQuestionConfirmBox(dataId, ok, close);
-        // $(this).parents("div.card-box").removeClass("card-box").addClass("card-box-alert");
-        $(this).parents("div.question-container").find("div.d-flex").after(confirmBox);
+        let confirmBox = UxUtils.getDeleteQuestionConfirmBox(dataId, okKey, closeKey, confirmDeleteMsgKey);
+        UxUtils.setAfter($(this).parents("div.question-container").find("div.d-flex"), confirmBox);
     } else {
         Localizer.getString("atleastOneQuestion").then(function(result) {
-            $(this).parents("div.card-box:visible").prepend(getAtLeastOneQuestionError(result));
+            UxUtils.setPrepend($(this).parents("div.card-box:visible"), UxUtils.getAtLeastOneQuestionError(result));
         });
     }
 });
@@ -222,17 +247,22 @@ $(document).on("click", "#delete-question", function() {
  * @Event to remove option
  */
 
-$(document).on("click", ".remove-option", function(eve) {
+$(document).on("click", ".remove-option", function() {
     $("div.question-section").find("div.error-msg").remove();
+
+    $(this).parents(".question-container").find(".max-option-err-box").hide();
+    $(this).parents("div.question-container").find("button.add-options").show();
+
     if ($(this).parents("div.question-container").find("div.option-div").length > 2) {
         let selector = $(this).closest("div.container");
         $(this).parents("div.option-div").remove();
         $(selector)
-            .find("div.option-div div.input-group input[type='text']")
+            .find(`div.option-div div.input-group input[type="text"]`)
             .each(function(index, elem) {
                 let counter = index + 1;
-                $(elem).attr({
-                    placeholder: "Enter your choice ",
+                Localizer.getString("enterTheChioce").then(function(result) {
+                    enterTheChioceKey = result;
+                    $(elem).attr({ placeholder: result });
                 });
                 $(elem).attr({
                     id: "option" + counter
@@ -247,7 +277,7 @@ $(document).on("click", ".remove-option", function(eve) {
 
     } else {
         Localizer.getString("twoOptionError").then(function(result) {
-            $("div.card-box:visible").append(`<div class="mt--8 mb--8 text-danger error-msg">${result}</div>`);
+            UxUtils.setAppend("div.card-box:visible", UxUtils.getOptionError(result));
         });
     }
 });
@@ -256,19 +286,14 @@ $(document).on("click", ".remove-option", function(eve) {
  * @Event to submit question on click done button
  */
 $(document).on("click", "#question-done", function() {
+    $("form.sec1").find("div.content-limit-exceed").remove();
     /* Validate */
     let errorText = "";
-    let questionNumber = 0;
-    let error = false;
-    validate = true;
-    $("input[type='text']").removeClass("danger");
+    $(`input[type="text"]`).removeClass("danger");
     $("label.label-alert").remove();
     $("div.error-msg").remove();
-
     $("div.card-box-alert").removeClass("card-box-alert").addClass("card-box");
-
     $(".question-container:visible").each(function(qind, quest) {
-
         let isChecked = false;
         $(quest).find("#options").find(`input[type="checkbox"]`).each(function(optind, opt) {
             if ($(opt).prop("checked") == true) {
@@ -278,12 +303,7 @@ $(document).on("click", "#question-done", function() {
 
         if (isChecked != true) {
             // let questionId = $(quest).attr("id");
-            let questionId = qind;
-            $(quest)
-                .find("div.d-flex-ques")
-                .after(`<div class="clearfix"></div>
-                    <label class="label-alert d-block option-required-err text-left pull-left mt--8 mb--16"><font>Please select correct choice for the question</font></label>
-                    <div class="clearfix"></div>`);
+            UxUtils.setAfter($(quest).find("div.d-flex-ques"), UxUtils.checkCorrectOptionError(correctChoiceKey));
             $(quest)
                 .find("div.card-box")
                 .removeClass("card-box")
@@ -298,21 +318,11 @@ $(document).on("click", "#question-done", function() {
     });
 
     $("form")
-        .find("input[type='text']")
+        .find(`input[type="text"]`)
         .each(function() {
             let element = $(this);
             if (element.val() == "") {
-                if (element.attr("id") == "quiz-title") {
-                    errorText += "<p>Quiz title is required.</p>";
-                    $("#quiz-title").addClass("danger");
-                    $("#quiz-title").before(
-                        `<label class="label-alert d-block mb--4"><font class="required-key">${requiredKey}</font></label>`
-                    );
-
-                    if ($(this).find("div.card-box").length > 0) {
-                        $(this).parents("div.card-box").removeClass("card-box").addClass("card-box-alert");
-                    }
-                } else if (element.attr("id").startsWith("question-title")) {
+                if (element.attr("id").startsWith("question-title")) {
                     if ($(element).parents("div.form-group-question").find("img.question-preview-image").attr("src") != "") {
                         // Do nothing
                     } else {
@@ -321,34 +331,22 @@ $(document).on("click", "#question-done", function() {
                         }
                         $(element).addClass("danger");
                         Localizer.getString("questionLeftBlank").then(function(result) {
-                            questionLeftBlankKey = result;
                             $(".question-blank-key").text(result);
-                            $(element).parents("div.form-group-question").find(".question-number").parent("div")
-                                .after(
-                                    `<label class="label-alert d-block mb--4"><font class="question-blank-key">${result}</font></label>`
-                                );
+                            UxUtils.setAfter($(element).parents("div.form-group-question").find(".question-number").parent("div"), UxUtils.createLabelWithFontBox(result, "label-alert d-block mb--4", "question-blank-key", ""));
+
+                            errorText += UxUtils.createParagraphBox(result, "", "");
+
                         });
-                        errorText += "<p>Question cannot not left blank.</p>";
                         $(element).addClass("danger");
                     }
                 } else if (element.attr("id").startsWith("option")) {
                     if ($(element).parents("div.radio-outer").find("img.option-preview-image").attr("src") != "") {
                         // Do nothing
                     } else {
-                        if ($(this).find("div.card-box").length > 0) {
-                            $(this).parents("div.card-box").removeClass("card-box").addClass("card-box-alert");
-                        }
+                        if ($(this).find("div.card-box").length > 0) { $(this).parents("div.card-box").removeClass("card-box").addClass("card-box-alert"); }
                         $(this).addClass("danger");
-                        $(this)
-                            .parents("div.col-12").parents("div.option-div")
-                            .prepend(
-                                `<label class="label-alert d-block mb--4"><font class="required-key">${requiredKey}</font></label>`
-                            );
-
-                        errorText +=
-                            "<p>Blank option not allowed for " +
-                            element.attr("placeholder") +
-                            ".</p>";
+                        UxUtils.setPrepend($(this).parents("div.col-12").parents("div.option-div"), UxUtils.createLabelWithFontBox(requiredKey, "label-alert d-block mb--4", "required-key", ""));
+                        errorText += UxUtils.createParagraphBox(requiredKey, "", "");
                     }
                 }
             }
@@ -370,11 +368,11 @@ $(document).on("click", "#question-done", function() {
                 .find("div.option-div")
                 .each(function(index, elem) {
                     let count = index + 1;
-                    let optionsInputs = `<input type="hidden" class="all_options" id="option${count}" value="${$(elem).find("#option" + count).val()}">`;
+                    let optionsInputs = UxUtils.createInputBox("hidden", "all_options", `option${count}`, $(elem).find("#option" + count).val());
                     let ifCorrectCheck = "";
                     let styleOptionImage = "d-none";
                     let imagePreview = ($(elem).find("div.option-preview:visible").html()) ? $(elem).find("div.option-preview:visible").html() : "";
-                    let optionValue = $(elem).find("#option" + count).val();
+                    let optionValue = ($(elem).find("#option" + count).val()) ? $(elem).find("#option" + count).val() : "&nbsp;";
                     let questionOptionId = `question${j}option${count}`;
 
                     if ($(elem).find("div.option-preview:visible").html()) { styleOptionImage = ""; }
@@ -384,8 +382,8 @@ $(document).on("click", "#question-done", function() {
                         .find("#check" + count)
                         .is(":checked")
                     ) {
-                        ifCorrectCheck = `&nbsp;<i class="success">${Constants.getDefaultTickIcon()}</i>`;
-                        optionChecked += `<input type="checkbox" class="d-none quest-answer" checked>`;
+                        ifCorrectCheck = Constants.getCheckedTickIcon();
+                        optionChecked += UxUtils.createInputBox("checkbox", "d-none quest-answer", "", "", "checked");
                         // if it is checked
                         correct.push(questionOptionId);
                     }
@@ -393,21 +391,21 @@ $(document).on("click", "#question-done", function() {
 
                     let optionFile = ($(elem).find("textarea#option-attachment-set").val()) ? $(elem).find("textarea#option-attachment-set").val() : "";
                     if (optionFile) {
-                        optionAttachments += `<textarea class="d-none option-image${count}">${optionFile}</textarea>`;
+                        optionAttachments += UxUtils.createTextArea("", `d-none option-image${count}`, "", optionFile);
                     }
                 });
-            let questionInput = `<input type="hidden" class="question${j}" value="${$(e).find("#question-title").val()}">`;
+            let questionInput = UxUtils.createInputBox("hidden", `question${j}`, "", $(e).find("#question-title").val());
             let questionInputs = $(e).find("div.card-box").clone();
             let questionText = ($(e).find("#question-title").val() != "") ? $(e).find("#question-title").val() : "";
-            let questionImage = $(e).find("img.question-preview-image").parent().html();
+            let questionImage = $(e).find("div.question-preview").html();
             let hideQuestionImage = "d-none";
             if ($(e).find("img.question-preview-image").attr("src") != "") {
                 $(e).find("img.question-preview-image").addClass("image-responsive question-template-image smallfit");
                 hideQuestionImage = "";
             }
             let questionImagearray = ($(e).find("textarea#question-attachment-set").val()) ? $(e).find("textarea#question-attachment-set").val() : "";
-            $("div#root div.training-card-section:last").after(UxUtils.getQuestionSection(j, optionChecked, questionImage, hideQuestionImage, questionText, optionText, questionInput, questionImagearray, optionAttachments));
-            $("#quest-text-" + textNumber).html(questionInputs);
+            UxUtils.setAfter("div#root div.training-card-section:last", UxUtils.getQuestionSection(j, optionChecked, questionImage, hideQuestionImage, questionText, optionText, questionInput, questionImagearray, optionAttachments));
+            UxUtils.setHtml("#quest-text-" + textNumber, questionInputs);
         });
 
         /* Create Question Section Here */
@@ -464,14 +462,15 @@ $(document).on("click", "#back-text, #back-photo, #back-video, #back-document", 
  * Add Show Confirm box for discard
  */
 function confirmBox() {
-    $("div.discardContent").html(discardContent);
+    let discardContent = UxUtils.getDiscardContentArea(confirmDeleteContentMsgKey, cancelKey, discardKey);
+    UxUtils.setHtml("div.discardContent", discardContent);
 }
 
 /**
  * @Method to Go Back to previous step
  */
 function goBack() {
-    $("div.discardContent").html(" ");
+    UxUtils.setHtml("div.discardContent", " ");
     $(".section-2").show();
     $(".section-2-footer").show();
     $(".text-section").hide();
@@ -489,7 +488,7 @@ function goBack() {
  * @Event to Cancel Confirmation if don't want to discard content
  */
 $(document).on("click", ".cancel", function() {
-    $("div.discardContent").html(" ");
+    UxUtils.setHtml("div.discardContent", " ");
 });
 
 /**
@@ -506,12 +505,13 @@ $(document).on("click", "#add-text", function() {
     $(".error-msg").remove();
     $("#submit").attr("disabled", false);
     $(".loader-overlay").remove();
-
+    $("form.sec1").find("div.content-limit-exceed").remove();
     let textNumber = parseInt($("div.training-card-section.section-div").length);
     if (textNumber == 30) {
         Localizer.getString("contentLimitExceed").then(function(result) {
-            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(`<span class="text-danger content-limit-exceed">${result}</span>`);
+            UxUtils.setAfter("form.sec1 div.section-2 div.container:last", UxUtils.getContentLimitExceed(result));
         });
+        return true;
     }
 
     let textData = "";
@@ -524,10 +524,11 @@ $(document).on("click", "#add-text", function() {
         $("form.sec1 > div.text-footer").remove();
     }
 
-    $("form.sec1").append(addTextSection);
-    $("form.sec1").append(addTextFooter);
-
-    $("form.sec1 div.section-2 div#root div.training-card-section:last").after(UxUtils.getAddTextContainer(textData));
+    addTextSection = UxUtils.getTextContentArea(addTitlePlaceholderKey, addTextDescriptionPlaceholderKey);
+    UxUtils.setAppend("form.sec1", addTextSection);
+    UxUtils.setAppend("form.sec1", addTextFooter);
+    UxUtils.setText($(".back-key"), backKey);
+    UxUtils.setAfter($("form.sec1 div.section-2 div#root div.training-card-section:last"), UxUtils.getAddTextContainer(textData));
 });
 
 /**
@@ -535,15 +536,13 @@ $(document).on("click", "#add-text", function() {
  */
 $(document).on("click", "#text-done", function() {
     let textNumber = parseInt($("div.training-card-section").length) - 1;
-
-    let errorText = "";
     $("textarea").removeClass("danger");
     $("label.label-alert").remove();
 
     if ($("input#training-text").val().length <= 0 || $("textarea#training-text-description").val().length <= 0) {
 
         if ($("textarea#training-text-description").val().length <= 0) {
-            $("textarea#training-text-description").before(UxUtils.getRequiredError(requiredKey));
+            UxUtils.setBefore("textarea#training-text-description", UxUtils.getRequiredError(requiredKey));
             $("textarea#training-text-description").focus();
             $("textarea#training-text-description").addClass("danger");
         } else {
@@ -551,7 +550,7 @@ $(document).on("click", "#text-done", function() {
         }
 
         if ($("input#training-text").val().length <= 0) {
-            $("input#training-text").before(UxUtils.getRequiredError(requiredKey));
+            UxUtils.setBefore("input#training-text", UxUtils.getRequiredError(requiredKey));
             $("input#training-text").focus();
             $("input#training-text").addClass("danger");
         } else {
@@ -568,7 +567,7 @@ $(document).on("click", "#text-done", function() {
         $(".section-2").show();
         $(".section-2-footer").show();
 
-        $("form.sec1 div.section-2:visible div#root div.training-card-section").each(function(index, obj) {
+        $("form.sec1 div.section-2:visible div#root div.training-card-section").each(function(index) {
             if (!$(this).hasClass("question-section-div")) {
                 $(this).attr({
                     "data-id": "text-section-" + index
@@ -576,9 +575,7 @@ $(document).on("click", "#text-done", function() {
                 $(this).attr({
                     "id": "section-" + index
                 });
-                if (!($(obj).hasClass("question-section-div"))) {
-                    $(this).find("span.counter").text(index);
-                }
+                $(this).find("span.counter").text(index);
             }
         });
 
@@ -587,10 +584,10 @@ $(document).on("click", "#text-done", function() {
 
         $("#section-" + textNumber).find(".text-description-preview").text(textTrainingDesc);
         $("#section-" + textNumber).find(".textarea-text-description").val(textTrainingDesc);
-        if (textTrainingDesc && (textTrainingDesc.split(/\r\n|\r|\n/).length > 2 || textTrainingDesc.length > 200)) {
+        if (textTrainingDesc && (textTrainingDesc.split(/\r\n|\r|\n/).length > 2 || textTrainingDesc.length > 180)) {
             $("#section-" + textNumber).find(".text-description-preview").addClass("show-text");
             $("#section-" + textNumber).find(".text-description-preview").css({ "-webkit-line-clamp": `${Constants.webkitLineClampCssCount()}` });
-            $("#section-" + textNumber).find(".text-description-preview").after(Constants.getLoadMoreLink());
+            UxUtils.setAfter($("#section-" + textNumber).find(".text-description-preview"), Constants.getLoadMoreLink(loadMoreKey));
         }
 
     }
@@ -600,12 +597,14 @@ $(document).on("click", "#text-done", function() {
  * @Event to show photo section when click on add content button
  */
 $(document).on("click", "#add-photo", function() {
+    $("form.sec1").find("div.content-limit-exceed").remove();
     let textData = "";
     let textNumber = parseInt($("div.training-card-section").length);
     if (textNumber > 29) {
         Localizer.getString("contentLimitExceed").then(function(result) {
-            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(`<span class="text-danger content-limit-exceed">${result}</span>`);
+            UxUtils.setAfter("form.sec1 div.section-2 div.container:last", UxUtils.getContentLimitExceed(result));
         });
+        return true;
     }
     $(".error-msg").remove();
     $("#submit").attr("disabled", false);
@@ -618,10 +617,12 @@ $(document).on("click", "#add-photo", function() {
         $("form.sec1 > div.text-section").remove();
         $("form.sec1 > div.text-footer").remove();
     }
-    $("form.sec1 div.section-2 div#root div.training-card-section:last").after(UxUtils.getAddImageSection(textNumber, textData));
-    $("form.sec1").append(addPhotoSection);
-    $("form.sec1").append(addPhotoFooter);
-    $("#upload-photo").click();
+
+    addPhotoSection = UxUtils.getImageContentArea(addTitlePlaceholderKey, addDescriptionPlaceholderKey, uploadImageLabelKey);
+    UxUtils.setAfter("form.sec1 div.section-2 div#root div.training-card-section:last", UxUtils.getAddImageSection(textNumber, textData));
+    UxUtils.setAppend("form.sec1", addPhotoSection);
+    UxUtils.setAppend("form.sec1", addPhotoFooter);
+    UxUtils.setText($(".back-key"), backKey);
 });
 
 /**
@@ -629,19 +630,18 @@ $(document).on("click", "#add-photo", function() {
  */
 $(document).on("click", "#photo-done", function() {
     let textNumber = parseInt($("div.training-card-section").length) - 1;
-    let errorText = "";
-    $("input[type='file']#upload-photo").removeClass("danger");
+    $(`input[type="file"]#upload-photo`).removeClass("danger");
     $("label.label-alert").remove();
-    if ($("div.updated-img div.carousel:last").find("div.carousel-inner").html() == undefined || $("#image-training-text").val().length <= 0) {
-        if ($("div.updated-img div.carousel:last").find("div.carousel-inner").html() == undefined) {
-            $(".change-link").before(UxUtils.getRequiredError(requiredKey));
-            $("input[type='file']#upload-photo").focus();
-            $("input[type='file']#upload-photo").addClass("danger");
+    if ($("#photo-attachments").val() == "" || $("#image-training-text").val().length <= 0) {
+        if ($("#photo-attachments").val() == "") {
+            UxUtils.setBefore(".change-link", UxUtils.getRequiredError(requiredKey));
+            $(`input[type="file"]#upload-photo`).focus();
+            $(`input[type="file"]#upload-photo`).addClass("danger");
         } else {
             $(".change-link").find(`.label-alert .d-block`).remove();
         }
         if ($("#image-training-text").val().length <= 0) {
-            $("#image-training-text").before(UxUtils.getRequiredError(requiredKey));
+            UxUtils.setBefore("#image-training-text", UxUtils.getRequiredError(requiredKey));
             $("#image-training-text").focus();
             $("#image-training-text").addClass("danger");
         } else {
@@ -651,59 +651,34 @@ $(document).on("click", "#photo-done", function() {
         let photoTitle = $("input#image-training-text").val();
         let photoDesc = $("textarea#photo-description").val();
         let photoAttachments = $("textarea#photo-attachments").val();
+        let carasoulImage = $(".update-carasoul").html();
         $(".text-section").hide();
         $(".text-footer").hide();
         $(".section-2").show();
         $(".section-2-footer").show();
-        $("div.photo-section-div").find("span.type").text(" " + photoTitle);
         $("form.sec1 div.section-2:visible div#root div.training-card-section").each(function(index, obj) {
-            $(this).attr({
-                "data-id": "text-section-" + index
-            });
-            $(this).attr({
-                "id": "section-" + index
-            });
             if (!($(obj).hasClass("question-section-div"))) {
+                $(this).attr({
+                    "data-id": "text-section-" + index
+                });
+                $(this).attr({
+                    "id": "section-" + index
+                });
                 $(this).find("span.counter").text(index);
             }
         });
-
-        /* File reader */
-        let input = $("input[type='file']#upload-photo")[0];
-        if (input.files) {
-            $("#submit").attr("disabled", true);
-            $(".body-outer").before(loader);
-            let filesAmount = input.files.length;
-            let count = 0;
-            for (let j = 0; j < filesAmount; j++) {
-                let reader = new FileReader();
-                reader.onload = function(event) {
-                    if (count == 0) {
-                        $("#section-" + textNumber).find("#image-sec-" + textNumber).attr({
-                            "src": event.target.result
-                        });
-                        if (filesAmount > 1) {
-                            $("#section-" + textNumber).find("#image-sec-" + textNumber).after(`<span class="file-counter">+${filesAmount-1}</span>`);
-                        }
-                    }
-                    count++;
-                };
-                reader.readAsDataURL(input.files[j]);
-            }
-            $(".change-link").find(`.label-alert .d-block`).remove();
-            let carasoulId = $("div.carousel:last").attr("id");
-            $("#section-" + textNumber).find("div.img-thumbnail-new").html(UxUtils.getCarousalSliders($("div.carousel:last").html(), carasoulId));
-        }
+        $("#section-" + textNumber).find("span.type").text(photoTitle);
         $("#section-" + textNumber).find(".textarea-photo-title").val(photoTitle);
         $("#section-" + textNumber).find(".textarea-photo-description").val(photoDesc);
         $("#section-" + textNumber).find(".photo-description-preview").text(photoDesc);
+        UxUtils.setHtml($("#section-" + textNumber).find(".img-thumbnail-new"), carasoulImage);
         if (photoDesc.length < 1) {
             $("#section-" + textNumber).find(".photo-description-preview").parent(".col-12").addClass("d-none");
         }
-        if (photoDesc && (photoDesc.split(/\r\n|\r|\n/).length > 2 || photoDesc.length > 200)) {
+        if (photoDesc && (photoDesc.split(/\r\n|\r|\n/).length > 2 || photoDesc.length > 180)) {
             $("#section-" + textNumber).find(".photo-description-preview").addClass("show-text");
             $("#section-" + textNumber).find(".photo-description-preview").css({ "-webkit-line-clamp": Constants.webkitLineClampCssCount() });
-            $("#section-" + textNumber).find(".photo-description-preview").after(Constants.getLoadMoreLink());
+            UxUtils.setAfter($("#section-" + textNumber).find(".photo-description-preview"), Constants.getLoadMoreLink(loadMoreKey));
         }
         $("#section-" + textNumber).find("textarea.textarea-photo-attachments").val(photoAttachments);
 
@@ -718,11 +693,12 @@ $(document).on("click", "#photo-done", function() {
  */
 $(document).on("click", "#add-video", function() {
     let textNumber = parseInt($("div.training-card-section").length);
-
+    $("form.sec1").find("div.content-limit-exceed").remove();
     if (textNumber > 29) {
         Localizer.getString("contentLimitExceed").then(function(result) {
-            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(`<span class="text-danger content-limit-exceed">${result}</span>`);
+            UxUtils.setAfter("form.sec1 div.section-2 div.container:last", UxUtils.getContentLimitExceed(result));
         });
+        return true;
     }
 
     let textData = "";
@@ -737,11 +713,11 @@ $(document).on("click", "#add-video", function() {
         $("form.sec1 > div.text-section").remove();
         $("form.sec1 > div.text-footer").remove();
     }
-
-    $("form.sec1").append(addVideoSection);
-    $("form.sec1").append(addVideoFooter);
-    $("form.sec1 div.section-2 div#root div.training-card-section:last").after(UxUtils.getAddVideoSection(textNumber, textData));
-    $("#upload-video").click();
+    addVideoSection = UxUtils.getVideoContentArea(addTitlePlaceholderKey, addDescriptionPlaceholderKey, uploadVideoLabelKey);
+    UxUtils.setAppend("form.sec1", addVideoSection);
+    UxUtils.setAppend("form.sec1", addVideoFooter);
+    UxUtils.setText($(".back-key"), backKey);
+    UxUtils.setAfter("form.sec1 div.section-2 div#root div.training-card-section:last", UxUtils.getAddVideoSection(textNumber, textData));
 });
 
 /**
@@ -752,19 +728,17 @@ $(document).on("click", "#video-done", function() {
     let videoTitle = $("input#video-training-text").val();
     let videoDesc = $("textarea#video-description").val();
     let videoAttachment = $("textarea#video-attachments").val();
-
-    let errorText = "";
     $("textarea").removeClass("danger");
     $("label.label-alert").remove();
 
-    if ($("input[type='file']#upload-video").val().length <= 0 || $("#video-training-text").val().length <= 0) {
-        if ($("input[type='file']#upload-video").val().length <= 0) {
-            $("div.video-box").before(UxUtils.getRequiredError(requiredKey));
+    if ($(`input[type="file"]#upload-video`).val().length <= 0 || $("#video-training-text").val().length <= 0) {
+        if ($(`input[type="file"]#upload-video`).val().length <= 0) {
+            UxUtils.setBefore("div.video-box", UxUtils.getRequiredError(requiredKey));
             $("div.video-box").focus().addClass("danger");
         }
 
         if ($("#video-training-text").val().length <= 0) {
-            $("#video-training-text").before(UxUtils.getRequiredError(requiredKey));
+            UxUtils.setBefore("#video-training-text", UxUtils.getRequiredError(requiredKey));
             $("#video-training-text").focus();
             $("#video-training-text").addClass("danger");
         } else {
@@ -777,13 +751,13 @@ $(document).on("click", "#video-done", function() {
         $(".section-2").show();
         $(".section-2-footer").show();
         $("form.sec1 div.section-2:visible div#root div.training-card-section").each(function(index, obj) {
-            $(this).attr({
-                "data-id": "text-section-" + index
-            });
-            $(this).attr({
-                "id": "section-" + index
-            });
-            if (!($(obj).hasClass("question-section-div"))) {
+            if (!$(obj).hasClass("question-section-div")) {
+                $(this).attr({
+                    "data-id": "text-section-" + index
+                });
+                $(this).attr({
+                    "id": "section-" + index
+                });
                 $(this).find("span.counter").text(index);
             }
         });
@@ -797,14 +771,13 @@ $(document).on("click", "#video-done", function() {
         if (videoDesc.length < 1) {
             $("#section-" + textNumber).find(".video-description-preview").parent(".col-12").addClass("d-none");
         }
-        if (videoDesc && (videoDesc.split(/\r\n|\r|\n/).length > 2 || videoDesc.length > 200)) {
+        if (videoDesc && (videoDesc.split(/\r\n|\r|\n/).length > 2 || videoDesc.length > 180)) {
             $("#section-" + textNumber).find(".video-description-preview").addClass("show-text");
             $("#section-" + textNumber).find(".video-description-preview").css({ "-webkit-line-clamp": Constants.webkitLineClampCssCount() });
-            $("#section-" + textNumber).find(".video-description-preview").after(Constants.getLoadMoreLink());
+            UxUtils.setAfter($("#section-" + textNumber).find(".video-description-preview"), Constants.getLoadMoreLink(loadMoreKey));
         }
         $("#section-" + textNumber).find(".textarea-video-attachments").val(videoAttachment);
-        let imageCounter = $("#section-" + textNumber).find(`input[type="file"]`).get(0).files.length;
-        $("#section-" + textNumber).find("textarea:last").after(UxUtils.getAttachmentTextarea());
+        UxUtils.setAfter($("#section-" + textNumber).find("textarea:last"), UxUtils.getAttachmentTextarea());
     }
 });
 
@@ -813,13 +786,13 @@ $(document).on("click", "#video-done", function() {
  */
 $(document).on("click", "#add-document", function() {
     let textNumber = parseInt($("div.training-card-section").length);
-
+    $("form.sec1").find("div.content-limit-exceed").remove();
     if (textNumber > 29) {
         Localizer.getString("contentLimitExceed").then(function(result) {
-            $("form.sec1 div.section-2 div#root div.training-card-section:last").after(`<span class="text-danger content-limit-exceed">${result}</span>`);
+            UxUtils.setAfter("form.sec1 div.section-2 div.container:last", UxUtils.getContentLimitExceed(result));
         });
+        return true;
     }
-
     let textData = "";
     $(".error-msg").remove();
     $("#submit").attr("disabled", false);
@@ -830,77 +803,73 @@ $(document).on("click", "#add-document", function() {
         $("form.sec1 > div.text-section").remove();
         $("form.sec1 > div.text-footer").remove();
     }
-    $("form.sec1 div.section-2 div#root div.training-card-section:last").after(UxUtils.getAddDownloadSection(textNumber, textData));
-    $("form.sec1").append(addDocumentSection);
-    $("form.sec1").append(addDocumentFooter);
-    $("#upload-document").click();
+    UxUtils.setAfter("form.sec1 div.section-2 div#root div.training-card-section:last", UxUtils.getAddDownloadSection(textNumber, textData));
+    addDocumentSection = UxUtils.getDocumentContentArea(addTitlePlaceholderKey, addDescriptionPlaceholderKey, uploadFileLabelKey);
+    UxUtils.setAppend("form.sec1", addDocumentSection);
+    UxUtils.setAppend("form.sec1", addDocumentFooter);
+    UxUtils.setText($(".back-key"), backKey);
 });
 
 /**
  * @Event to submit the document area
  */
 $(document).on("click", "#document-done", function() {
-    let textNumber = parseInt($("div.training-card-section").length) - 1;
-    let docTitle = $("#doc-training-text").val();
-    let docDescription = $("#document-description").val();
-    $("textarea").removeClass("danger");
-    $("label.label-alert").remove();
-    if ($("div.doc-name").text().trim().length <= 0 || $("#doc-training-text").val().length <= 0) {
-        if ($("div.doc-name").text().trim().length <= 0) {
-            $("div.doc-box").before(UxUtils.getRequiredError(requiredKey));
-        } else {
-            $("div.doc-box").parents().find("label.label-alert").remove();
-        }
-        if ($("#doc-training-text").val().length <= 0) {
-            $("#doc-training-text").before(UxUtils.getRequiredError(requiredKey));
-            $("#doc-training-text").focus();
-            $("#doc-training-text").addClass("danger");
-        } else {
-            $("#doc-training-text").removeClass("danger");
-        }
-    } else {
-        $(".text-section").hide();
-        $(".text-footer").hide();
-        $(".section-2").show();
-        $(".section-2-footer").show();
-        $("div.document-section-div").find("span.type").text(" " + docTitle);
-        $("form.sec1 div.section-2:visible div#root div.training-card-section").each(function(index, obj) {
-            $(this).attr({
-                "data-id": "text-section-" + index
-            });
-            $(this).attr({
-                "id": "section-" + index
-            });
+            let textNumber = parseInt($("div.training-card-section").length) - 1;
+            let docTitle = $("#doc-training-text").val();
+            let docDescription = $("#document-description").val();
+            $("textarea").removeClass("danger");
+            $("label.label-alert").remove();
+            if ($("div.doc-name").text().trim().length <= 0 || $("#doc-training-text").val().length <= 0) {
+                if ($("div.doc-name").text().trim().length <= 0) {
+                    UxUtils.setBefore("div.doc-box", UxUtils.getRequiredError(requiredKey));
+                } else {
+                    $("div.doc-box").parents().find("label.label-alert").remove();
+                }
+                if ($("#doc-training-text").val().length <= 0) {
+                    UxUtils.setBefore("#doc-training-text", UxUtils.getRequiredError(requiredKey));
+                    $("#doc-training-text").focus();
+                    $("#doc-training-text").addClass("danger");
+                } else {
+                    $("#doc-training-text").removeClass("danger");
+                }
+            } else {
+                $(".text-section").hide();
+                $(".text-footer").hide();
+                $(".section-2").show();
+                $(".section-2-footer").show();
+                $("form.sec1 div.section-2:visible div#root div.training-card-section").each(function(index, obj) {
+                    if (!($(obj).hasClass("question-section-div"))) {
+                        $(this).attr({
+                            "data-id": "text-section-" + index
+                        });
+                        $(this).attr({
+                            "id": "section-" + index
+                        });
+                        $(this).find("span.counter").text(index);
+                    }
+                });
+                $("#section-" + textNumber).find("span.type").text(docTitle);
+                $("#section-" + textNumber).find("textarea.textarea-document").val(docTitle);
+                $("#section-" + textNumber).find(".document-description-preview").text(docDescription);
+                $("#section-" + textNumber).find("textarea.textarea-document-description").val(docDescription);
 
-            if (!($(obj).hasClass("question-section-div"))) {
-                $(this).find("span.counter").text(index);
+                if (docDescription.length < 1) {
+                    $("#section-" + textNumber).find(".document-description-preview").addClass("d-none");
+                }
+
+                if (docDescription && (docDescription.split(/\r\n|\r|\n/).length > 2 || docDescription.length > 180)) {
+                    $("#section-" + textNumber).find(".document-description-preview").addClass("show-text");
+                    $("#section-" + textNumber).find(".document-description-preview").css({ "-webkit-line-clamp": Constants.webkitLineClampCssCount() });
+                    UxUtils.setAfter($("#section-" + textNumber).find(".document-description-preview"), Constants.getLoadMoreLink(loadMoreKey));
+                }
+                $("#section-" + textNumber).find("textarea.textarea-document-attachment").val($("#document-attachment").val());
+                $("#section-" + textNumber).find("#image-sec-" + textNumber).attr("src", "images/doc.png");
+                let docfilesize = $(`input[type="file"]#upload-document`)[0].files[0].size / 1024;
+                let fileTypeIcon = "";
+                UxUtils.setHtml("div.doc-box", Constants.getDocumentIcon());
+                fileTypeIcon = Constants.getDocumentIcon();
+                UxUtils.setBefore($("#section-" + textNumber).find("#image-sec-" + textNumber).parents("div.row").find("p.document-description-preview"), UxUtils.createParagraphBox(`${fileTypeIcon} ${UxUtils.createSpanBox(`${$(`input[type="file"]#upload-document`)[0].files[0].name} (${Math.round(docfilesize)} Kb)`, "semi-bold teams-link a-link font-14", "")}`,"mb0 doc-name" ,""));
             }
-
-        });
-
-        $("#section-" + textNumber).find("textarea.textarea-document").val(docTitle);
-        $("#section-" + textNumber).find(".document-description-preview").text(docDescription);
-        $("#section-" + textNumber).find("textarea.textarea-document-description").val(docDescription);
-
-        if (docDescription.length < 1) {
-            $("#section-" + textNumber).find(".document-description-preview").addClass("d-none");
-        }
-
-        if (docDescription && (docDescription.split(/\r\n|\r|\n/).length > 2 || docDescription.length > 200)) {
-            $("#section-" + textNumber).find(".document-description-preview").addClass("show-text");
-            $("#section-" + textNumber).find(".document-description-preview").css({ "-webkit-line-clamp": Constants.webkitLineClampCssCount() });
-            $("#section-" + textNumber).find(".document-description-preview").after(Constants.getLoadMoreLink());
-        }
-        $("#section-" + textNumber).find("textarea.textarea-document-attachment").val($("#document-attachment").val());
-        $("#section-" + textNumber).find("#image-sec-" + textNumber).attr("src", "images/doc.png");
-        let docfilesize = $("input[type='file']#upload-document")[0].files[0].size / 1024;
-        let fileTypeIcon = "";
-        let fileType = $("input[type='file']#upload-document")[0].files[0].type;
-        $("div.doc-box").html(Constants.getDocumentIcon());
-        fileTypeIcon = Constants.getDocumentIcon();
-        $("#section-" + textNumber).find("#image-sec-" + textNumber).parents("div.row").find("p.document-description-preview").before(`<p class="mb0 doc-name">${fileTypeIcon}&nbsp;<span class="semi-bold teams-link a-link font-14">` + $("input[type='file']#upload-document")[0].files[0].name + ` (` + Math.round(docfilesize) + ` Kb)</span></p>`);
-    }
-    $("#section-" + textNumber).find("textarea:last").after(`<textarea id="attachment-id" class="d-none" ></textarea>`);
 });
 
 /**
@@ -908,13 +877,64 @@ $(document).on("click", "#document-done", function() {
  */
 $(document).on("change", "#upload-photo", function() {
     if ($(this).val()) {
+        $(".text-danger.error-msg").remove();
         $("#photo-done").addClass("disabled");
-        $("#photo-done").append(Constants.getDisabledLoader());
-        if (imagesPreview(this, ".update-carasoul")) {
+        UxUtils.setAppend("#photo-done", Constants.getDisabledLoader());
+        if ($(this)[0].files.length > 1) {
+            if (imagesPreview(this, ".update-carasoul")) {
+                $(".text-section .photo-box").hide();
+                $(".text-section .change-link").show();
+                $(".text-section .update-carasoul").show();
+                $(".text-section .label-alert").remove();
+            }
+        } else {
+            let uniqueCarouselId = Constants.getUniqueId();
+            let className = "prev-single-image" + uniqueCarouselId;
+            $(".show-image-loader").show();
             $(".text-section .photo-box").hide();
             $(".text-section .change-link").show();
-            $(".text-section .update-carasoul").show();
             $(".text-section .label-alert").remove();
+            let response = readURL(this, `.${className}`);        
+            if (response) {
+
+                let input = this;
+                let reader = new FileReader();
+                reader.onload = function(event) {
+                    UxUtils.setHtml(".text-section .update-carasoul" , UxUtils.createImageLightBox(event.target.result,uniqueCarouselId));
+                };
+                reader.readAsDataURL(input.files[0]);
+
+                $(".text-section .update-carasoul").show();
+                $(".show-image-loader").hide();
+                let fileData = this;
+                let coverImage = fileData.files[0];
+                let attachment = ActionHelper.attachmentUpload(coverImage, coverImage["type"]);
+                let attachmentRequest = {};
+                attachmentRequest = ActionHelper.requestAttachmentUploadDraft(attachment);
+                ActionHelper.executeApi(attachmentRequest)
+                    .then(function(response) {
+                        let attachmentData = [{
+                            "name": fileData.files[0].name,
+                            "type": "Image",
+                            "id": response.attachmentId
+                        }];
+                        $("#photo-done").removeClass("disabled");
+                        $("#photo-done").find(Constants.getDisabledLoaderClass()).remove();
+                        $("#photo-attachments").val(JSON.stringify(attachmentData));
+                    })
+                    .catch(function(error) {
+                        console.log("GetContext - Error2: " + JSON.stringify(error));
+                    });
+
+            }else{
+                $(".show-image-loader").hide();
+                $(".text-section .photo-box").show();
+                $(".text-section .change-link").hide();
+                $("#photo-done").removeClass("disabled");
+                $("#photo-done").find(Constants.getDisabledLoaderClass()).remove();
+                UxUtils.setBefore("div.text-section:visible div.relative" , UxUtils.getMaxImageAlert(invalidFileFormatKey));
+            }
+
         }
     }
 });
@@ -929,80 +949,86 @@ let imagesPreview = function(input, placeToInsertImagePreview) {
     if (input.files) {
         let filesAmount = input.files.length;
         if (filesAmount > 10) {
+            $("#photo-done").removeClass("disabled");
+            $("#photo-done").find(Constants.getDisabledLoaderClass()).remove();
             Localizer.getString("maximum_images_allowed").then(function(result) {
-                let msg = result;
-                Localizer.getString("alert").then(function(result) {
-                    $("div.text-section:visible div.relative").before(`<span class="text-danger error-msg float-right"> ${msg}</span><div class="clearfix"></div>`);
-                });
+                UxUtils.setBefore("div.text-section:visible div.relative" , UxUtils.getMaxImageAlert(result));
             });
             return false;
         }
 
+        let returnArr = new Array();
         for (let i = 0; i < filesAmount; i++) {
+            let isSuccess = true;
             let fileTypes = ["jpg", "jpeg", "png", "gif", "webp", "jfif"];
-            let isSuccess = false;
-            if (input.files && input.files[0]) {
-                // let reader = new FileReader();
-                let extension = input.files[0].name.split(".").pop().toLowerCase();
+            if (input.files && input.files[i]) {
+                let extension = input.files[i].name.split(".").pop().toLowerCase();
                 isSuccess = fileTypes.indexOf(extension) > -1;
-                if (isSuccess) {
-                    isSuccess = true;
-                } else {
-                    $("div.text-section:visible div.relative").before(`<span class="text-danger float-right">Invalid file formate</span><div class="clearfix"></div>`);
-                    return false;
-                }
+                returnArr.push(isSuccess);
             }
-        }
-        let uniqueCarouselId = Constants.getUniqueId();
-        $(".update-carasoul").html("");
-        let $carousel = $(`<div id="carouselExampleIndicators${uniqueCarouselId}" class="carousel slide" data-ride="carousel"></div>`);
-        let $olSection = $(`<ol class="carousel-indicators"></ol>`);
-        let $carouselInner = $(`<div class="carousel-inner"></div>`);
-        $carousel.append($olSection);
-        $carousel.append($carouselInner);
-        let attachmentRequest = "";
-        let count = 0;
-        let newPhotos = new Array();
-        let photoUploadCounter = 0;
-        for (let i = 0; i < filesAmount; i++) {
-            let reader = new FileReader();
-            let $liList = $(`<li data-target="#carouselExampleIndicators${uniqueCarouselId}" data-slide-to="${i}" class="${i == 0 ? "active": ""}"></li>`);
-            $olSection.append($liList);
-            reader.onload = function(event) {
-                let $imgDiv = $(UxUtils.getCarousalImages(count, event.target.result));
-                $carouselInner.append($imgDiv);
-                count++;
-            };
-            reader.readAsDataURL(input.files[i]);
-            let fileData = input.files[i];
-            let attachment = ActionHelper.attachmentUpload(fileData, fileData["type"]);
-            attachmentRequest = ActionHelper.requestAttachmentUploadDraft(attachment);
-            ActionHelper.executeApi(attachmentRequest)
-                .then(function(response) {
-                    let filesize = input.files[i].size / Constants.getKbConvertConst();
-                    let attachmentData = {
-                        "name": input.files[i].name + " ( " + Math.round(filesize) + " Kb)",
-                        "type": "Image",
-                        "id": response.attachmentId
-                    };
-                    newPhotos.push(attachmentData);
-                    $(input).parent().find("textarea.textarea-photo-attachments").val(JSON.stringify(newPhotos));
-                    $("div.text-section").find("textarea#photo-attachments").val(JSON.stringify(newPhotos));
-                    photoUploadCounter++;
-                });
         }
 
-        let tid = setInterval(() => {
-            if (photoUploadCounter == filesAmount) {
-                $("#photo-done").removeClass("disabled");
-                $("#photo-done").find(Constants.getDisabledLoaderClass()).remove();
-                clearInterval(tid);
+        if($.inArray(false, returnArr) != -1){
+            $("#photo-done").removeClass("disabled");
+            $("#photo-done").find(Constants.getDisabledLoaderClass()).remove();
+            UxUtils.setBefore("div.text-section:visible div.relative" , UxUtils.getMaxImageAlert(invalidFileFormatKey));
+            return false;
+        }else{
+            let uniqueCarouselId = Constants.getUniqueId();
+            $(".update-carasoul").html("");
+            let $carousel = $(UxUtils.getResponseViewCarouselSection(uniqueCarouselId));
+            let $olSection = $(UxUtils.getCarouselOlSection());
+            let $carouselInner = $(UxUtils.getCarouselInnerSection());
+            UxUtils.setAppend($carousel, $olSection);
+            UxUtils.setAppend($carousel, $carouselInner);
+            let attachmentRequest = "";
+            let count = 0;
+            let newPhotos = new Array();
+            let photoUploadCounter = 0;
+            for (let i = 0; i < filesAmount; i++) {
+                let reader = new FileReader();
+                let $liList = $(UxUtils.getCarousalLiSection(uniqueCarouselId, i));
+                UxUtils.setAppend($olSection , $liList);
+                reader.onload = function(event) {
+                    let $imgDiv = $(UxUtils.getCarousalImages(event.target.result, count, uniqueCarouselId));
+                    UxUtils.setAppend($carouselInner ,$imgDiv);
+                    count++;
+                };
+                reader.readAsDataURL(input.files[i]);
+                let fileData = input.files[i];
+                let attachment = ActionHelper.attachmentUpload(fileData, fileData["type"]);
+                attachmentRequest = ActionHelper.requestAttachmentUploadDraft(attachment);
+                ActionHelper.executeApi(attachmentRequest)
+                    .then(function(response) {
+                        let filesize = input.files[i].size / Constants.getKbConvertConst();
+                        let attachmentData = {
+                            "name": input.files[i].name + " ( " + Math.round(filesize) + " Kb)",
+                            "type": "Image",
+                            "id": response.attachmentId
+                        };
+                        newPhotos.push(attachmentData);
+                        $(input).parent().find("textarea.textarea-photo-attachments").val(JSON.stringify(newPhotos));
+                        $("div.text-section").find("textarea#photo-attachments").val(JSON.stringify(newPhotos));
+                        photoUploadCounter++;
+                    });
             }
-        }, Constants.setIntervalTimeHundred());
-        $carousel.append(UxUtils.getCarousalPagination(uniqueCarouselId));
-        $(placeToInsertImagePreview).append($carousel);
-        $(".carousel").carousel();
-        return true;
+            let tid = setInterval(() => {
+                if (photoUploadCounter == filesAmount) {
+                    $("#photo-done").removeClass("disabled");
+                    $("#photo-done").find(Constants.getDisabledLoaderClass()).remove();
+                    clearInterval(tid);
+                }
+            }, Constants.setIntervalTimeHundred());
+            UxUtils.setAppend($carousel , UxUtils.getCarousalPagination(uniqueCarouselId));
+            UxUtils.setAppend(placeToInsertImagePreview,$carousel);
+            let modelId = `model${uniqueCarouselId}`;
+            $(placeToInsertImagePreview).attr({
+                "data-toggle": "modal",
+                "data-target": modelId
+            });
+            $(".carousel").carousel();
+            return true;
+        }
     }
     return false;
 };
@@ -1036,15 +1062,15 @@ $(document).on("change", "#upload-video", function() {
         let inputVideoSize = fileInput.files[0].size;
         let sizeOf1MB = 1048576;
         if ((inputVideoSize / sizeOf1MB) > videoSize) {
-            $(".video-box").parent(".relative").before(`<span class="text-danger font-12 pull-right">${Constants.getInvalidFileSizeMsg()}</span><div class="clearfix"></div>`);
+            UxUtils.setBefore($(".video-box").parent(".relative") , UxUtils.getMaxImageAlert(Constants.getInvalidFileSizeMsg()));
             return false;
         }
         if ($.inArray(fileInput.files[0].type, videoFormate) == -1) {
-            $(".video-box").parent(".relative").before(`<span class="text-danger font-12 pull-right">${Constants.getInvalidFileMsg()}</span><div class="clearfix"></div>`);
+            UxUtils.setBefore($(".video-box").parent(".relative") , UxUtils.getMaxImageAlert(Constants.getInvalidFileMsg()));
             return false;
         }
         $("button#video-done").addClass("disabled");
-        $("#video-done").append(Constants.getDisabledLoader());
+        UxUtils.setAppend("#video-done" , Constants.getDisabledLoader());
         let fileUrl = window.URL.createObjectURL(fileInput.files[0]);
         let fileData = fileInput.files[0];
         let attachment = ActionHelper.attachmentUpload(fileData, fileData["type"]);
@@ -1072,8 +1098,6 @@ $(document).on("change", "#upload-video", function() {
  * @event when upload document uploadedd
  */
 $(document).on("change", "#upload-document", function() {
-    let textNumber = parseInt($("div.training-card-section").length) - 1;
-
     // If file is blank then return back
     if (!$(this).val()) {
         return false;
@@ -1084,7 +1108,7 @@ $(document).on("change", "#upload-document", function() {
     }
 
     $("#document-done").addClass("disabled");
-    $("#document-done").append(Constants.getDisabledLoader());
+    UxUtils.setAppend("#document-done" , Constants.getDisabledLoader());
 
     // Convert File size in Kb
     let filesize = $(this)[0].files[0].size / Constants.getKbConvertConst();
@@ -1108,7 +1132,7 @@ $(document).on("change", "#upload-document", function() {
         });
     $("label.label-alert").remove();
     $(".doc-box").addClass("d-none");
-    $(".doc-name").append(`${fileTypeIcon}&nbsp; <a class="a-link">${$(this)[0].files[0].name} (${Math.round(filesize)} Kb)</a>`);
+    UxUtils.setAppend(".doc-name" , `${fileTypeIcon}&nbsp; <a class="a-link">${$(this)[0].files[0].name} (${Math.round(filesize)} Kb)</a>`);
 });
 
 /**
@@ -1116,14 +1140,14 @@ $(document).on("change", "#upload-document", function() {
  */
 $(document).on("click", ".remove-text", function() {
     let dataId = $(this).parents(".card-box").attr("data-id");
-    let confirmBox = UxUtils.getTextConfirmBox(dataId);
+    let confirmBox = UxUtils.getTextConfirmBox(dataId, okKey , closeKey , confirmDeleteMsgKey);
     if (!$(this).parents("div.card-box").find("div.confirm-box").is(":visible")) {
         if ($(this).parents(".card-box").hasClass("question-section-div")) {
-            $(this).parents("div.card-box").find(".input_section").after(confirmBox);
+            UxUtils.setAfter($(this).parents("div.card-box").find(".input_section") , confirmBox);
         } else if ($(this).parents(".card-box").hasClass("text-section-div")) {
-            $(this).parents("div.card-box").find("p:last").after(confirmBox);
+            UxUtils.setAfter($(this).parents("div.card-box").find("textarea:last") , confirmBox);
         } else {
-            $(this).parents("div.card-box").find(".row:last").after(confirmBox);
+            UxUtils.setAfter($(this).parents("div.card-box").find(".row:last") , confirmBox);
         }
     }
 });
@@ -1153,10 +1177,9 @@ $(document).on("click", "#next", function() {
     /* Validate */
     let errorText = "";
     let questionNumber = 0;
-    $("form").find("input[type='text']").each(function() {
+    $("form").find(`input[type="text"]`).each(function() {
         let element = $(this);
         if (element.val() == "") {
-            validate = false;
             if (element.attr("id").startsWith("question-title")) {
                 if (questionNumber != element.parents("div.form-group").find("span.question-number").text()) {
                     questionNumber = element.parents("div.form-group").find("span.question-number").text();
@@ -1178,18 +1201,14 @@ $(document).on("click", "#next", function() {
 
     if ($.trim(errorText).length <= 0) {
         $(".section-1").hide();
-        $("form").append($("#setting").clone());
+        UxUtils.setAppend("form"  , $("#setting").clone());
         $("form #setting").show();
     } else {
-        $("#exampleModalCenter")
-            .find("#exampleModalLongTitle")
-            .html(`<img src="images/error.png"/> Error!`);
-        $("#exampleModalCenter").find(".modal-body").html(errorText);
-        $("#exampleModalCenter")
-            .find(".modal-footer")
-            .html(
-                `<button type="button" class="btn btn-outline-secondary btn-sm" data-dismiss="modal">Close</button>`
-            );
+
+        UxUtils.setHtml($("#exampleModalCenter").find("#exampleModalLongTitle") , UxUtils.createImageBox("images/error.png","","") + " Error!");
+        UxUtils.setHtml($("#exampleModalCenter").find(".modal-body") , errorText);
+        UxUtils.setHtml($("#exampleModalCenter").find(".modal-footer") , UxUtils.createButtonBox(closeKey , "btn btn-outline-secondary btn-sm" , `data-dismiss="modal"`));
+
         $("#exampleModalCenter").find("#save-changes").hide();
         $("#exampleModalCenter").modal("show");
     }
@@ -1213,7 +1232,7 @@ $(document).on("change", "div.question-container input.form-check-input", functi
  */
 $(document).on("click", "#submit", function() {
     $("#submit").prop("disabled", true);
-    $(".body-outer").before(loader);
+    UxUtils.setBefore(".body-outer" , loader);
     submitForm();
 });
 
@@ -1240,22 +1259,9 @@ async function getStringKeys() {
         questionTitleKey = result;
     });
 
-    Localizer.getString("option", "").then(function(result) {
-        optionKey = result;
-    });
     Localizer.getString("dueIn", " 1 week ", "").then(function(result) {
         settingText = result;
         $("#due").text(settingText);
-    });
-
-    Localizer.getString("addMoreOptions").then(function(result) {
-        addMoreOptionsKey = result;
-        $(".add-options").html(`<svg role="presentation" focusable="false" viewBox="8 8 16 16" class="cc gs gt tc gv">
-            <path class="ui-icon__outline cc" d="M23.352 16.117c.098.1.148.217.148.352 0 .136-.05.253-.148.351a.48.48 0 0 1-.352.149h-6v6c0 .136-.05.253-.148.351a.48.48 0 0 1-.352.149.477.477 0 0 1-.352-.149.477.477 0 0 1-.148-.351v-6h-6a.477.477 0 0 1-.352-.149.48.48 0 0 1-.148-.351c0-.135.05-.252.148-.352A.481.481 0 0 1 10 15.97h6v-6c0-.135.049-.253.148-.352a.48.48 0 0 1 .352-.148c.135 0 .252.05.352.148.098.1.148.216.148.352v6h6c.135 0 .252.05.352.148z">
-            </path>
-            <path class="ui-icon__filled gr" d="M23.5 15.969a1.01 1.01 0 0 1-.613.922.971.971 0 0 1-.387.078H17v5.5a1.01 1.01 0 0 1-.613.922.971.971 0 0 1-.387.078.965.965 0 0 1-.387-.079.983.983 0 0 1-.535-.535.97.97 0 0 1-.078-.386v-5.5H9.5a.965.965 0 0 1-.387-.078.983.983 0 0 1-.535-.535.972.972 0 0 1-.078-.387 1.002 1.002 0 0 1 1-1H15v-5.5a1.002 1.002 0 0 1 1.387-.922c.122.052.228.124.32.215a.986.986 0 0 1 .293.707v5.5h5.5a.989.989 0 0 1 .707.293c.09.091.162.198.215.32a.984.984 0 0 1 .078.387z">
-            </path>
-        </svg> ${addMoreOptionsKey}`);
     });
 
     Localizer.getString("choices").then(function(result) {
@@ -1294,14 +1300,6 @@ async function getStringKeys() {
     Localizer.getString("resultVisibleTo").then(function(result) {
         resultVisibleToKey = result;
         $(".result-visible-key").text(resultVisibleToKey);
-    });
-
-    Localizer.getString("resultEveryone").then(function(result) {
-        resultEveryoneKey = result;
-    });
-
-    Localizer.getString("resultMe").then(function(result) {
-        resultMeKey = result;
     });
 
     Localizer.getString("correctAnswerSetting", ", ").then(function(result) {
@@ -1351,12 +1349,12 @@ async function getStringKeys() {
         coverImageKey = result;
     });
 
-    Localizer.getString("tap_upload_image").then(function(result) {
+    Localizer.getString("tapUploadImage").then(function(result) {
         $(".tap-upload-label").text(result);
         uploadImageLabelKey = result;
     });
 
-    Localizer.getString("tap_upload_file").then(function(result) {
+    Localizer.getString("tapUploadFile").then(function(result) {
         $(".tap-upload-files-label").text(result);
         uploadFileLabelKey = result;
     });
@@ -1401,15 +1399,15 @@ async function getStringKeys() {
     });
 
     Localizer.getString("tapUploadPhoto").then(function(result) {
-        $(".tap-upload-label").text(result);
         uploadImageLabelKey = result;
+        $(".tap-upload-photo-label").text(result);
     });
 
-    Localizer.getString("upload_photo").then(function(result) {
+    Localizer.getString("uploadPhoto").then(function(result) {
         $(".upload-photo-label").text(result);
     });
 
-    Localizer.getString("description_content_about").then(function(result) {
+    Localizer.getString("descriptionContentAbout").then(function(result) {
         $(".desc-content-about-placeholder").attr("placeholder", result);
     });
 
@@ -1418,11 +1416,11 @@ async function getStringKeys() {
     });
 
     Localizer.getString("close").then(function(result) {
-        close = result;
+        closeKey = result;
     });
 
     Localizer.getString("ok").then(function(result) {
-        ok = result;
+        okKey = result;
     });
 
     Localizer.getString("uploadCoverImage").then(function(result) {
@@ -1432,12 +1430,12 @@ async function getStringKeys() {
 
     Localizer.getString("trainingDescriptionOptional").then(function(result) {
         trainingDescriptionOptionalKey = result;
-        $(".training-description-optional-key").attr("placeholder", trainingDescriptionOptionalKey);
+        $(".training-description-optional-key").attr({ "placeholder": trainingDescriptionOptionalKey });
     });
 
     Localizer.getString("trainingTitle").then(function(result) {
         trainingTitleKey = result;
-        $(".training-title-key").attr("placeholder", trainingTitleKey);
+        $(".training-title-key").attr({ "placeholder": trainingTitleKey });
     });
 
     Localizer.getString("clear").then(function(result) {
@@ -1462,11 +1460,102 @@ async function getStringKeys() {
 
     Localizer.getString("addTitlePlaceholder").then(function(result) {
         addTitlePlaceholderKey = result;
+        $("#image-training-text").attr({ "placeholder": result });
     });
 
     Localizer.getString("addDescriptionPlaceholder").then(function(result) {
         addDescriptionPlaceholderKey = result;
     });
+
+    Localizer.getString("correctChoice").then(function(result) {
+        correctChoiceKey = result;
+    });
+
+    Localizer.getString("invalidFileFormat").then(function(result) {
+        invalidFileFormatKey = result;
+    });
+
+    Localizer.getString("atleastOneQuestion").then(function(result) {
+        atleastOneErrorKey = result;
+    });
+
+    Localizer.getString("addTextDescriptionPlaceholder").then(function(result) {
+        addTextDescriptionPlaceholderKey = result;
+    });
+
+    Localizer.getString("loadMore").then(function(result) {
+        loadMoreKey = result;
+    });
+
+    Localizer.getString("loadLess").then(function(result) {
+        loadLessKey = result;
+    });
+
+    Localizer.getString("enterTheChioce").then(function(result) {
+        enterTheChioceKey = result;
+    });
+
+    Localizer.getString("addMoreOptions").then(function(result) {
+        addMoreOptionsKey = result;
+    });
+    
+    Localizer.getString("addQuestions").then(function(result) {
+        addQuestionsKey = result;
+    });
+
+    Localizer.getString("done").then(function(result) {
+        doneKey = result;
+    });
+
+    Localizer.getString("confirmDeleteMsg").then(function(result) {
+        confirmDeleteMsgKey = result;
+    });
+
+    Localizer.getString("confirmDeleteContentMsg").then(function(result) {
+        confirmDeleteContentMsgKey = result;
+    });
+
+    Localizer.getString("cancel").then(function(result) {
+        cancelKey = result;
+    });
+
+    Localizer.getString("discard").then(function(result) {
+        discardKey = result;
+    });
+
+    Localizer.getString("questions").then(function(result) {
+        questionsKey = result;
+    });
+
+    Localizer.getString("nWeek", "1").then(function(result) {
+        nweekKey = result;
+    });
+
+    Localizer.getString("nWeek", " ").then(function(result) {
+        weekKey = result;
+    });
+
+    Localizer.getString("hours").then(function(result) {
+        hoursKey = result;
+    });
+
+    Localizer.getString("hour").then(function(result) {
+        hourKey = result;
+    });
+
+    Localizer.getString("minutes").then(function(result) {
+        minutesKey = result;
+    });
+
+    Localizer.getString("minute").then(function(result) {
+        minuteKey = result;
+    });
+
+    Localizer.getString("days").then(function(result) {
+        daysKey = result;
+    });
+
+
 }
 
 /**
@@ -1475,6 +1564,7 @@ async function getStringKeys() {
 function submitForm() {
     $("form.sec1").find("div.text-danger.error-msg.at-least-one-content-key").remove();
     getStringKeys();
+    console.log(getStringKeys());
     ActionHelper
         .executeApi(request)
         .then(function(response) {
@@ -1484,16 +1574,9 @@ function submitForm() {
             } else {
                 $("#submit").attr("disabled", false);
                 $(".loader-overlay").remove();
-                $(".section-2").after(UxUtils.getAtLeastOneContainerError(atleastOneContentKey));
+                UxUtils.setAfter(".section-2" , UxUtils.getAtLeastOneContainerError(atleastOneContentKey));
             }
         });
-    /*
-            .catch(function(error) {
-                $("#submit").attr("disabled", false);
-                $(".loader-overlay").remove();
-                $(".section-2").after(UxUtils.getAtLeastOneContainerError(atleastOneContentKey));
-                console.error("GetContext - Error123: " + JSON.stringify(error));
-            })*/
 }
 
 /**
@@ -1509,7 +1592,7 @@ function getQuestionSet() {
             // let questionId = $(elem).data("id");
             let questionId = $(elem).find("span.counter").text();
             let option = [];
-            $(elem).find("div.qna-option").each(function(ind, e) {
+            $(elem).find("div.qna-option").each(function(ind) {
                 let count = ind + 1;
                 let optId = "question" + questionId + "option" + count;
                 let optTitle = $(elem).find("input#option" + count).val();
@@ -1580,23 +1663,12 @@ function getQuestionSet() {
             questions.push(val);
         } else if ($(elem).hasClass("document-section-div") == true) {
             /* Document */
-            let attachmentId = $(elem).find("textarea#attachment-id").val();
             let optionType = ActionHelper.getColumnType("largetext");
             let option = [];
             let optId = index; // $(elem).find("span.counter").text();
             let optTitle = $(elem).find("textarea.textarea-document").val();
             let optDesc = $(elem).find("textarea.textarea-document-description").val();
             let optAttach = [JSON.parse($(elem).find("textarea.textarea-document-attachment").val())];
-
-            let displayNameArr = {
-                "description": optDesc,
-                "attachmentId": (attachmentId)
-            };
-            /* option.push({
-                name: optId,
-                displayName: JSON.stringify(displayNameArr)
-            }); */
-
             option.push({
                 name: optId,
                 displayName: optDesc
@@ -1614,19 +1686,12 @@ function getQuestionSet() {
             questions.push(val);
         } else if ($(elem).hasClass("video-section-div") == true) {
             /* Video */
-            let attachmentId = $(elem).find("textarea#attachment-id").val();
             let optionType = ActionHelper.getColumnType("largetext");
             let option = [];
             let optId = index; // $(elem).find("span.counter").text();
             let optTitle = $(elem).find("textarea.textarea-video").val();
             let optDesc = $(elem).find("textarea.textarea-video-description").val();
             let optAttachment = [JSON.parse($(elem).find("textarea.textarea-video-attachments").val())];
-
-            let displayNameArr = {
-                "description": optDesc,
-                "attachmentId": (attachmentId)
-            };
-            //option.push({ name: optId, displayName: JSON.stringify(displayNameArr) });
             option.push({
                 name: optId,
                 displayName: optDesc
@@ -1645,7 +1710,6 @@ function getQuestionSet() {
         }
     });
     return questions;
-
 }
 
 /**
@@ -1658,7 +1722,7 @@ function getCorrectAnswer() {
         let correct = [];
         let questionId = $(elem).find("span.counter").text();
         if ($(elem).hasClass("question-section-div") == true) {
-            $(elem).find("div.option-div").each(function(ind, e) {
+            $(elem).find("div.option-div").each(function(ind) {
                 let count = ind + 1;
                 let questionId = $(elem).data("id");
                 if ($(elem).find("#quest-text-" + questionId + " #check" + count).is(":checked")) {
@@ -1690,9 +1754,13 @@ function getCorrectAnswer() {
 function createAction(actionPackageId) {
     let trainingTitle = $("#training-title").val();
     let trainingDescription = $("#training-description").val();
-    let trainingExpireDate = $("input[name='expiry_date']").val();
-    let trainingExpireTime = $("input[name='expiry_time']").val();
-    let resultVisible = $("input[name='visible_to']:checked").val();
+    let trainingExpireDate = $("input[name='expiry_date']").datepicker("getDate");
+    let trainingExpireTime = $(`input[name="expiry_time"]`).val();
+    let getExpiryDateData = trainingExpireDate.toString().split(" ");
+    getExpiryDateData[4] = trainingExpireTime + ":00";
+    let expiryDate = new Date(getExpiryDateData.join(" "));
+
+    let resultVisible = $(`input[name="visible_to"]:checked`).val();
     let showCorrectAnswer = $("#show-correct-answer").is(":checked") ? "Yes" : "No";
     let allowMultipleAttempt = $("#allow-multiple-attempt").is(":checked") ? "Yes" : "No";
     let questionsSet = getQuestionSet();
@@ -1731,7 +1799,7 @@ function createAction(actionPackageId) {
         version: 1,
         displayName: trainingTitle,
         description: trainingDescription,
-        expiryTime: new Date(trainingExpireDate + " " + trainingExpireTime).getTime(),
+        expiryTime: new Date(expiryDate).getTime(),
         customProperties: properties,
         dataTables: [{
             name: "TrainingDataSet",
@@ -1740,9 +1808,12 @@ function createAction(actionPackageId) {
             itemsEditable: false,
             canUserAddMultipleItems: false,
             dataColumns: questionsSet,
-            attachments: saveAttachmentData
+            attachments: ($("#training-attachment-id").val()) ? [JSON.parse($("#training-attachment-id").val())] : []
         }],
     };
+
+    console.log("Action : ", JSON.stringify(action));
+
     let request = ActionHelper.createAction(action);
     ActionHelper
         .executeApi(request)
@@ -1762,7 +1833,7 @@ function createAction(actionPackageId) {
 $(document).ready(function() {
     request = ActionHelper.getContextRequest();
     getStringKeys();
-    getTheme();
+    loadCreationView(request);
     $(".training-clear").attr({
         "style": "display:none;"
     });
@@ -1771,21 +1842,26 @@ $(document).ready(function() {
 /**
  * Method to get theme color and localization
  */
-async function getTheme() {
-    let response = "";
-    let context = "";
+async function loadCreationView(request) {
+
+    getStringKeys();
+
+    let response = await ActionHelper.executeApi(request);
+    let context = response.context;
+    let langObj = Utils.getLocaleForCalendar(context.locale);
     ActionHelper.executeApi(request).then(function(res) {
         response = res;
         context = response.context;
         lastSession = context.lastSessionData;
-
         let theme = context.theme;
+        
+        let formSection = UxUtils.getLandingContainer(uploadCoverImageKey, trainingTitleKey, trainingDescriptionOptionalKey, coverImageKey, clearKey, settingText, nextKey);
+
         $("link#theme").attr("href", "css/style-" + theme + ".css");
-        $("form.sec1").append(formSection);
-        $("form.sec1").append(settingSection);
-        $("form.sec1").append(trainingSectionView);
-        $("form.sec1").after(optionSection);
-        // $("form.sec1").after(toggleSection);
+        UxUtils.setAppend("form.sec1" , formSection);
+        UxUtils.setAppend("form.sec1" , settingSection);
+        UxUtils.setAppend("form.sec1" , trainingSectionView);
+        UxUtils.setAfter("form.sec1" , optionSection);
         opt = $("div#option-section .option-div").clone();
         let weekDate = new Date(new Date().setDate(new Date().getDate() + 7))
             .toISOString()
@@ -1794,6 +1870,8 @@ async function getTheme() {
         let weekMonth = new Date(weekDate).toLocaleString("default", {
             month: "short"
         });
+
+        let setDate = "";
         let weekD = new Date(weekDate).getDate();
         let weekYear = new Date(weekDate).getFullYear();
         let weekDateFormat = weekMonth + " " + weekD + ", " + weekYear;
@@ -1801,18 +1879,37 @@ async function getTheme() {
 
         /* If Edit back the quiz */
         if (lastSession != null) {
-            let ddtt = ((lastSession.action.customProperties[1].value).split("T"));
-            let dt = ddtt[0].split("-");
-            weekDateFormat = new Date(dt[1]).toLocaleString("default", {
-                month: "short"
-            }) + " " + dt[2] + ", " + dt[0];
-            let ttTime = (ddtt[1].split("Z")[0]).split(":");
-            currentTime = `${ttTime[0]}:${ ttTime[1]}`;
-            if (lastSession.action.customProperties[2].value == "Everyone") {
-                $(`input[name="visible_to"][value="Everyone"]`).prop("checked", true);
+            // let ddtt = ((lastSession.action.customProperties[1].value).split("T"));
+            // let dt = ddtt[0].split("-");
+            // weekDateFormat = new Date(dt[1]).toLocaleString("default", {
+            //     month: "short"
+            // }) + " " + dt[2] + ", " + dt[0];
+            // let ttTime = (ddtt[1].split("Z")[0]).split(":");
+            // currentTime = `${ttTime[0]}:${ ttTime[1]}`;
+
+            let expiryTime = lastSession.action.expiryTime;
+            setDate = new Date(expiryTime);
+            currentTime = new Date(expiryTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }).toLowerCase();
+
+            /* Quiz Section */
+            $("#quiz-title").val(lastSession.action.displayName);
+            $("#quiz-description").val(lastSession.action.customProperties[0].value);
+
+            /* Due Setting String */
+            let end = new Date(setDate + " " + currentTime);
+            let start = new Date();
+            let days = calc_date_diff(start, end);
+            let correctAnswer = lastSession.action.customProperties[3].value == "Yes" ? correctAnswerKey : "";
+            if (lastSession.action.customProperties[2].value == "Yes") {
+                $("#allow-multiple-attempt").prop("checked", true);
             } else {
-                $(`input[name="visible_to"][value="Only me"]`).prop("checked", true);
+                $("#allow-multiple-attempt").prop("checked", false);
             }
+            getStringKeys();
+            Localizer.getString("dueIn", days, correctAnswer).then(function(result) {
+                settingText = result;
+                $("div.section-1-footer").find("span#due").append(settingText);
+            });
 
             if (lastSession.action.customProperties[3].value == "Yes") {
                 $("#show-correct-answer").prop("checked", true);
@@ -1820,55 +1917,53 @@ async function getTheme() {
                 $("#show-correct-answer").prop("checked", false);
             }
 
-            /* Quiz Section */
-            $("#quiz-title").val(lastSession.action.displayName);
-            $("#quiz-description").val(lastSession.action.customProperties[0].value);
-
-            /* Due Setting String */
-            let end = new Date(weekDateFormat + " " + currentTime);
-            let start = new Date();
-            let days = calc_date_diff(start, end);
-
-            let resultVisible = lastSession.action.customProperties[2].value == "Everyone" ? resultEveryoneKey : resultMeKey;
-            let correctAnswer = lastSession.action.customProperties[3].value == "Yes" ? correctAnswerKey : "";
-
-            Localizer.getString("dueIn", days, correctAnswer).then(function(result) {
-                settingText = result;
-                $("#due").text(settingText);
-            });
-
         } else {
+            getStringKeys();
             $("form.sec1").show();
             $(".section-1").show();
             $(".section-1-footer").show();
+
+            let todayDate = new Date();
+            //Change it so that it is 7 days ago.
+            let weekAgoDate = todayDate.getDate() + 7;
+            setDate = new Date(todayDate.setDate(weekAgoDate));
+            currentTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }).toLowerCase();
+
         }
+
+        $(".form_date").attr({ "data-date": setDate });
         $(".form_date input").val(weekDateFormat);
         $(".form_date").attr({
-            "data-date": weekDateFormat
+            "data-date": setDate
         });
-
+        let lang = langObj.lang;
         $(".form_time").datetimepicker({
-            language: "en",
             weekStart: 1,
-            todayBtn: 1,
-            autoclose: 1,
-            todayHighlight: 1,
-            startView: 1,
-            minView: 0,
-            maxView: 1,
-            forceParse: 0
-        });
-
-        $(".form_time input").val(currentTime);
-        let dateInput = $(`input[name="expiry_date"]`);
-        let container = $(".bootstrap-iso form").length > 0 ? $(".bootstrap-iso form").parent() : "body";
-        let options = {
-            format: "M dd, yyyy",
-            container: container,
-            todayHighlight: true,
+            format: "HH:ii",
+            pickDate: "false",
             autoclose: true,
-            orientation: "top"
-        };
+            startView: 1,
+            maxView: 1,
+            useCurrent: false,
+            minView: 0,
+            forceParse: 0,
+            todayHighlight: 1,
+            todayBtn: 1,
+            meridiem: "",
+            language: lang
+
+        });
+        $(".form_time input").val(currentTime);
+        // let dateInput = $(`input[name="expiry_date"]`);
+        // let container = $(".bootstrap-iso form").length > 0 ? $(".bootstrap-iso form").parent() : "body";
+        // let options = {
+        //     format: "dd-mm-yyyy",
+        //     container: container,
+        //     todayHighlight: true,
+        //     autoclose: true,
+        //     orientation: "top",
+        //     language: lang
+        // };
 
         if (lastSession != null) {
             $(".sec1").show();
@@ -1876,7 +1971,6 @@ async function getTheme() {
             $(".section-1-footer").hide();
             $(".section-2").show();
             $("div.section-2-footer").show();
-            getStringKeys();
 
             $("#training-title").val(lastSession.action.displayName);
             $("#training-description").val(lastSession.action.customProperties[0].value);
@@ -1885,26 +1979,35 @@ async function getTheme() {
 
             /* Check if image upload for training */
             if (lastSession.action.dataTables[0].attachments.length > 0) {
+                UxUtils.setAppend($("div.section-2").find("div.training-card-section") , UxUtils.createTextArea("", "", "training-attachment-id", JSON.stringify(lastSession.action.dataTables[0].attachments[0]), "d-none"));
                 let req2 = ActionHelper.getAttachmentInfoDraft(lastSession.action.dataTables[0].attachments[0].id);
                 saveAttachmentData.push(lastSession.action.dataTables[0].attachments[0]);
                 ActionHelper.executeApi(req2)
                     .then(function(response) {
                         $("#training-title-image").attr("src", `${response.attachmentInfo.downloadUrl}`);
-                        $("#training-title-image").addClass('heightfit');
+                        $("#training-title-image").addClass("heightfit");
                         $("#training-title-image").parent().show();
                         $("#training-img-preview").attr("src", `${response.attachmentInfo.downloadUrl}`);
+
+                        let uniqueCarouselId = Constants.getUniqueId();
+                        UxUtils.setHtml($("#training-img-preview").parent() , UxUtils.createImageLightBox(response.attachmentInfo.downloadUrl,uniqueCarouselId,0,"training-updated-img quiz-updated-img card-bg card-border","training-img-preview"));
+                        $("#training-img-preview").parent().show();
+                        UxUtils.setHtml("#training-title-image" , UxUtils.createImageLightBox(response.attachmentInfo.downloadUrl,(uniqueCarouselId+2),0,"training-updated-img quiz-updated-img card-bg card-border","training-title-image"));
+
+                        Utils.getClassFromDimension(response.attachmentInfo.downloadUrl , "#training-title-image");
+                        Utils.getClassFromDimension(response.attachmentInfo.downloadUrl , "#training-img-preview");
+
                         $(".section-1").find(".training-updated-img").show();
                         $(".section-1").find(".photo-box").hide();
                         $(".section-2").find(".img-thumbnail").show();
                         $(".section-2").find("#training-title-image").show();
-                        $('.training-clear').show();
+                        $(".training-clear").show();
                     })
                     .catch(function(error) {
                         console.error("AttachmentAction - Error: sasasa" + JSON.stringify(error));
                     });
-                $("#cover-image").after(`<textarea name="training_title" class="training-title" style="display:none">${$("#training-title").val()}</textarea>`);
-                $("#cover-image").after(`<textarea name="training_description" class="training-description" style="display:none">${$("#training-description").val()}</textarea>`);
-                // $("#cover-image").after(`<span name="is_edit" class="training-is_edit" >Edit</span>`);
+                UxUtils.setAfter("#cover-image" , UxUtils.createTextArea("training_title", "training-title d-none", "", $("#training-title").val()));
+                UxUtils.setAfter("#cover-image" , UxUtils.createTextArea("training_description", "training-description d-none", "", $("#training-description").val()));
             }
 
             /* Create Text and Question summary */
@@ -1915,89 +2018,71 @@ async function getTheme() {
                     let counter = ind + 1;
                     if (data.valueType == "LargeText") {
                         /* Call Text Section 1 */
-                        let textTitle = data.displayName.length > 100 ? data.displayName.substr(0, data.displayName.lastIndexOf(" ", 97)) + "..." : data.displayName;
-
                         if (data.name.indexOf("photo") >= 0) {
                             let uniqueCarouselId = Constants.getUniqueId();
-                            let $carousel = $(`<div id="carouselExampleIndicators${uniqueCarouselId}" class="carousel slide "data-ride="carousel"></div>`);
-                            let $olSection = $(`<ol class="carousel-indicators"></ol>`);
-                            let $carouselInner = $(`<div class="carousel-inner"></div>`);
-                            $carousel.append($olSection);
-                            $carousel.append($carouselInner);
-                            data.attachments.forEach((respData, indx) => {
-                                let $liList = $(`<li data-target="#carouselExampleIndicators${uniqueCarouselId}" data-slide-to="${indx}" class="${indx == 0 ? "active": ""}"></li>`);
-                                $olSection.append($liList);
-                                let getImagedata = ActionHelper.getAttachmentInfoDraft(respData.id);
-                                ActionHelper.executeApi(getImagedata)
-                                    .then(function(response) {
-                                        let $imgDiv = $(UxUtils.getCarousalImages(indx, response.attachmentInfo.downloadUrl));
-                                        $carouselInner.append($imgDiv);
-                                        console.info("Attachment - Response: " + JSON.stringify(response));
-                                    })
-                                    .catch(function(error) {
-                                        console.error("AttachmentAction - Error: " + JSON.stringify(error));
-                                    });
-                            });
-                            $carousel.append(UxUtils.getCarousalPagination(uniqueCarouselId));
                             let photoDesc = data.options[0].displayName;
                             let loaderClass = "";
                             let loaderCss = "";
                             let loaderButton = "";
-                            if (photoDesc && (photoDesc.split(/\r\n|\r|\n/).length > 2 || photoDesc.length > 200)) {
+                            if (photoDesc && (photoDesc.split(/\r\n|\r|\n/).length > 2 || photoDesc.length > 180)) {
                                 loaderClass = "show-text";
                                 loaderCss = Constants.getLoadMoreCss();
-                                loaderButton = Constants.getLoadMoreLink();
+                                loaderButton = Constants.getLoadMoreLink(loadMoreKey);
                             }
                             let photoSec = UxUtils.getEditImageSection(counter, data.displayName, photoDesc, JSON.stringify(data.attachments), loaderClass, loaderCss, loaderButton);
-                            $("div.section-2 div#root").append(photoSec);
-
-                            $(".edit-carasoul-here").append($carousel);
-                            $(".carousel").carousel();
-
-                            if (photoDesc && (photoDesc.split(/\r\n|\r|\n/).length > 2 || photoDesc.length > 200)) {
+                            UxUtils.setAppend("div.section-2 div#root" , photoSec);
+                            if (photoDesc && (photoDesc.split(/\r\n|\r|\n/).length > 2 || photoDesc.length > 180)) {
                                 $("#section-" + counter).find(".photo-description-preview").addClass("show-text");
                                 $("#section-" + counter).find(".photo-description-preview").css({ "-webkit-line-clamp": Constants.webkitLineClampCssCount() });
-                                $("#section-" + counter).find(".photo-description-preview").after(Constants.getLoadMoreLink());
+                                UxUtils.setAfter($("#section-" + counter).find(".photo-description-preview") , Constants.getLoadMoreLink(loadMoreKey));
                             }
 
-                            let dname = Utils.isJson(data.options[0].displayName) ? JSON.parse(data.options[0].displayName) : data.options[0].displayName;
-                            let attachment = Utils.isJson(dname.attachmentId) ? JSON.parse(dname.attachmentId) : dname.attachmentId;
-                            if (attachment != undefined) {
-                                $("#text-section-" + counter + " textarea#attachment-id").val(attachment);
-
-                                let attachmentImg = "";
-                                $.each(attachment, function(ind, att) {
-                                    attachmentImg = att;
-                                    return false;
+                            let $carousel = $(UxUtils.getResponseViewCarouselSection(uniqueCarouselId));
+                            let $olSection = $(UxUtils.getCarouselOlSection());
+                            let $carouselInner = $(UxUtils.getCarouselInnerSection());
+                            UxUtils.setAppend($carousel , $olSection);
+                            UxUtils.setAppend($carousel , $carouselInner);
+                            if (data.attachments.length > 1) {
+                                data.attachments.forEach((respData, indx) => {
+                                    let $liList = $(UxUtils.getCarousalLiSection(uniqueCarouselId, indx));
+                                    UxUtils.setAppend($olSection , $liList);
+                                    let getImagedata = ActionHelper.getAttachmentInfoDraft(respData.id);
+                                    ActionHelper.executeApi(getImagedata)
+                                        .then(function(response) {
+                                            let $imgDiv = $(UxUtils.getCarousalImages(response.attachmentInfo.downloadUrl, indx ,uniqueCarouselId));
+                                            UxUtils.setAppend($carouselInner , $imgDiv);
+                                            console.info("Attachment - Response: " + JSON.stringify(response));
+                                        })
+                                        .catch(function(error) {
+                                            console.error("AttachmentAction - Error: " + JSON.stringify(error));
+                                        });
                                 });
-                                let req = ActionHelper.getAttachmentInfo(attachmentImg);
-                                let filesAmount = Object.keys(attachment).length;
-                                ActionHelper.executeApi(req)
+                                UxUtils.setAppend($carousel , UxUtils.getCarousalPagination(uniqueCarouselId));
+                                UxUtils.setAppend($("#section-" + counter).find(".edit-carasoul-here") , $carousel);
+                                $(".carousel").carousel();
+                            } else {
+                                let getImagedata = ActionHelper.getAttachmentInfoDraft(data.attachments[0].id);
+                                ActionHelper.executeApi(getImagedata)
                                     .then(function(response) {
+                                        UxUtils.setAppend($("#section-" + counter).find(".edit-carasoul-here") , UxUtils.createImageLightBox(response.attachmentInfo.downloadUrl,uniqueCarouselId));
                                         console.info("Attachment - Response: " + JSON.stringify(response));
-                                        $("img#image-sec-" + counter).attr("src", response.attachmentInfo.downloadUrl);
-                                        if (filesAmount > 1) {
-                                            $("img#image-sec-" + counter).after(`<span class="file-counter">+${filesAmount-1}</span>`);
-                                        }
                                     })
                                     .catch(function(error) {
                                         console.error("AttachmentAction - Error: " + JSON.stringify(error));
                                     });
-
                             }
-
                         } else if (data.name.indexOf("document") >= 0) {
                             let docDesc = data.options[0].displayName;
                             let loaderClass = "";
                             let loaderCss = "";
                             let loaderButton = "";
-                            if (docDesc && (docDesc.split(/\r\n|\r|\n/).length > 2 || docDesc.length > 200)) {
+                            if (docDesc && (docDesc.split(/\r\n|\r|\n/).length > 2 || docDesc.length > 180)) {
                                 loaderClass = "show-text";
                                 loaderCss = `-webkit-line-clamp : ${Constants.webkitLineClampCssCount()}`;
-                                loaderButton = Constants.getLoadMoreLink();
+                                loaderButton = Constants.getLoadMoreLink(loadMoreKey);
                             }
                             let documentSection = UxUtils.getEditDownloadSection(counter, data.displayName, data.options[0].displayName, JSON.stringify(data.attachments[0]), Constants.getDocumentIcon(), loaderClass, loaderCss, loaderButton);
-                            $("div.section-2 div#root").append(documentSection);
+                            UxUtils.setAppend("div.section-2 div#root" , documentSection);
                             let dname = Utils.isJson(data.options[0].displayName) ? JSON.parse(data.options[0].displayName) : data.options[0].displayName;
                             let attachment = Utils.isJson(dname.attachmentId) ? JSON.parse(dname.attachmentId) : dname.attachmentId;
                             if (attachment != undefined) {
@@ -2012,10 +2097,10 @@ async function getTheme() {
                             let loaderClass = "";
                             let loaderCss = "";
                             let loaderButton = "";
-                            if (videoDesc && (videoDesc.split(/\r\n|\r|\n/).length > 2 || videoDesc.length > 200)) {
+                            if (videoDesc && (videoDesc.split(/\r\n|\r|\n/).length > 2 || videoDesc.length > 180)) {
                                 loaderClass = "show-text";
                                 loaderCss = `-webkit-line-clamp : ${Constants.webkitLineClampCssCount()}`;
-                                loaderButton = Constants.getLoadMoreLink();
+                                loaderButton = Constants.getLoadMoreLink(loadMoreKey);
                             }
                             let videoSection = UxUtils.getEditVideoSection(counter, data.displayName, data.options[0].displayName, JSON.stringify(data.attachments[0]), "", loaderClass, loaderCss, loaderButton);
                             ActionHelper.executeApi(req)
@@ -2027,39 +2112,39 @@ async function getTheme() {
                                 .catch(function(error) {
                                     console.error("AttachmentAction - Error: videourl" + JSON.stringify(error));
                                 });
-                            $("div.section-2 div#root").append(videoSection);
+                            UxUtils.setAppend("div.section-2 div#root" , videoSection);
                         } else {
                             /* text */
                             let textDesc = data.options[0].displayName;
                             let loaderClass = "";
                             let loaderCss = "";
                             let loaderButton = "";
-                            if (textDesc && (textDesc.split(/\r\n|\r|\n/).length > 2 || textDesc.length > 200)) {
+                            if (textDesc && (textDesc.split(/\r\n|\r|\n/).length > 2 || textDesc.length > 180)) {
                                 loaderClass = "show-text";
                                 loaderCss = `-webkit-line-clamp : ${Constants.webkitLineClampCssCount()}`;
-                                loaderButton = Constants.getLoadMoreLink();
+                                loaderButton = Constants.getLoadMoreLink(loadMoreKey);
                             }
                             let textSection = UxUtils.getEditTextContainer(counter, data.displayName, textDesc, loaderClass, loaderCss, loaderButton);
-
-                            $("div.section-2 div#root").append(textSection);
+                            UxUtils.setAppend("div.section-2 div#root" , textSection);
                         }
 
                     } else if (data.valueType == "SingleOption" || data.valueType == "MultiOption") {
 
                         /* Call Question Section 1 */
                         let correct = new Array();
-                        let correctOpt = "";
+                        // let correctOpt = "";
                         let optionText = "";
                         let correctInputs = "";
-                        let questionInput = `<input type="hidden" class="question${countQuestionno}" value="${data.displayName}">`;
+                        let questionInput = UxUtils.createInputBox("hidden", `question${countQuestionno}`, "", data.displayName, "");
                         let questionImagearray = "";
                         if (data.attachments.length > 0) {
                             questionImagearray = data.attachments[0];
                             let req = ActionHelper.getAttachmentInfoDraft(questionImagearray.id);
                             ActionHelper.executeApi(req)
                                 .then(function(response) {
-                                    console.info("Attachment - Response: question image" + JSON.stringify(response));
-                                    $(".section-2").find(`#${questionImagearray.id}`).attr("src", response.attachmentInfo.downloadUrl);
+                                    $(".section-2").find(`#${data.attachments[0].id}`).attr("src", response.attachmentInfo.downloadUrl);
+                                    $(`img#${data.attachments[0].id}`).parent().attr({"href": response.attachmentInfo.downloadUrl});
+                                    Utils.getClassFromDimension(response.attachmentInfo.downloadUrl , `img#${data.attachments[0].id}`);
                                 })
                                 .catch(function(error) {
                                     console.error("AttachmentAction - Error: question image" + JSON.stringify(error));
@@ -2087,30 +2172,35 @@ async function getTheme() {
                                         console.info("Attachment - Response: option url" + JSON.stringify(response));
                                         imageURL += response.attachmentInfo.downloadUrl;
                                         $(`.opt-image${count}`).attr("src", response.attachmentInfo.downloadUrl);
+                                        $(`.opt-image${count}`).parent().attr("href", response.attachmentInfo.downloadUrl);
                                         $(`.opt-image${count}`).parent().find("loader-cover").hide();
+
+                                        Utils.getClassFromDimension(response.attachmentInfo.downloadUrl , `.opt-image${count}`);
+
                                     })
                                     .catch(function(error) {
                                         console.error("AttachmentAction - Error: option url" + JSON.stringify(error));
                                     });
                             }
                             if (imageArray) {
-                                optionAttachments += `<textarea class="d-none option-image${count}">${JSON.stringify(imageArray)}</textarea>`;
+                                optionAttachments += UxUtils.createTextArea("", `d-none option-image${count}`, "", JSON.stringify(imageArray));
                             }
 
                             let ifCorrectCheck = "";
                             let questionOptionId = `question${countQuestionno}option${count}`;
                             if ($.inArray(opt.name, quesAnsArr[countQuestion]) != -1) {
-                                correctInputs += `<input type="checkbox" id="check${count}" checked>`;
-                                optionChecked += `<input type="checkbox" class="d-none quest-answer" checked>`;
+                                correctInputs += UxUtils.createInputBox("checkbox", "", `check${count}`, "", "checked");
+                                optionChecked += UxUtils.createInputBox("checkbox", "d-none quest-answer", "", "", "checked");
 
                                 // if it is checked
                                 correct.push(questionOptionId);
-                                correctOpt += `<p class="mb0">${opt.displayName}</li>`;
-                                ifCorrectCheck = `&nbsp;<i class="success">${Constants.getDefaultTickIcon()}</i>`;
+                                // correctOpt += UxUtils.createParagraphBox(opt.displayName, "mb0", "");
+                                ifCorrectCheck = Constants.getCheckedTickIcon();
                             }
-                            let optionsInputs = `<input type="hidden" class="all_options" id="option${count}" value="${opt.displayName}">`;
-                            let imagePreview = `<img src="${imageURL}" class="opt-image opt-image${count} img-responsive smallfit">`;
-                            optionText += UxUtils.getOptionValue(optionsInputs, imagePreview, opt.displayName, questionOptionId, ifCorrectCheck, styleOptionImage, count);
+                            let optionsInputs = UxUtils.createInputBox("hidden", "all_options", `option${count}`, opt.displayName);
+                            let imagePreview = UxUtils.createImageLightBox(imageURL, "question" + countQuestionno , count , `opt-image opt-image${count} img-responsive`);
+                            let optionValue = (opt.displayName) ? opt.displayName : "&nbsp;";
+                            optionText += UxUtils.getOptionValue(optionsInputs, imagePreview, optionValue, questionOptionId, ifCorrectCheck, styleOptionImage, count);
 
                         });
 
@@ -2118,19 +2208,30 @@ async function getTheme() {
                         let hideQuestionImage = "d-none";
                         if (data.attachments.length > 0) {
                             hideQuestionImage = "";
-                            questionImage = `<img src="${imageQuestionURL}" id="${questionImagearray.id}" class="question-preview-image question-preview-image heightfit" >`;
+                            questionImage = UxUtils.createImageLightBox(imageQuestionURL, "question" + countQuestionno ,countQuestionno, `question-preview-image` , data.attachments[0].id);
                         }
                         let questSection1 = UxUtils.getQuestionSection(countQuestionno, optionChecked, questionImage, hideQuestionImage, data.displayName, optionText, questionInput, questionImagearray, optionAttachments, correctInputs);
-                        $("div.section-2 div#root").append(questSection1);
+                        UxUtils.setAppend("div.section-2 div#root" , questSection1);
                         countQuestion++;
                         countQuestionno++;
                     }
                 });
             });
+        }else{
+            getStringKeys();
         }
+        let dateInput = $("input[name='expiry_date']");
+        let container = $(".bootstrap-iso form").length > 0 ? $(".bootstrap-iso form").parent() : "body";
+        let options = {
+            container: container,
+            autoclose: true,
+            orientation: "top",
+            todayHighlight: true,
+            language: lang
+        };
         dateInput.datepicker(options);
-        ActionHelper.hideLoader();
-        getStringKeys();
+        dateInput.datepicker("setDate", setDate);
+        ActionHelper.hideLoader();        
     });
 }
 /***********************************  Other Actions *******************************/
@@ -2147,6 +2248,9 @@ $(document).on("click", "#back", function() {
     $(".section-1").show();
     $(".section-1-footer").show();
     $(".error-msg").remove();
+    
+    $("#due").text(settingText);
+
 });
 
 /**
@@ -2174,8 +2278,6 @@ $(document).on("click", "#next1", function() {
         .each(function() {
             let element = $(this);
             if (element.val() == "") {
-                validate = false;
-
                 $(this)
                     .parents("div.card-box")
                     .removeClass("card-box")
@@ -2183,40 +2285,39 @@ $(document).on("click", "#next1", function() {
 
                 if (element.attr("id") == "training-title") {
                     $("#training-title").addClass("danger");
-                    $("#training-title").before(`<label class="label-alert d-block mb--4">${requiredKey}</label>`);
+                    UxUtils.setBefore("#training-title" , UxUtils.getRequiredError(requiredKey));
                 }
             } else {
+
+                let trainingTitle = $("#training-title").val();
+                let trainingDesc = $("#training-description").val();
                 $(".section-1").hide();
                 $("div.section-1-footer").hide();
 
                 $(".section-2").show();
                 $("div.section-2-footer").show();
 
-                $("#training-title-content").text($("#training-title").val());
-                if ($("#training-description").val()) {
-                    $("#training-description-content").text($("#training-description").val());
+                $("#training-title-content").text(trainingTitle);
+                if (trainingDesc) {
+                    $("#training-description-content").text(trainingDesc);
                 }
 
                 if ($(".training-title").length > 0) {
-                    $(".training-title").val($("#training-title").val());
+                    $(".training-title").val(trainingTitle);
                 } else {
-                    $("#cover-image").after(`<textarea name="training_title" class="training-title" style="display:none">${$("#training-title").val()}</textarea>`);
+                    UxUtils.setAfter("#cover-image" , UxUtils.createTextArea("training_title", "training-title", "", trainingTitle, "d-none"));
                 }
                 if ($(".training-description").length > 0) {
-                    $(".training-description").val($("#training-description").val());
-                    $("#cover-image").after(`<textarea name="training_description" class="training-description" style="display:none">${$("#training-description").val()}</textarea>`);
+                    $(".training-description").val(trainingDesc);
                 } else {
-                    $("#cover-image").after(`<textarea name="training_description" class="training-description" style="display:none">${$("#training-description").val()}</textarea>`);
+                    UxUtils.setAfter("#cover-image" ,UxUtils.createTextArea("training_description", "training-description", "", trainingDesc, "d-none"));
                 }
             }
         });
 
     let imageCounter = $(".training-card-section").find(`input[type="file"]`).get(0).files.length;
     if (imageCounter > 0) {
-        $(".body-outer").before(loader);
-        for (let i = 0; i < imageCounter; i++) {
-            let fileData = $(".training-card-section").find(`input[type="file"]`).get(0).files[i];
-        }
+        UxUtils.setBefore(".body-outer" , loader);
         $(".loader-overlay").remove();
     } else {
         $("#training-title-content").parents("div.col-9").addClass("col-12").removeClass("col-9");
@@ -2231,25 +2332,31 @@ $(document).on("change", "#cover-image", function() {
     $(".error-msg").remove();
     if ($(this).val()) {
         let urlResponse = readURL(this, "#training-img-preview, #training-title-image", "next1");
-        $(".cover-image-loader").parent().parent().find("span.text-danger.pull-right").remove();
         if (urlResponse == true) {
+            // Create Light Box Slider
+            let input = this;
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                let uniqueCarouselId = Constants.getUniqueId();
+                UxUtils.setHtml($("#training-img-preview").parents("div.training-updated-img") , UxUtils.createImageLightBox(event.target.result,uniqueCarouselId,0,`training-updated-img quiz-updated-img card-bg card-border`,"training-img-preview"));
+                UxUtils.setHtml($("#training-title-image").parents("div.quiz-updated-img") , UxUtils.createImageLightBox(event.target.result,(uniqueCarouselId+2),0,`training-updated-img quiz-updated-img card-bg card-border` , "training-title-image"));
+                Utils.getClassFromDimension(event.target.result, "#training-title-image");
+                Utils.getClassFromDimension(event.target.result,"#training-img-preview");
+                $("#training-img-preview").parents("div.training-updated-img").show();
+            };
+            reader.readAsDataURL(input.files[0]);
             $(".photo-box").hide();
-            // $(".quiz-updated-img").show();
             $(".training-updated-img").show();
-            $("#training-title-image").show();
-            $("#training-title-image").parent(".quiz-updated-img").show();
+            $("#training-title-image").parents("div.quiz-updated-img").show();
             $(".training-clear").show();
             if (!$("#next1").hasClass("disabled")) {
                 $("#next1").addClass("disabled");
-                $("#next1").prepend(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
+                UxUtils.setPrepend("#next1" , UxUtils.getLoaderSpinner());
             }
-
             /* Perform image upload for quiz template */
             let fileData = this;
             if ($(fileData).val() != "") {
-                $(".cover-image-loader").show();
                 let coverImage = fileData.files[0];
-
                 let attachment = ActionHelper.attachmentUpload(coverImage, coverImage["type"]);
                 let attachmentRequest = {};
                 attachmentRequest = ActionHelper.requestAttachmentUploadDraft(attachment);
@@ -2263,8 +2370,11 @@ $(document).on("change", "#cover-image", function() {
                         saveAttachmentData.push(attachmentData);
                         $("#next1").removeClass("disabled");
                         $("#next1").find(`span.spinner-border.spinner-border-sm`).remove();
-                        $("div.section-2").find("div.training-card-section").after(`<textarea id="training-attachment-id" class="d-none">${JSON.stringify(attachmentData)}</textarea>`);
-                        attachmentSet.push(attachmentData);
+                        if($("#training-attachment-id").length > 0) {
+                            $("#training-attachment-id").val(JSON.stringify(attachmentData));
+                        } else {
+                            UxUtils.setAppend($("div.section-2").find("div.training-card-section") , UxUtils.createTextArea(" ", " ", "training-attachment-id", JSON.stringify(attachmentData), "d-none"));
+                        }
                     })
                     .catch(function(error) {
                         console.log("GetContext - Error2: " + JSON.stringify(error));
@@ -2278,8 +2388,7 @@ $(document).on("change", "#cover-image", function() {
             $(".training-updated-img").hide();
             $("#training-title-image").hide();
             $(".training-clear").hide();
-
-            $(".cover-image-loader").parent().before(`<span class="text-danger pull-right">Invalid file formate</span><div class="clearfix"></div>`);
+            UxUtils.setBefore($(".cover-image-loader").parent() , UxUtils.getMaxImageAlert(invalidFileFormatKey));
         }
     }
 });
@@ -2292,13 +2401,9 @@ $(document).on("click", ".training-clear", function() {
     $("div.section-1 .photo-box").show();
     $("div.section-1 .training-updated-img").hide();
     $("div.section-1 .training-clear").hide();
-
     $("#training-img-preview").attr("src", "");
-
-    $("#training-title-image").parent().hide();
-
+    $("#training-title-image").parents("div.quiz-updated-img").hide();
     $("#training-attachment-id").remove();
-
     $("div#section-0 #cover-image").val("");
     $("div#section-0 .img-thumbnail").hide();
     $("div#section-0 .img-thumbnail").parents(".rows").addClass("col-12").removeClass("col-9");
@@ -2310,13 +2415,9 @@ $(document).on("click", ".training-clear", function() {
 $(document).on("click", ".upvj", function(event) {
     event.preventDefault();
     if ($(this).parents("div.section-1").length > 0) {
-        $(".section-2").find("div.training-card-section:first").find(`
-                                    input[type = "file"]
-                                    `).click();
+        $(".section-2").find("div.training-card-section:first").find(`input[type="file"]`).click();
     } else {
-        $(".section-2").find("div.training-card-section:last").find(`
-                                    input[type = "file"]
-                                    `).click();
+        $(".section-2").find("div.training-card-section:last").find(`input[type="file"]`).click();
     }
 });
 
@@ -2327,16 +2428,29 @@ $(document).on("click", ".upvj", function(event) {
  * @event when change on setting inputs
  */
 $(document).on("change", `input[name="expiry_date"], input[name="expiry_time"], .visible-to, #show-correct-answer`, function() {
-    let end = new Date($(`input[name="expiry_date"]`).val() + " " + $(`input[name="expiry_time"]`).val());
+    
+    $(".invalid-date-err").remove();
+    let getExpiryDate = $(`input[name="expiry_date"]`).datepicker("getDate");
+    let getExpiryDateData = getExpiryDate.toString().split(" ");
+    getExpiryDateData[4] = $("input[name='expiry_time']").val() + ":00";
+    let end = new Date(getExpiryDateData.join(" "));
+    $(".text-danger").parent("div.col-12").remove();
+    $("#back").removeClass("disabled");
+
     let start = new Date();
-    let days = calc_date_diff(start, end);
+    let days = Utils.calcDateDiff(start, end, weekKey, hoursKey, hourKey, minutesKey, minuteKey, daysKey);
+
+    // let end = new Date($(`input[name="expiry_date"]`).val() + " " + $(`input[name="expiry_time"]`).val());
+    // let start = new Date();
+    // let days = calc_date_diff(start, end);
+
     $(this).parents("div.row").find(".error-msg").remove();
     if (days == undefined) {
-        let $errSec = $(` < p class = "text-danger error-msg" > < /p>`);
+        let $errSec = $(UxUtils.createParagraphBox("", "text-danger error-msg"));
         Localizer.getString("alert_invalid_date_time").then(function(result) {
-            $errSec.append(result);
+            UxUtils.setAppend($errSec , result);
         });
-        $("small.invalid-date-error").prepend($errSec);
+        UxUtils.setPrepend("small.invalid-date-error" , $errSec);
         $("#back-setting").parents("a.cursur-pointer").addClass("disabled");
         $("#back").addClass("disabled");
         $("#back").find("span[tabindex=0]").addClass("disabled");
@@ -2344,7 +2458,6 @@ $(document).on("change", `input[name="expiry_date"], input[name="expiry_time"], 
         $("#back").removeClass("disabled");
         $("#back").find("span[tabindex=0]").removeClass("disabled");
         $("#back-setting").parents("a.cursur-pointer").removeClass("disabled");
-        let resultVisible = $(".visible-to:checked").val() == "Everyone" ? resultEveryoneKey : resultMeKey;
         let correctAnswer = $("#show-correct-answer:eq(0)").is(":checked") == true ? correctAnswerKey : "";
         Localizer.getString("dueIn", days, correctAnswer).then(function(result) {
             settingText = result;
@@ -2468,14 +2581,12 @@ $(document).on("keydown", "div[tabindex=0] , span[tabindex=0] , a[tabindex=0]", 
         if ($(this).attr("role") == "checkbox") {
             $(this).find("input[type=checkbox]").click();
         }
-
         if ($(this).attr("role") == "button") {
             if ($(this).data("id") == "back" && $(this).hasClass("disabled")) {
                 return false;
             }
             $("#" + $(this).data("id")).click();
         }
-
         if ($(this).attr("role") == "input") {
             $(".quiz-clear").click();
         }
@@ -2486,7 +2597,6 @@ $(document).on("keydown", "div[tabindex=0] , span[tabindex=0] , a[tabindex=0]", 
                 $(".section-2").find("div.training-card-section:last").find(`input[type="file"]`).click();
             }
         }
-
         return false;
     }
 
@@ -2511,60 +2621,72 @@ $(document).on({
     }
 }, ".question-image, .option-image");
 
+$(document).on("click", '[data-toggle="lightbox"]', function(event) {
+    event.preventDefault();
+    $(this).ekkoLightbox();
+});
+
 /**
  * @event Change when question cover image changes
  */
 $(document).on("change", `input[name="question_image"]`, function() {
-    $(".invalid-file-question").remove();
+    // $(".invalid-file-question").remove();
+    $(this).parents("div.form-group-question").find("span.text-danger.error-msg").remove();
     let urlReturn = readURL(this, $(this).parents("div.form-group-question").find(".question-preview-image"));
     if (urlReturn == true) {
         if (!$("#question-done").hasClass("disabled")) {
             $("#question-done").addClass("disabled");
-            $("#question-done").append(Constants.getDisabledLoader());
+            UxUtils.setAppend("#question-done" , Constants.getDisabledLoader());
         }
-        $(this).parents("div.form-group-question").find(".question-preview-image").show();
+        buttonCounter++;
+        $("#question-done").attr({"data-count" : buttonCounter});
+        let input = this;
+        let reader = new FileReader();
+        reader.onload = function(event) {
+            let uniqueCarouselId = Constants.getUniqueId();
+            let questionId = "question" + uniqueCarouselId;
+            $(input).parents("div.question-container").attr({"data-id": questionId});
+            UxUtils.setHtml($(input).parents("div.form-group-question").find(".question-preview") , UxUtils.createImageLightBox(event.target.result,questionId,"0",`question-preview-image`,questionId));
+            Utils.getClassFromDimension(event.target.result,`#${questionId}`);
+        };
+        reader.readAsDataURL(input.files[0]);
         $(this).parents("div.form-group-question").find(".question-preview").show();
         $(".remove-option").hide();
 
         /* Perform image upload for question image */
         let fileData = this;
         if ($(fileData).val() != "") {
-            if (!$("#submit").hasClass("disabled")) {
-                $("#submit").addClass("disabled");
-                $("#submit").prepend(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
-            }
             let coverImage = fileData.files[0];
             let attachment = ActionHelper.attachmentUpload(coverImage, coverImage["type"]);
             let attachmentRequest = ActionHelper.requestAttachmentUploadDraft(attachment);
             let imgIndex = $(this).attr("id");
             ActionHelper.executeApi(attachmentRequest)
-                .then(function(response) {
-                    let attachmentData = {
-                        "name": "question-banner-" + imgIndex,
-                        type: "Image",
-                        id: response.attachmentId
-                    };
-                    let selector = $(this).parents(".question-container").attr("id");
-                    if ($("#" + selector).find("#question-attachment-id").length > 0) {
-                        $("#" + selector).find("#question-attachment-id").val(response.attachmentId);
-                        $("#" + selector).find("#question-attachment-set").val(JSON.stringify(attachmentData));
-                    } else {
-                        $(fileData).after(`<textarea id="question-attachment-id" class="d-none" >${response.attachmentId}</textarea>`);
-                        $(fileData).after(`<textarea id="question-attachment-set" class="d-none" >${JSON.stringify(attachmentData)}</textarea>`);
-                    }
-                    $("#submit").removeClass("disabled");
-                    $("#submit").find(`.spinner-border.spinner-border-sm`).remove();
+            .then(function(response) {
+                let attachmentData = {
+                    "name": "question-banner-" + imgIndex,
+                    type: "Image",
+                    id: response.attachmentId
+                };
+                let selector = $(this).parents(".question-container").attr("id");
+                if ($("#" + selector).find("#question-attachment-set").length > 0) {
+                    $("#" + selector).find("#question-attachment-set").val(JSON.stringify(attachmentData));
+                } else {
+                    UxUtils.setAfter(fileData , UxUtils.createTextArea("", "d-none", "question-attachment-set", JSON.stringify(attachmentData)));
+                }
+                buttonCounter--;
+                if(buttonCounter == 0) {
                     $("#question-done").removeClass("disabled");
                     $("#question-done").find(Constants.getDisabledLoaderClass()).remove();
-                })
-                .catch(function(error) {
-                    console.log("GetContext - Error3: " + JSON.stringify(error));
-                });
+                }
+            })
+            .catch(function(error) {
+                console.log("GetContext - Error3: " + JSON.stringify(error));
+            });
         }
     } else {
         $(".question-preview-image").attr("src", "");
         $(".question-preview").hide();
-        $(this).parents(".form-group-question").find(".question-preview").before(`<label class="label-alert d-block mb--4 invalid-file-question"><font class="invalid-file-key">${invalidFileFormatKey}</font></label>`);
+        UxUtils.setBefore($(this).parents(".form-group-question").find(".question-preview") , UxUtils.getMaxImageAlert(invalidFileFormatKey));
         $(this).parents("div.input-group-append").find("#question-attachment-id").remove();
         $(this).parents("div.input-group-append").find("#question-attachment-set").remove();
     }
@@ -2574,26 +2696,33 @@ $(document).on("change", `input[name="question_image"]`, function() {
  * @event Change when option cover image changes
  */
 $(document).on("change", `input[name="option_image"]`, function() {
-    $(".invalid-file-option").remove();
+    $(this).parents("div.option-div").find("span.text-danger.error-msg").remove();
     let urlReturn = readURL(this, $(this).parents("div.row").find(".option-preview-image"));
     $(this).parents("div.row").find(".option-preview-image").show();
     $(this).parents("div.row").find("div.option-preview").show();
     if (urlReturn == true) {
+        buttonCounter++;
+        $("#question-done").attr({"data-count" : buttonCounter});
         if (!$("#question-done").hasClass("disabled")) {
             $("#question-done").addClass("disabled");
-            $("#question-done").append(Constants.getDisabledLoader());
+            UxUtils.setAppend("#question-done" , Constants.getDisabledLoader());
         }
         let fileData = this;
         $(".remove-option").hide();
         if ($(fileData).val() != "") {
-            if (!$("#submit").hasClass("disabled")) {
-                $("#submit").addClass("disabled");
-                $("#submit").prepend(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
-            }
             let coverImage = fileData.files[0];
             let attachment = ActionHelper.attachmentUpload(coverImage, coverImage["type"]);
             let attachmentRequest = ActionHelper.requestAttachmentUploadDraft(attachment);
             let imgIndex = $(this).attr("id");
+            let optionClass = Constants.getUniqueId();
+            let input = this;
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                let questionId = $(input).parents("div.question-container").data("id");
+                UxUtils.setHtml($(input).parents("div.row").find(".option-preview") , UxUtils.createImageLightBox(event.target.result,questionId, 0 , `option-preview-image ${optionClass}`));
+                Utils.getClassFromDimension(event.target.result,`.${optionClass}`);
+            };
+            reader.readAsDataURL(input.files[0]);
             ActionHelper.executeApi(attachmentRequest)
                 .then(function(response) {
                     let attachmentData = {
@@ -2602,26 +2731,25 @@ $(document).on("change", `input[name="option_image"]`, function() {
                         id: response.attachmentId
                     };
                     let selector = $(this).parents(".row");
-                    if ($(selector).find("textarea#option-attachment-id").length > 0) {
-                        $(selector).find("textarea#option-attachment-id").val(response.attachmentId);
+                    if ($(selector).find("textarea#option-attachment-set").length > 0) {
                         $(selector).find("textarea#option-attachment-set").val(JSON.stringify(attachmentData));
                     } else {
-                        $(fileData).after(`<textarea id="option-attachment-id" class="d-none" >${response.attachmentId}</textarea>`);
-                        $(fileData).after(`<textarea id="option-attachment-set" class="d-none" >${JSON.stringify(attachmentData)}</textarea>`);
+                        UxUtils.setAfter(fileData , UxUtils.createTextArea("", "d-none", "option-attachment-set", JSON.stringify(attachmentData)));
                     }
-                    $("#submit").removeClass("disabled");
-                    $("#submit").find(`.spinner-border.spinner-border-sm`).remove();
-                    $("#question-done").removeClass("disabled");
-                    $("#question-done").find(Constants.getDisabledLoaderClass()).remove();
+                    buttonCounter--;
+                    if(buttonCounter == 0) {
+                        $("#question-done").removeClass("disabled");
+                        $("#question-done").find(Constants.getDisabledLoaderClass()).remove();
+                    }
                 })
                 .catch(function(error) {
                     console.log("GetContext - Error4: " + JSON.stringify(error));
                 });
         }
     } else {
-        $(".option-preview-image").attr("src", "");
-        $(".option-preview").hide();
-        $(this).parents("div.option-div").prepend(`<label class="label-alert d-block mb--4 invalid-file-option"><font class="invalid-file-key">${invalidFileFormatKey}</font></label>`);
+        $(this).parents("div.option-div").find(".option-preview-image").attr("src", "");
+        $(this).parents("div.option-div").find(".option-preview").hide();
+        UxUtils.setPrepend($(this).parents("div.option-div") , UxUtils.getMaxImageAlert(invalidFileFormatKey));
         $(this).parents("div.option-div").find("#question-attachment-id").remove();
         $(this).parents("div.option-div").find("#question-attachment-set").remove();
     }
@@ -2663,28 +2791,12 @@ KeyboardUtils.keydownClick(document, ".remove-question");
  * @event Click for remove the Question from the section-2
  */
 $(document).on({
-    click: function(e) {
-        let element = $(this);
+    click: function() {
         $(this).parents(".question-container").find(".confirm-box").remove();
         $(this).parents(".question-container").find(".question-required-err").remove();
-
+        let dataId = $(this).parents(".question-container").attr("id");
         if ($("div.question-container:visible").length > 1) {
-            $(this).parents(".question-container").find(".add-options").hide();
-            $(this).parents(".question-container").find(".form-group-opt").after(`
-            <div class="confirm-box">
-                <div class="clearfix"></div>
-                <div class="d-flex-alert  mb--8">
-                    <div class="pr--8">
-                        <label class="confirm-box text-danger">Are you sure you want to delete?</label>
-                    </div>
-                    <div class="pl--8 text-right">
-                        <button type="button" class="btn btn-primary-outline btn-sm cancel-question-delete mr--8">Cancel</button>
-                        <button type="button" class="btn btn-primary btn-sm" id="delete-question">Ok</button>
-                    </div>
-                </div>
-            </div>
-        `);
-
+            UxUtils.setAfter($(this).parents(".question-container").find(".form-group-opt") , UxUtils.getDeleteQuestionConfirmBox(dataId, okKey, closeKey, confirmDeleteMsgKey));
             $([document.documentElement, document.body]).animate({
                 scrollTop: $(this).parents(".question-container").find(".confirm-box").offset().top - 200
             }, 1000);
@@ -2706,15 +2818,7 @@ $(document).on({
                 });
             });
         } else {
-            Localizer.getString("atleastOneQuestion").then(function(result) {
-                $(this).parents("div.question-container")
-                    .find("div.d-flex-ques")
-                    .after(`<label class="text-danger d-block question-required-err"><font class="mb--16 mt--16 d-block">${result}</font></label>`);
-
-            });
-            $([document.documentElement, document.body]).animate({
-                scrollTop: $(".text-danger.d-block:first").offset().top - 200
-            }, 2000);
+            UxUtils.setAfter($(this).parents("div.question-container").find("div.d-flex-ques") , UxUtils.createLabelWithFontBox(atleastOneErrorKey, "text-danger d-block question-required-err" , "mb--16 mt--16 d-block" ,""));
         }
     }
 }, ".remove-question");
@@ -2730,20 +2834,17 @@ KeyboardUtils.keydownClick(document, ".add-options");
 $(document).on({
     click: function(e) {
         e.preventDefault();
+        $(this).parents(".question-container").find(".max-option-err-box").hide();
         if ($(this).parents("div#options").find(`div.option-div input[type="text"][id^=option]`).length >= 10) {
             $(this).parents(".question-container").find(".add-options").hide();
-
             Localizer.getString("maximumTenOptions").then(function(result) {
-                $(this).parents(".question-container").find(".add-options").after(`<div class="max-option-err-box">${result}</div>`);
+                $(".max-option-err-box").text(result);
+                $(this).parents(".question-container").find(".max-option-err-box").show();
             });
-
-
-            $([document.documentElement, document.body]).animate({
-                scrollTop: $(this).parents(".question-container").find(".max-option-err-box").offset().top - 200
-            }, 1000);
+            $(this).parents(".question-container").find(".max-option-err-box").show();
             return false;
         }
-        $(this).parents(".container").find("div.option-div:last").after(opt.clone());
+        UxUtils.setAfter($(this).parents(".container").find("div.option-div:last") , opt.clone());
 
         let selector = $(this).parents("div.container");
         let counter = 0;
@@ -2751,15 +2852,17 @@ $(document).on({
             .find(`div.option-div div.input-group input[type="text"]`)
             .each(function(index, elem) {
                 counter = index + 1;
-                $(elem).attr({
-                    placeholder: "Enter your choice",
+                Localizer.getString("enterTheChioce").then(function(result) {
+                    enterTheChioceKey = result;
+                    $(elem).attr({ placeholder: result });
                 });
+
                 $(elem).attr({
                     id: "option" + counter
                 });
                 $(elem)
                     .parents(".option-div")
-                    .find("input[type='file']")
+                    .find(`input[type="file"]`)
                     .attr({
                         id: "option-image-" + counter
                     });
@@ -2793,17 +2896,17 @@ let trainingSectionView = UxUtils.getTrainingContentArea(backKey, submitKey, add
 /**
  * Variable contains question section
  */
-let questionsSection = UxUtils.getQuestionArea(questionKey, questionTitleKey, checkMeKey);
+let questionsSection = UxUtils.getQuestionArea(questionKey, questionTitleKey, checkMeKey , enterTheChioceKey , addMoreOptionsKey);
 
 /**
  * Variable contains add button section
  */
-let addQuestionButton = UxUtils.getAddQuestionButton();
+let addQuestionButton = UxUtils.getAddQuestionButton(addQuestionsKey);
 
 /**
  * Variable contains question footer
  */
-let questionFooter = UxUtils.getQuestionAreaFooter();
+let questionFooter = UxUtils.getQuestionAreaFooter(doneKey);
 
 /**
  * Variable contains option section
@@ -2813,7 +2916,7 @@ let optionSection = UxUtils.getOptionArea(checkMeKey);
 /**
  * Variable contains text section
  */
-let addTextSection = UxUtils.getTextContentArea();
+let addTextSection = UxUtils.getTextContentArea(addTitlePlaceholderKey);
 
 /**
  * Variable contains text footer section
@@ -2832,7 +2935,7 @@ let addPhotoFooter = UxUtils.getImageContentFooter();
 /**
  * Variable contains video section
  */
-let addVideoSection = UxUtils.getVideoContentArea();
+let addVideoSection = UxUtils.getVideoContentArea(addTitlePlaceholderKey, addDescriptionPlaceholderKey, uploadVideoLabelKey);
 
 /**
  * Variable contains video footer section
@@ -2841,7 +2944,7 @@ let addVideoFooter = UxUtils.getVideoContentFooter();
 /**
  * Variable contains document section
  */
-let addDocumentSection = UxUtils.getDocumentContentArea();
+let addDocumentSection = UxUtils.getDocumentContentArea(addTitlePlaceholderKey, addDescriptionPlaceholderKey, uploadFileLabelKey);
 
 /**
  * Variable contains document footer section

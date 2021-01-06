@@ -8,10 +8,6 @@ import { UxUtils } from "../common/utils/UxUtils";
 import { Utils } from "../common/utils/Utils";
 import { Constants } from "../common/utils/Constants";
 
-$(document).ready(function() {
-    OnPageLoad();
-});
-
 let actionContext = null;
 let actionInstance = null;
 let actionSummary = null;
@@ -30,13 +26,12 @@ let changeDueDateKey = "";
 let cancelKey = "";
 let confirmKey = "";
 let changeKey = "";
-let closeKey= "";
+let closeKey = "";
 let closeTrainingConfirmKey = "";
 let deleteTrainingConfirmKey = "";
 let downloadCSVKey = "";
 let downloadKey = "";
 let downloadImageKey = "";
-let backKey = "";
 let dueByKey = "";
 let expiredOnKey = "";
 let changeDueByKey = "";
@@ -44,18 +39,23 @@ let closeTrainingKey = "";
 let deleteTrainingKey = "";
 let correctKey = "";
 let incorrectKey = "";
-let youKey = "";
 let questionKey = "";
+let questionsKey = "";
 let request = ActionHelper.getContextRequest();
-let root = document.getElementById("root");
 let context = "";
 let scoreKey = "";
 let questionCount = 0;
 let trainingContentKey = "";
 let contentSection = "";
+let theme = "";
+let subscriberResponse = "";
 
-getTheme(request);
-getStringKeys();
+loadDetailView(request);
+
+/* Document get ready */
+$(document).ready(function() {
+    OnPageLoad();
+});
 
 /*
  * Method for fetching localization strings
@@ -73,6 +73,10 @@ async function getStringKeys() {
         questionKey = result;
     });
 
+    Localizer.getString("questions").then(function(result) {
+        questionsKey = result;
+    });
+
     Localizer.getString("correct").then(function(result) {
         correctKey = result;
     });
@@ -81,89 +85,85 @@ async function getStringKeys() {
     });
 
     Localizer.getString("responders").then(function(result) {
-        $(".responder-key").text(result);
+        UxUtils.setText(".responder-key", result);
     });
 
     Localizer.getString("nonResponders").then(function(result) {
-        $(".non-responder-key").text(result);
+        UxUtils.setText(".non-responder-key", result);
     });
 
-    Localizer.getString("you").then(function(result) {
-        youKey = result;
-    });
-
-    Localizer.getString("changeDueBy").then(function (result) {
+    Localizer.getString("changeDueBy").then(function(result) {
         changeDueByKey = result;
-        $(".change-due-by-key").text(changeDueByKey);
+        UxUtils.setText(".change-due-by-key", changeDueByKey);
     });
 
-    Localizer.getString("closeTraining").then(function (result) {
+    Localizer.getString("closeTraining").then(function(result) {
         closeTrainingKey = result;
-        $(".close-quiz-key").text(closeTrainingKey);
+        UxUtils.setText(".close-quiz-key", closeTrainingKey);
     });
 
-    Localizer.getString("deleteTraining").then(function (result) {
+    Localizer.getString("deleteTraining").then(function(result) {
         deleteTrainingKey = result;
-        $(".delete-quiz-key").text(deleteTrainingKey);
+        UxUtils.setText(".delete-quiz-key", deleteTrainingKey);
     });
 
-    Localizer.getString("changeDueDate").then(function (result) {
+    Localizer.getString("changeDueDate").then(function(result) {
         changeDueDateKey = result;
-        $(".change-due-date-key").html(changeDueDateKey);
+        UxUtils.setHtml(".change-due-date-key", changeDueDateKey);
     });
 
-    Localizer.getString("close").then(function (result) {
+    Localizer.getString("close").then(function(result) {
         closeKey = result;
-        $(".close-key").html(closeKey);
+        UxUtils.setHtml(".close-key", closeKey);
     });
 
-    Localizer.getString("cancel").then(function (result) {
+    Localizer.getString("cancel").then(function(result) {
         cancelKey = result;
-        $(".cancel-key").html(cancelKey);
+        UxUtils.setHtml(".cancel-key", cancelKey);
     });
 
-    Localizer.getString("confirm").then(function (result) {
+    Localizer.getString("confirm").then(function(result) {
         confirmKey = result;
-        $(".confirm-key").html(confirmKey);
+        UxUtils.setHtml(".confirm-key", confirmKey);
     });
 
-    Localizer.getString("change").then(function (result) {
+    Localizer.getString("change").then(function(result) {
         changeKey = result;
-        $(".change-key").html(changeKey);
+        UxUtils.setHtml(".change-key", changeKey);
     });
 
-    Localizer.getString("closeTrainingConfirm").then(function (result) {
+    Localizer.getString("closeTrainingConfirm").then(function(result) {
         closeTrainingConfirmKey = result;
-        $(".close-quiz-confirm-key").html(closeTrainingConfirmKey);
+        UxUtils.setHtml(".close-quiz-confirm-key", closeTrainingConfirmKey);
     });
 
-    Localizer.getString("deleteTrainingConfirm").then(function (result) {
+    Localizer.getString("deleteTrainingConfirm").then(function(result) {
         deleteTrainingConfirmKey = result;
-        $(".close-quiz-confirm-key").html(deleteTrainingConfirmKey);
+        UxUtils.setHtml(".close-quiz-confirm-key", deleteTrainingConfirmKey);
     });
 
     Localizer.getString("download").then(function(result) {
         downloadKey = result;
-        $("#download-key").html(downloadKey);
+        UxUtils.setHtml("#download-key", downloadKey);
     });
 
     Localizer.getString("downloadImage").then(function(result) {
         downloadImageKey = result;
-        $("#download-image-key").html(downloadImageKey);
+        UxUtils.setHtml("#download-image-key", downloadImageKey);
     });
 
     Localizer.getString("downloadCSV").then(function(result) {
         downloadCSVKey = result;
-        $("#download-csv-key").html(downloadCSVKey);
+        UxUtils.setHtml("#download-csv-key", downloadCSVKey);
     });
 
-    Localizer.getString("score", ":").then(function (result) {
+    Localizer.getString("score", ":").then(function(result) {
         scoreKey = result;
     });
 
-    Localizer.getString("trainingContent", ":").then(function (result) {
+    Localizer.getString("trainingContent", ":").then(function(result) {
         trainingContentKey = result;
-        $(".training-content-key").text(result);
+        UxUtils.setHtml(".training-content-key", result);
     });
 }
 
@@ -171,14 +171,14 @@ async function getStringKeys() {
  * Method to get theme color
  * @param request object
  */
-async function getTheme(request) {
+async function loadDetailView(request) {
     getStringKeys();
     dataResponse = await ActionHelper.executeApi(request);
     context = dataResponse.context;
     $("form.section-1").show();
-    let theme = context.theme;
-    theme = "default";  // Remove this to enable theme based css
+    theme = "default"; // Remove this to enable theme based css
     $("link#theme").attr("href", "css/style-" + theme + ".css");
+    theme = context.theme;
     ActionHelper.hideLoader();
 }
 
@@ -212,7 +212,11 @@ function getDataRows(actionId) {
         actionInstance = batchResponse.responses[0].action;
         actionSummary = batchResponse.responses[1].summary;
         actionDataRows = batchResponse.responses[2].dataRows;
-        actionDataRowsLength = actionDataRows == null ? 0 : actionDataRows.length;
+        if (actionDataRows == null) {
+            actionDataRowsLength = 0;
+        } else {
+            actionDataRowsLength = actionDataRows.length;
+        }
         createBody();
     }).catch(function(error) {
         console.log("Console log: Error: " + JSON.stringify(error));
@@ -225,7 +229,7 @@ function getDataRows(actionId) {
 async function createBody() {
     await getUserprofile();
     let getSubscriptionCount = "";
-    $("#root").html("");
+    UxUtils.clearHtml("#root");
     /*  Head Section  */
     if (myUserId == dataResponse.context.userId && myUserId == actionInstance.creatorId) {
         isCreator = true;
@@ -245,36 +249,33 @@ async function createBody() {
     /*  Person Responded X of Y Responses  */
     getSubscriptionCount = ActionHelper.getSubscriptionMemberCount(actionContext.subscription);
 
-    let response = await ActionHelper.executeApi(getSubscriptionCount);
+    subscriberResponse = await ActionHelper.executeApi(getSubscriptionCount);
 
     if (isCreator == true) {
-        let $pcard = $('<div class="progress-section"></div>');
-        let memberCount = response.memberCount;
+        let $pcard = $(UxUtils.divTemplate("progress-section", ""));
+        let memberCount = subscriberResponse.memberCount;
         let participationPercentage = 0;
 
         participationPercentage = Math.round(
             (actionSummary.rowCreatorCount / memberCount) * 100
         );
-
         Localizer.getString("participation", participationPercentage).then(function(result) {
-            $pcard.append(`<label class="mb--4"><strong>${result} </strong></label><div class="progress mb-2"><div class="progress-bar bg-primary" role="progressbar" style="width:${participationPercentage}%" aria-valuenow="${participationPercentage}" aria-valuemin="0" aria-valuemax="100"></div></div>`);
+            UxUtils.setAppend($pcard, UxUtils.getParticipationProgress(result, participationPercentage));
         });
-
         Localizer.getString("xofyPeopleResponded", actionSummary.rowCount, memberCount).then(function(result) {
-            $pcard.append(`<p class="date-color cursor-pointer md-0" id="show-responders"><span tabindex="0" role="button">${result}</span></p>`);
+            UxUtils.setAppend($pcard, UxUtils.getTotalPeopleRespondedString(result));
         });
-
-        $("#root").append($pcard);
+        UxUtils.setAppend("#root", $pcard);
     }
     let responderDateLength = Object.keys(responderDate).length;
     if (responderDateLength > 0) {
-        if (myUserId == dataResponse.context.userId) {
-            createCreatorQuestionView(myUserId, responderDate);
+        if (myUserId == dataResponse.context.userId && myUserId == actionInstance.creatorId) {
+            createCreatorQuestionView(myUserId);
         } else if (myUserId == dataResponse.context.userId && myUserId != actionInstance.creatorId) {
             let isResponded = false;
             responderDate.forEach((responder) => {
                 if (responder.value2 == myUserId) {
-                    createQuestionView(myUserId);
+                    createQuestionView(myUserId, true);
                     isResponded = true;
                 }
             });
@@ -285,10 +286,10 @@ async function createBody() {
                         let name = nonresponders.label;
                         let matches = name.match(/\b(\w)/g); // [D,P,R]
                         let initials = matches.join("").substring(0, 2); // DPR
-                        Localizer.getString("youYetRespond").then(function (result) {
-                            $("div#root div:first").append(UxUtils.getInitials(nonresponders.value2, initials, result));
-                            $("div#root div:first").append(UxUtils.breakline());
-                            $("div#" + nonresponders.value2).after(UxUtils.breakline());
+                        Localizer.getString("youYetRespond").then(function(result) {
+                            UxUtils.setAppend("div#root div:first", UxUtils.getInitials(nonresponders.value2, initials, result));
+                            UxUtils.setAppend("div#root div:first", UxUtils.breakline());
+                            UxUtils.setAfter("div#" + nonresponders.value2, UxUtils.breakline());
                         });
                     }
                 });
@@ -296,7 +297,7 @@ async function createBody() {
         } else {
             responderDate.forEach((responder) => {
                 if (responder.value2 == myUserId) {
-                    createReponderQuestionView(myUserId, responder);
+                    createResponderQuestionView(myUserId, responder);
                 }
             });
         }
@@ -304,15 +305,15 @@ async function createBody() {
         actionNonResponders.forEach((nonresponders) => {
             if (nonresponders.value2 == myUserId) {
                 if (myUserId == dataResponse.context.userId && myUserId == actionInstance.creatorId) {
-                    createCreatorQuestionView();
+                    createCreatorQuestionView(myUserId);
                 } else {
                     let name = nonresponders.label;
                     let matches = name.match(/\b(\w)/g); // [D,P,R]
                     let initials = matches.join("").substring(0, 2); // DPR
-                    Localizer.getString("youYetRespond").then(function (result) {
-                        $("#root div:first").append(UxUtils.getInitials(nonresponders.value2, initials, result));
-                        $("#root div:first").append(UxUtils.breakline());
-                        $("div#" + nonresponders.value2).after(UxUtils.breakline());
+                    Localizer.getString("youYetRespond").then(function(result) {
+                        UxUtils.setAppend("#root div:first", UxUtils.getInitials(nonresponders.value2, initials, result));
+                        UxUtils.setAppend("#root div:first", UxUtils.breakline());
+                        UxUtils.setAfter("div#" + nonresponders.value2, UxUtils.breakline());
                     });
                 }
             }
@@ -333,14 +334,14 @@ async function createBody() {
  * @description Method for footer for return back to landing page
  */
 function footerClose() {
-    $("#root").append(UxUtils.getFooterCloseArea(closeKey));
+    UxUtils.setAppend("#root", UxUtils.getFooterCloseArea(closeKey));
 }
 
 /**
  * @description Method for footer with download button
  */
 function footerDownload() {
-    $("#root").append(UxUtils.getFooterDownloadButton(downloadKey, downloadImageKey, downloadCSVKey));
+    UxUtils.setAppend("#root", UxUtils.getFooterDownloadButton(downloadKey, downloadImageKey, downloadCSVKey));
 }
 
 /**
@@ -349,24 +350,26 @@ function footerDownload() {
 function head() {
     let title = actionInstance.displayName;
     let description = actionInstance.customProperties[0]["value"];
-    let dueby = new Date(actionInstance.expiryTime).toDateString();
-    let $card = $(`<div class=""></div>`);
+    let options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    let expiryTime = new Date(actionInstance.expiryTime);
+    let dueby = expiryTime.toLocaleDateString(context.locale, options);
+    let $card = $(UxUtils.divTemplate("", ""));
     let $titleSec = $(UxUtils.getQuizTitleResponders(title));
     let $descriptionSec = $(UxUtils.getQuizDescription(description));
     let currentTimestamp = new Date().getTime();
     let $dateSec = $(UxUtils.getResponderQuizDate(actionInstance.expiryTime, currentTimestamp, dueByKey, expiredOnKey, dueby));
-    $card.append($titleSec);
-    $card.append($descriptionSec);
-    $card.append($dateSec);
-    $("#root").append($card);
-    if (actionInstance.dataTables[0].attachments.length > 0 && (actionInstance.dataTables[0].attachments[0].id != null || actionInstance.dataTables[0].attachments[0].id  != "")) {
+    UxUtils.setAppend($card, $titleSec);
+    UxUtils.setAppend($card, $descriptionSec);
+    UxUtils.setAppend($card, $dateSec);
+    UxUtils.setAppend("#root", $card);
+    if (actionInstance.dataTables[0].attachments.length > 0 && (actionInstance.dataTables[0].attachments[0].id != null || actionInstance.dataTables[0].attachments[0].id != "")) {
         let req = ActionHelper.getAttachmentInfo(actionId, actionInstance.dataTables[0].attachments[0].id);
-        ActionHelper.executeApi(req).then(function (response) {
-            $card.prepend(UxUtils.getQuizBannerImageWithLoader(response.attachmentInfo.downloadUrl));
+        ActionHelper.executeApi(req).then(function(response) {
+            UxUtils.setPrepend("#root div:first", UxUtils.getQuizBannerImageWithLoader(response.attachmentInfo.downloadUrl));
             Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, ".quiz-template-image");
         })
-        .catch(function (error) {
-            console.error("AttachmentAction - Error7: " + JSON.stringify(error));
+        .catch(function(error) {
+            console.error("AttachmentAction - Error: " + JSON.stringify(error));
         });
     }
 }
@@ -377,29 +380,32 @@ function head() {
 function headCreator() {
     let title = actionInstance.displayName;
     let description = actionInstance.customProperties[0]["value"];
-    let dueby = new Date(actionInstance.expiryTime).toDateString();
-    let $card = $(`<div class=""></div>`);
-    let $titleDiv = $(`<div class="d-table mb--4"></div>`);
+    let options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    let expiryTime = new Date(actionInstance.expiryTime);
+    let dueby = expiryTime.toLocaleDateString(context.locale, options);
+    let $card = $(UxUtils.divTemplate("", ""));
+    let $titleDiv = $(UxUtils.divTemplate("d-table mb--4", ""));
     let $titleSec = $(UxUtils.getQuizTitle(title));
+    console.log(dueby, "dueby");
     let $creatorButtons = $(UxUtils.creatorQuizDateManageSection(changeDueByKey, closeTrainingKey, deleteTrainingKey));
     let $descriptionSec = $(UxUtils.getQuizDescription(description));
     let currentTimestamp = new Date().getTime();
-    let $dateSec = $(`<p class="mb--16 date-text font-12">${actionInstance.expiryTime > currentTimestamp ? dueByKey + " " : expiredOnKey + " "} ${dueby}</p>`);
-    $titleDiv.append($titleSec);
-    $titleDiv.append($creatorButtons);
-    $card.append($titleDiv);
-    $card.append($descriptionSec);
-    $card.append($dateSec);
-    $("#root").append($card);
+    let $dateSec = $(UxUtils.getResponderQuizDate(actionInstance.expiryTime, currentTimestamp, dueByKey, expiredOnKey, dueby));
+    UxUtils.setAppend($titleDiv, $titleSec);
+    UxUtils.setAppend($titleDiv, $creatorButtons);
+    UxUtils.setAppend($card, $titleDiv);
+    UxUtils.setAppend($card, $descriptionSec);
+    UxUtils.setAppend($card, $dateSec);
+    UxUtils.setAppend("#root", $card);
 
-    if (actionInstance.dataTables[0].attachments.length > 0 && (actionInstance.dataTables[0].attachments[0].id != null || actionInstance.dataTables[0].attachments[0].id  != "")) {
+    if (actionInstance.dataTables[0].attachments.length > 0 && (actionInstance.dataTables[0].attachments[0].id != null || actionInstance.dataTables[0].attachments[0].id != "")) {
         let req = ActionHelper.getAttachmentInfo(actionId, actionInstance.dataTables[0].attachments[0].id);
-        ActionHelper.executeApi(req).then(function (response) {
-            $card.prepend(UxUtils.getQuizBannerImageWithLoader(response.attachmentInfo.downloadUrl));
-            Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, ".training-template-image");
+        ActionHelper.executeApi(req).then(function(response) {
+            UxUtils.setPrepend("#root div:first", UxUtils.getQuizBannerImageWithLoader(response.attachmentInfo.downloadUrl));
+            Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, ".quiz-template-image");
         })
-        .catch(function (error) {
-            console.error("AttachmentAction - Error7: " + JSON.stringify(error));
+        .catch(function(error) {
+            console.error("AttachmentAction - Error: " + JSON.stringify(error));
         });
     }
 }
@@ -443,31 +449,21 @@ async function getUserprofile() {
  * Method to get respponders list
  */
 function getResponders() {
-    $("table#responder-table tbody").html("");
-
+    UxUtils.clearHtml("table#responder-table tbody");
     for (let itr = 0; itr < responderDate.length; itr++) {
-        let id = responderDate[itr].value2;
         let name = "";
-        if (responderDate[itr].value2 == myUserId) {
-            name = youKey;
-        } else {
-            name = responderDate[itr].label;
-        }
-        let date = responderDate[itr].value;
-
+        name = responderDate[itr].label;
+        let options = { weekday: "short", year: "numeric", month: "short", day: "numeric" };
+        let respondDate = new Date(responderDate[itr].value);
+        let date = respondDate.toLocaleDateString(context.locale, options);
         let matches = responderDate[itr].label.match(/\b(\w)/g); // [D,P,R]
         let initials = matches.join("").substring(0, 2); // DPR
-
         let correctAnswer = Utils.isJson(actionInstance.customProperties[Constants.getCorrectAnswerIndex()].value) ? JSON.parse(actionInstance.customProperties[Constants.getCorrectAnswerIndex()].value) : actionInstance.customProperties[Constants.getCorrectAnswerIndex()].value;
-        if (correctAnswer.length > 0){
+        if (correctAnswer.length > 0) {
             let score = scoreCalculate(responderDate[itr].value2);
-            $(".tabs-content:first")
-            .find("table#responder-table tbody")
-            .append(UxUtils.getResponderScoreWithDate(responderDate[itr].value2, initials, name, date, scoreKey, score));
-        }else{
-            $(".tabs-content:first")
-                .find("table#responder-table tbody")
-                .append(UxUtils.getResponderWithDate(responderDate[itr].value2, initials, name, date, scoreKey, score));
+            UxUtils.setAppend($(".tabs-content:first").find("table#responder-table tbody"), UxUtils.getResponderScoreWithDate(responderDate[itr].value2, initials, name, date, scoreKey, score));
+        } else {
+            UxUtils.setAppend($(".tabs-content:first").find("table#responder-table tbody"), UxUtils.getResponderWithDate(responderDate[itr].value2, initials, name, date, scoreKey, score));
         }
     }
 }
@@ -480,13 +476,17 @@ function scoreCalculate(userId) {
     let total = 0;
     let score = 0;
     actionInstance.dataTables.forEach((dataTable) => {
-        total = Object.keys(dataTable.dataColumns).length;
+        dataTable.dataColumns.forEach((question) => {
+            if (question.valueType == "SingleOption" || question.valueType == "MultiOption") {
+                total++;        
+            }
+        });
+        // total = Object.keys(dataTable.dataColumns).length;
 
         /* Correct Answer */
         let correctResponse = JSON.parse(
             actionInstance.customProperties[Constants.getCorrectAnswerIndex()].value
         );
-
         for (let i = 0; i < actionDataRowsLength; i++) {
             if (actionDataRows[i].creatorId == userId) {
                 for (let c = 0; c < correctResponse.length; c++) {
@@ -504,10 +504,14 @@ function scoreCalculate(userId) {
 
                     if (Utils.isJson(actionDataRows[i].columnValues[c + 1])) {
                         let responderAnsArr = JSON.parse(actionDataRows[i].columnValues[c + 1]);
-                        if (responderAnsArr.length > 1) {
-                            userAnsString = responderAnsArr.join(",");
+                        if(responderAnsArr != null) {
+                            if (responderAnsArr.length > 1) {
+                                userAnsString = responderAnsArr.join(",");
+                            } else {
+                                userAnsString = responderAnsArr[0];
+                            }
                         } else {
-                            userAnsString = responderAnsArr[0];
+                                userAnsString = "";
                         }
                     } else {
                         userAnsString = actionDataRows[i].columnValues[c + 1];
@@ -521,6 +525,7 @@ function scoreCalculate(userId) {
             }
         }
     });
+    console.log(`(${score} / ${total}) * 100`);
     let scoreIs = (score / total) * 100;
     if (scoreIs % 1 != 0) {
         scoreIs = scoreIs.toFixed(2);
@@ -532,32 +537,13 @@ function scoreCalculate(userId) {
  * Method to get non responders list
  */
 function getNonresponders() {
-    $("table#non-responder-table tbody").html("");
-
+    UxUtils.clearHtml("table#non-responder-table tbody");
     for (let itr = 0; itr < actionNonResponders.length; itr++) {
-        let id = actionNonResponders[itr].value2;
         let name = "";
-        if (actionNonResponders[itr].value2 == myUserId) {
-            name = "You";
-        } else {
-            name = actionNonResponders[itr].label;
-        }
+        name = actionNonResponders[itr].label;
         let matches = actionNonResponders[itr].label.match(/\b(\w)/g); // [D,P,R]
         let initials = matches.join("").substring(0, 2); // DPR
-
-        let date = actionNonResponders[itr].value;
-        $(".tabs-content:first")
-            .find("table#non-responder-table tbody")
-            .append(`<tr>
-                <td>
-                    <div class="d-flex">
-                        <div class="avtar">
-                            ${initials}
-                        </div>
-                        <div class="avtar-txt">${name}</div>
-                    </div>
-                </td>
-            </tr>`);
+        UxUtils.setAppend($(".tabs-content:first").find("table#non-responder-table tbody"), UxUtils.getNonRespondersInitials(initials, name));
     }
 }
 
@@ -566,10 +552,11 @@ function getNonresponders() {
  */
 $(document).on("click", ".getresult", function() {
     let userId = $(this).attr("id");
-    $("#root").html("");
+    UxUtils.clearHtml("#root");
     head();
-    $("#root").append($(".question-content").clone());
-    createQuestionView(userId);
+    UxUtils.setAppend("#root", $(".question-content").clone());
+
+    createQuestionView(userId, false);
     footer(userId);
 });
 
@@ -578,9 +565,8 @@ $(document).on("click", ".getresult", function() {
  * @param userId string identifier
  * @param responder object
  */
-function createReponderQuestionView(userId, responder) {
-    $("div#root > div.question-content").html("");
-    let count = 1;
+function createResponderQuestionView(userId, responder) {
+    UxUtils.clearHtml("div#root > div.question-content");
     answerIs = "";
     total = 0;
     score = 0;
@@ -588,50 +574,29 @@ function createReponderQuestionView(userId, responder) {
     let name = responder.label;
     let matches = name.match(/\b(\w)/g); // [D,P,R]
     let initials = matches.join("").substring(0, 2); // DPR
-    let $youSection = `<table class="table" cellspacing="0" id="responder-table">
-                            <tbody>
-                                <tr id="${myUserId}" class="getresult cursor-pointer">
-                                    <td>
-                                        <div class="d-flex ">
-                                            <div class="avtar">
-                                                ${initials}
-                                            </div>
-                                            <div class="avtar-txt">${name}</div>
-                                        </div>
-                                    </td>
-                                    <td class="text-right avtar-txt">
-                                        ${responder.value}
-                                        ${Constants.getLeftCaratIcon()}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>`;
-    $("#root").append($youSection);
+    let $youSection = UxUtils.getRespondersInitials(myUserId, initials, name, responder.value);
+    UxUtils.setAppend("#root", $youSection);
 
     actionInstance.dataTables.forEach((dataTable) => {
         dataTable.dataColumns.forEach((question, ind) => {
             answerIs = "";
             let count = ind + 1;
 
-            let $cardDiv = $(`<div class="card-blank"></div>`);
-            let $formGroup = $(`<div class="form-group"></div>`);
-            let $row = $(`<div class="row"></div>`);
-            let $hoverBtn = $('<div class="hover-btn"></div>');
-            $cardDiv.append($formGroup);
-            $formGroup.append($row);
+            let $cardDiv = $(UxUtils.divTemplate("card-blank", ""));
+            let $formGroup = $(UxUtils.divTemplate("form-group", ""));
+            let $row = $(UxUtils.divTemplate("row", ""));
+            let $hoverBtn = $(UxUtils.divTemplate("hover-btn", ""));
+            UxUtils.setAppend($cardDiv, $formGroup);
+            UxUtils.setAppend($formGroup, $row);
             if (question.name.indexOf("photo") >= 0) {
                 /* Photo Section */
-                let $col9 = $(`<div class="col-9"></div>`);
+                let $col9 = $(UxUtils.divTemplate("col-9", ""));
                 let content = "";
-                $formGroup.append($row);
-                $row.append($col9);
+                UxUtils.setAppend($formGroup, $row);
+                UxUtils.setAppend($row, $col9);
                 Localizer.getString("photo").then(function(result) {
-                    content = `<label class="mb0"><strong><span class="counter">${count}</span>.
-                                    <span class="training-type">${result}</span></strong>
-                                </label>
-                                <span class="float-right result"></span>
-                                <p class="mb0 text-description text-justify">${question.displayName}</p>`;
-                    $col9.append(content);
+                    content = UxUtils.contentSection(count, result, question.displayName);
+                    UxUtils.setAppend($col9, content);
                 });
 
                 let dname = Utils.isJson(question.options[0].displayName) ? JSON.parse(question.options[0].displayName) : question.options[0].displayName;
@@ -645,28 +610,24 @@ function createReponderQuestionView(userId, responder) {
 
                     let req = ActionHelper.getAttachmentInfo(attachmentImg);
                     let filesAmount = Object.keys(attachment).length;
-                    let $col3 = $(`<div class="col-3"></div>`);
-                    let $imgThumbnail = $(`<div class="img-thumbnail"></div>`);
+                    let $col3 = UxUtils.divTemplate("col-3", "");
+                    let $imgThumbnail = UxUtils.divTemplate("img-thumbnail", "");
                     ActionHelper.setAttachmentPreview(req, question.name, filesAmount, $imgThumbnail, $col3, "photo");
-                    $row.append($col3);
+                    UxUtils.setAppend($row, $col3);
                 }
-                $formGroup.append($row);
-                $cardDiv.append($formGroup);
-                $("#root").append($cardDiv);
-                $("#root").append("<hr>");
+                UxUtils.setAppend($formGroup, $row);
+                UxUtils.setAppend($cardDiv, $formGroup);
+                UxUtils.setAppend("#root", $cardDiv);
+                UxUtils.setAppend("#root", UxUtils.breakline());
             } else if (question.name.indexOf("document") >= 0) {
                 /* Document Section */
-                let $col9 = $(`<div class="col-9"></div>`);
+                let $col9 = $(UxUtils.divTemplate("col-9", ""));
                 let content = "";
-                $formGroup.append($row);
-                $row.append($col9);
+                UxUtils.setAppend($formGroup, $row);
+                UxUtils.setAppend($row, $col9);
                 Localizer.getString("document").then(function(result) {
-                    content = `<label class="mb0"><strong><span class="counter">${count}</span>.
-                                    <span class="training-type">${result}</span></strong>
-                                </label>
-                                <span class="float-right result"></span>
-                                <p class="mb0 text-description text-justify">${question.displayName}</p>`;
-                    $col9.append(content);
+                    content = contentSection(count, result, question.displayName);
+                    UxUtils.setAppend($col9, content);
                 });
 
                 let dname = Utils.isJson(question.options[0].displayName) ? JSON.parse(question.options[0].displayName) : question.options[0].displayName;
@@ -679,29 +640,24 @@ function createReponderQuestionView(userId, responder) {
                     });
                     let req = ActionHelper.getAttachmentInfo(attachmentImg);
                     let filesAmount = Object.keys(attachment).length;
-                    let $col3 = $(`<div class="col-3"></div>`);
-                    let $imgThumbnail = $(`<div class="img-thumbnail"></div>`);
+                    let $col3 = $(UxUtils.divTemplate("col-3", ""));
+                    let $imgThumbnail = $(UxUtils.divTemplate("img-thumbnail", ""));
                     ActionHelper.setAttachmentPreview(req, question.name, filesAmount, $imgThumbnail, $col3, "document");
-                    $row.append($col3);
+                    UxUtils.setAppend($row, $col3);
                 }
-                $formGroup.append($row);
-                $cardDiv.append($formGroup);
-                $("#root").append($cardDiv);
-                $("#root").append("<hr>");
+                UxUtils.setAppend($formGroup, $row);
+                UxUtils.setAppend($cardDiv, $formGroup);
+                UxUtils.setAppend("#root", $cardDiv);
+                UxUtils.setAppend("#root", UxUtils.breakline());
             } else if (question.name.indexOf("video") >= 0) {
                 /* Video Section */
-                let $col9 = $(`<div class="col-9"></div>`);
+                let $col9 = $(UxUtils.divTemplate("col-9", ""));
                 let content = "";
-
-                $formGroup.append($row);
-                $row.append($col9);
+                UxUtils.setAppend($formGroup, $row);
+                UxUtils.setAppend($row, $col9);
                 Localizer.getString("video").then(function(result) {
-                    content = `<label class="mb0"><strong><span class="counter">${count}</span>.
-                                    <span class="training-type">${result}</span></strong>
-                                </label>
-                                <span class="float-right result"></span>
-                                <p class="mb0 text-description text-justify">${question.displayName}</p>`;
-                    $col9.append(content);
+                    content = contentSection(count, result, question.displayName);
+                    UxUtils.setAppend($col9, content);
                 });
                 let dname = Utils.isJson(question.options[0].displayName) ? JSON.parse(question.options[0].displayName) : question.options[0].displayName;
                 let attachment = Utils.isJson(dname.attachmentId) ? JSON.parse(dname.attachmentId) : dname.attachmentId;
@@ -712,38 +668,29 @@ function createReponderQuestionView(userId, responder) {
                         return false;
                     });
                     let req = ActionHelper.getAttachmentInfo(attachmentImg);
-                    let $col3 = $(`<div class="col-3"></div>`);
-                    let $imgThumbnail = $(`<div class="img-thumbnail"></div>`);
+                    let $col3 = $(UxUtils.divTemplate("col-3", ""));
+                    let $imgThumbnail = $(UxUtils.divTemplate("img-thumbnail", ""));
                     ActionHelper.setAttachmentPreview(req, question.name, 1, $imgThumbnail, $col3, "video");
-                    $row.append($col3);
+                    UxUtils.setAppend($row, $col3);
                 }
 
-                $formGroup.append($row);
-                $cardDiv.append($formGroup);
-                $("#root").append($cardDiv);
-                $("#root").append("<hr>");
+                UxUtils.setAppend($formGroup, $row);
+                UxUtils.setAppend($cardDiv, $formGroup);
+                UxUtils.setAppend("#root", $cardDiv);
+                UxUtils.setAppend("#root", UxUtils.breakline());
             } else {
                 if (question.options.length > 1) {
                     /* Question Section */
-                    let $rowdDiv = $('<div class="row"></div>');
-                    let $qDiv = $('<div class="col-sm-12"></div>');
-                    let $dflex = $("<div class='d-table'></div>");
-
-                    $cardDiv.append($rowdDiv);
-                    $rowdDiv.append($qDiv);
-
-                    let $questionHeading = $(`<label class="mb0"></label>`);
-                    $questionHeading.append(
-                        "<strong>" + count + ". " + question.displayName + "</strong>"
-                    );
-
-                    $cardDiv.append($dflex);
-                    $dflex.append($questionHeading);
-
-                    $dflex.append(
-                        '<label class="float-right mb0" id="status-' + question.name + '"></label>'
-                    );
-
+                    let $rowdDiv = $(UxUtils.divTemplate("row", ""));
+                    let $qDiv = $(UxUtils.divTemplate("col-sm-12", ""));
+                    let $dflex = $(UxUtils.divTemplate("d-table", ""));
+                    UxUtils.setAppend($cardDiv, $rowdDiv);
+                    UxUtils.setAppend($rowdDiv, $qDiv);
+                    let $questionHeading = $(UxUtils.divTemplate("mb0", ""));
+                    UxUtils.setAppend($questionHeading, UxUtils.getQuestionTileWithCounter(count, question.displayName));
+                    UxUtils.setAppend($cardDiv, $dflex);
+                    UxUtils.setAppend($dflex, $questionHeading);
+                    UxUtils.setAppend($dflex, UxUtils.questionIdentifierSection(question.name));
                     question.options.forEach((option) => {
                         /* User Responded */
                         let userResponse = [];
@@ -757,17 +704,19 @@ function createReponderQuestionView(userId, responder) {
                                 for (let j = 1; j <= userResponseLength; j++) {
                                     if (Utils.isJson(userResponse[j])) {
                                         let userResponseAns = JSON.parse(userResponse[j]);
-                                        let userResponseAnsLen = userResponseAns.length;
-                                        if (userResponseAnsLen > 1) {
-                                            for (let k = 0; k < userResponseAnsLen; k++) {
-                                                if (userResponseAns[k] == option.name) {
-                                                    userResponseAnswer = userResponseAns[k];
-                                                } else {
-                                                    continue;
+                                        if(userResponseAns != null){
+                                            let userResponseAnsLen = userResponseAns.length;
+                                            if (userResponseAnsLen > 1) {
+                                                for (let k = 0; k < userResponseAnsLen; k++) {
+                                                    if (userResponseAns[k] == option.name) {
+                                                        userResponseAnswer = userResponseAns[k];
+                                                    } else {
+                                                        continue;
+                                                    }
                                                 }
+                                            } else {
+                                                userResponseAnswer = userResponseAns;
                                             }
-                                        } else {
-                                            userResponseAnswer = userResponseAns;
                                         }
                                     } else {
                                         if (userResponse[j] == option.name) {
@@ -802,130 +751,98 @@ function createReponderQuestionView(userId, responder) {
                                 userResponseAnswer,
                                 correctAnswer,
                             );
-                            $cardDiv.append($radioOption);
+                            UxUtils.setAppend($cardDiv, $radioOption);
                             let res = "";
-                            if(answerIs.toLowerCase() == "correct") {
+                            if (answerIs.toLowerCase() == "correct") {
                                 res = correctKey;
                             } else {
                                 res = incorrectKey;
                             }
-                            $cardDiv.find("#status-" + question.name).html(`<span class="${answerIs.toLowerCase() == "correct" ? "text-success" : "text-danger"}">${res}</span>`);
+                            UxUtils.setHtml($cardDiv.find("#status-" + question.name), UxUtils.getQuestionCorrectIncorrectSection(answerIs, res));
                         }
                     });
 
-                    if (answerIs == "Correct") {
+                    if (answerIs == Constants.getCorrectString()) {
                         score++;
                     }
-                    $("#root").append($cardDiv);
+                    UxUtils.setAppend("#root", $cardDiv);
                 } else {
                     /* Text Section */
                     let $textSection = "";
-                    let $clearfix = $(`<div class="clearfix"></div>`);
-                    $formGroup.append($hoverBtn);
-                    Localizer.getString("video").then(function(result) {
-                        $textSection = $(`<label class="mb0"><strong><span class="counter">${count}</span>.
-                                        <span class="training-type">Text</span></strong></label>
-                                        <span class="float-right result"></span>`);
-                        $hoverBtn.append($textSection);
+                    let $clearfix = $(UxUtils.divTemplate("clearfix", ""));
+                    UxUtils.setAppend($formGroup, $hoverBtn);
+                    Localizer.getString("video").then(function() {
+                        $textSection = $(UxUtils.contentSection(count, "Text", question.displayName));
+                        UxUtils.setAppend($hoverBtn, $textSection);
                     });
-                    $formGroup.append($clearfix);
-                    let $descriptionSection = `<p class="mb0 text-description text-justify">${question.displayName}</p>`;
-                    $cardDiv.append($descriptionSection);
+                    UxUtils.setAppend($formGroup, $clearfix);
+                    let $descriptionSection = UxUtils.createParagraphBox(question.displayName, "mb0 text-description text-justify", "");
+                    UxUtils.setAppend($cardDiv, $descriptionSection);
                 }
-                $("#root").append($cardDiv);
-                $("#root").append("<hr>");
+                UxUtils.setAppend("#root", $cardDiv);
+                UxUtils.setAppend("#root", UxUtils.breakline());
             }
         });
-        count++;
     });
-    $("#root").append('<div class="ht-100"></div>');
+    UxUtils.setAppend("#root", UxUtils.divTemplate("ht-100", ""));
 }
 
 /*
  * Method to create creator questions view
  * @param userId string identifier
- * @param responderData object
  */
-function createCreatorQuestionView(userId, responderData) {
-    $("div#root > div.question-content").html("");
-    let count = 1;
+function createCreatorQuestionView(userId) {
+    UxUtils.clearHtml("div#root > div.question-content");
     answerIs = "";
     total = 0;
     score = 0;
     let $youSection = "";
     Localizer.getString("aggregrateResult").then(function(result) {
         $youSection = UxUtils.getYouAsIntial(result, userId);
-        $("#root div.progress-section").after($youSection);
+        UxUtils.setAppend("#root div:first", $youSection);
     });
 
-    let imageCounter = 0;
-    let successDownLoadImageCounter = 0;
     let tid = setInterval(() => {
         /* Correct Answer */
         let correctResponse = JSON.parse(
             actionInstance.customProperties[Constants.getCorrectAnswerIndex()].value
         );
-        if($(".aggregrate-section").length > 0) {
-            $("#root").append(contentSection);
-            actionInstance.dataTables.forEach((dataTable, ind) => {
-                let isImage = false;
+        if ($(".aggregrate-section").length > 0) {
+            UxUtils.setAppend("#root", contentSection);
+            let qCounter = 0;
+            actionInstance.dataTables.forEach((dataTable) => {
                 let scoreArray = {};
-                if (dataTable.attachments.length > 0) {
-                    imageCounter++;
-                    isImage = true;
-                    let req = ActionHelper.getAttachmentInfo(actionId, dataTable.attachments[0].id);
-                    ActionHelper.executeApi(req).then(function(response) {
-                        $("#root .d-table:first").before(UxUtils.trainingTemplateImageSection());
-                        actionInstance.dataTables[ind].attachments[0].url = response.attachmentInfo.downloadUrl;
-                        if (actionInstance.dataTables[ind].attachments[0].url != null) {
-                            $("img.training-template-image").attr("src", actionInstance.dataTables[0].attachments[0].url);
-                            Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, ".training-template-image");
-                            Utils.removeImageLoader(".training-template-image");
-                            successDownLoadImageCounter++;
-                        }
-                        ActionHelper.hideLoader();
-
-                    })
-                    .catch(function(error) {
-                        console.log("AttachmentAction - ErrorTraining: " + JSON.stringify(error));
-                    });
-                }
-                let qCounter = 0;
                 dataTable.dataColumns.forEach((data, qindex) => {
                     if (data.valueType == "LargeText") {
                         /* Call Text Section 1 */
                         $("#question-msg").hide();
-                        $(".training-contents").after(UxUtils.trainingTitle(data.displayName));
+                        UxUtils.setAppend($(".training-contents:first").parents("div.card-box"), UxUtils.trainingTitle(data.displayName));
                     } else if (data.valueType == "SingleOption" || data.valueType == "MultiOption") {
                         answerIs = "";
-                        let $quesContDiv = $(`<div class="question-content disabled2" id="content-${data.name}"></div>`);
-                        let $mtDiv = $(`<div class="mt--16"></div>`);
-                        let $dflexDiv = $(`<div class="d-table mb--4"></div>`);
-
-                        $quesContDiv.append($mtDiv);
-                        $("#root").append($quesContDiv);
+                        let $quesContDiv = $(UxUtils.divTemplate("question-content disabled2", "content-" + data.name, ""));
+                        let $mtDiv = $(UxUtils.divTemplate("mt--16", ""));
+                        let $dflexDiv = $(UxUtils.divTemplate("d-table mb--4", ""));
+                        UxUtils.setAppend($quesContDiv, $mtDiv);
+                        UxUtils.setAppend("#root", $quesContDiv);
                         let count = qCounter + 1;
-                        $dflexDiv.append(UxUtils.getQuestionNumberContainer(questionKey, count));
-                        $dflexDiv.append(`<label class="float-right font-12 bold" id="status-${data.name}"> </label>`);
-                        $mtDiv.append($dflexDiv);
-                        let $blankQDiv = $(`<div class=""></div>`);
-                        $mtDiv.append($blankQDiv);
-                        $blankQDiv.append(`
-                            <div class="semi-bold font-16 mb--16">${data.displayName}</div>
-                        `);
+                        UxUtils.setAppend($dflexDiv, UxUtils.getQuestionNumberContainer(questionKey, count));
+                        UxUtils.setAppend($dflexDiv, UxUtils.labelTemplate("float-right font-12 bold", "status-" + data.name));
+                        UxUtils.setAppend($mtDiv, $dflexDiv);
+                        let $blankQDiv = $(UxUtils.divTemplate("", ""));
+                        UxUtils.setAppend($mtDiv, $blankQDiv);
+                        UxUtils.setAppend($blankQDiv, UxUtils.getQuestionTitleContainer(data.displayName));
                         let questionAttachmentId = data.attachments.length > 0 ? data.attachments[0].id : "";
                         if (questionAttachmentId != "") {
                             let req = ActionHelper.getAttachmentInfo(actionId, questionAttachmentId);
-                            ActionHelper.executeApi(req).then(function (response) {
+                            ActionHelper.executeApi(req).then(function(response) {
                                 console.info("Attachment - Response: " + JSON.stringify(response));
-                                $blankQDiv.prepend(UxUtils.quizTemplateImageWithLoader(response.attachmentInfo.downloadUrl));
+                                UxUtils.setPrepend($blankQDiv, UxUtils.quizTemplateImageWithLoader(response.attachmentInfo.downloadUrl));
                                 Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, `#content-${data.name} img.question-image`);
                             })
-                            .catch(function (error) {
+                            .catch(function(error) {
                                 console.error("AttachmentAction - Error: " + JSON.stringify(error));
                             });
                         }
-                        let correctAnswerCounter = 0;
                         scoreArray[data.name] = 0;
 
                         /* check for correct answer for each users */
@@ -945,10 +862,14 @@ function createCreatorQuestionView(userId, responderData) {
 
                                 if (Utils.isJson(actionDataRows[i].columnValues[count])) {
                                     let responderAnsArr = JSON.parse(actionDataRows[i].columnValues[count]);
-                                    if (responderAnsArr.length > 1) {
-                                        userAnsString = responderAnsArr.join(",");
+                                    if(responderAnsArr != null) {
+                                        if (responderAnsArr.length > 1) {
+                                            userAnsString = responderAnsArr.join(",");
+                                        } else {
+                                            userAnsString = responderAnsArr[0];
+                                        }
                                     } else {
-                                        userAnsString = responderAnsArr[0];
+                                        userAnsString = "";    
                                     }
                                 } else {
                                     userAnsString = actionDataRows[i].columnValues[count];
@@ -965,9 +886,9 @@ function createCreatorQuestionView(userId, responderData) {
                             isRadio = false;
                         }
 
-                        data.options.forEach((option, iii) => {
+                        data.options.forEach((option) => {
                             /* User Responded */
-                            let $cardDiv = $(`<div class="card-box card-bg card-border mb--8 "></div>`);
+                            let $cardDiv = $(UxUtils.divTemplate("card-box card-bg card-border mb--8", ""));
                             let userResponse = [];
                             let userResponseAnswer = "";
                             for (let i = 0; i < actionDataRowsLength; i++) {
@@ -977,18 +898,20 @@ function createCreatorQuestionView(userId, responderData) {
                                 for (let j = 1; j <= userResponseLength; j++) {
                                     if (Utils.isJson(userResponse[j])) {
                                         let userResponseAns = JSON.parse(userResponse[j]);
-                                        let userResponseAnsLen = userResponseAns.length;
-                                        if (userResponseAnsLen > 1) {
-                                            for (let k = 0; k < userResponseAnsLen; k++) {
-                                                if (userResponseAns[k] == option.name) {
-                                                    userResponseAnswer = userResponseAns[k];
+                                        if(userResponseAns != null){
+                                            let userResponseAnsLen = userResponseAns.length;
+                                            if (userResponseAnsLen > 1) {
+                                                for (let k = 0; k < userResponseAnsLen; k++) {
+                                                    if (userResponseAns[k] == option.name) {
+                                                        userResponseAnswer = userResponseAns[k];
+                                                        userResArr.push(userResponseAnswer);
+                                                    }
+                                                }
+                                            } else {
+                                                if (userResponseAns[0] == option.name) {
+                                                    userResponseAnswer = userResponseAns[0];
                                                     userResArr.push(userResponseAnswer);
                                                 }
-                                            }
-                                        } else {
-                                            if (userResponseAns[0] == option.name) {
-                                                userResponseAnswer = userResponseAns[0];
-                                                userResArr.push(userResponseAnswer);
                                             }
                                         }
                                     } else {
@@ -1006,22 +929,8 @@ function createCreatorQuestionView(userId, responderData) {
                             );
 
                             let correctResponseLength = Object.keys(correctResponse).length;
-                            if(correctResponse != null) {
-                                let correctAnswer = "";
-                                for (let j = 0; j < correctResponseLength; j++) {
-                                    let correctResponseAns = correctResponse[j];
-                                    let correctResponseAnsLen = correctResponseAns.length;
-
-                                    for (let k = 0; k < correctResponseAnsLen; k++) {
-                                        if (correctResponseAns[k] == option.name) {
-                                            correctAnswer = correctResponseAns[k];
-                                            correctAnswerCounter++;
-                                        }
-                                    }
-                                }
-                            }
-
                             let optName = option.displayName;
+                            //console.log("Name teststst", option);
                             let attachmentId = option.attachments.length > 0 ? option.attachments[0].id : "";
                             let optId = option.name;
                             let $radioOption = "";
@@ -1040,7 +949,7 @@ function createCreatorQuestionView(userId, responderData) {
                                     result,
                                     attachmentId
                                 );
-                                $cardDiv.append($radioOption);
+                                UxUtils.setAppend($cardDiv, $radioOption);
                             } else {
                                 let $checkOption = getCheckOptionsCreator(
                                     optName,
@@ -1049,25 +958,36 @@ function createCreatorQuestionView(userId, responderData) {
                                     result,
                                     attachmentId
                                 );
-                                $cardDiv.append($checkOption);
+                                UxUtils.setAppend($cardDiv, $checkOption);
                             }
-                            $quesContDiv.append($cardDiv);
+                            UxUtils.setAppend($quesContDiv, $cardDiv);
                         });
                         qCounter++;
 
                         if (actionDataRowsLength == 0) {
                             let aggregrateQuestionScore = 0;
-                            $dflexDiv.find("#status-" + data.name).html(UxUtils.getAggregrateScoreContainer(aggregrateQuestionScore, correctKey));
+                            UxUtils.setHtml($dflexDiv.find("#status-" + data.name), UxUtils.getAggregrateScoreContainer(aggregrateQuestionScore, correctKey));
                         } else {
                             let aggregrateQuestionScore = ((scoreArray[data.name] * 100) / actionDataRowsLength);
                             if (aggregrateQuestionScore % 1 != 0) {
                                 aggregrateQuestionScore = aggregrateQuestionScore.toFixed(2);
                             }
-                            $dflexDiv.find("#status-" + data.name).html(UxUtils.getAggregrateScoreContainer(aggregrateQuestionScore, correctKey));
+                            UxUtils.setHtml($dflexDiv.find("#status-" + data.name), UxUtils.getAggregrateScoreContainer(aggregrateQuestionScore, correctKey));
                         }
                     }
                 });
             });
+            if (qCounter > 0) {
+                let localeQuest = "";
+                if (qCounter > 1) {
+                    localeQuest = questionsKey;
+                } else {
+                    localeQuest = questionKey;
+                }
+                Localizer.getString("totalQuestionTraining", qCounter, localeQuest).then(function (result) {
+                    UxUtils.setAppend($(".training-contents:first").parents("div.card-box"), UxUtils.getContentTitleSection(result));
+                });
+            }
             clearInterval(tid);
         }
     }, Constants.setIntervalTimeHundred());
@@ -1077,62 +997,58 @@ function createCreatorQuestionView(userId, responderData) {
  * Method to create question view
  * @param userId string identifier
  */
-function createQuestionView(userId) {
+function createQuestionView(userId, isLanding) {
     total = 0;
     score = 0;
-    $("div#root > div.question-content").html("");
-    $("div#root > div.question-content").append(contentSection);
+    if (isLanding == true) {
+        UxUtils.setAppend("div#root div:first", contentSection);
+    } else {
+        UxUtils.clearHtml("div#root > div.question-content");
+        UxUtils.setAppend("div#root > div.question-content", contentSection);
+    }
     let resQuestCount = 0;
     actionInstance.dataTables.forEach((dataTable) => {
-        total = Object.keys(dataTable.dataColumns).length;
-        dataTable.dataColumns.forEach((question, ind) => {
+        let qcount = 0;
+        dataTable.dataColumns.forEach((question) => {
             if (question.valueType == "LargeText") {
                 /* Call Text Section 1 */
                 $("#question-msg").hide();
-                $(".training-contents").after(`<p class="mt--16 font-16 semi-bold">${question.displayName}</p>`);
+                UxUtils.setAppend($(".training-contents:first").parents("div.card-box"), UxUtils.contentTitle(question.displayName));
             } else if (question.valueType == "SingleOption" || question.valueType == "MultiOption") {
                 answerIs = "";
-                let $questionDiv = $(`<div class="question-content disabled2" id="content-${question.name}"></div>`);
-                let $mtDiv = $(`<div class="mt--16"></div>`);
-                let $dtableDiv = $(`<div class="d-table mb--4 "></div>`);
-                let count = ind + 1;
+                let $questionDiv = $(UxUtils.divTemplate("question-content disabled2", `content-${question.name}`));
+                let $mtDiv = $(UxUtils.divTemplate("mt--16", ""));
+                let $dtableDiv = $(UxUtils.divTemplate("d-table mb--4", ""));
                 let questionAttachmentId = question.attachments != "" ? question.attachments[0].id : "";
+                UxUtils.setAppend($questionDiv, $mtDiv);
+                UxUtils.setAppend($mtDiv, $dtableDiv);
+                qcount++;
+                UxUtils.setAppend($dtableDiv, UxUtils.getQuestionNumberContainer(questionKey, qcount));
+                UxUtils.setAppend($dtableDiv, UxUtils.labelTemplate("float-right font-12 bold", `status-${question.name}`));
 
-                $questionDiv.append($mtDiv);
-                $mtDiv.append($dtableDiv);
-                $dtableDiv.append(UxUtils.getQuestionNumberContainer(questionKey, (questionCount + 1)));
-
-                $dtableDiv.append(`<label class="float-right font-12 bold" id="status-${question.name}"></label>`);
-
-                let $blankQDiv = $(`<div class=""></div>`);
-                $mtDiv.append($blankQDiv);
-                $blankQDiv.append(UxUtils.getQuestionTitleContainer(question.displayName));
+                let $blankQDiv = $(UxUtils.divTemplate("",""));
+                UxUtils.setAppend($mtDiv, $blankQDiv);
+                UxUtils.setAppend($blankQDiv, UxUtils.getQuestionTitleContainer(question.displayName));
 
                 if (questionAttachmentId.length > 0) {
                     let req = ActionHelper.getAttachmentInfo(actionId, questionAttachmentId);
-                    ActionHelper.executeApi(req).then(function (response) {
+                    ActionHelper.executeApi(req).then(function(response) {
                         console.info("Attachment - Response: " + JSON.stringify(response));
-                        $blankQDiv.prepend(UxUtils.getQuestionImageWithLoader(response.attachmentInfo.downloadUrl));
+                        UxUtils.setPrepend($blankQDiv, UxUtils.getQuestionImageWithLoader(response.attachmentInfo.downloadUrl));
                         Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, `#content-${question.name} img.question-image`);
                     })
-                        .catch(function (error) {
-                            console.error("AttachmentAction - Error: " + JSON.stringify(error));
-                        });
+                    .catch(function(error) {
+                        console.error("AttachmentAction - Error: " + JSON.stringify(error));
+                    });
                 }
 
-                let $blankDiv = $(`<div class=" "></div>`);
-                $mtDiv.append($blankDiv);
+                let $blankDiv = $(UxUtils.divTemplate("", ""));
+                UxUtils.setAppend($mtDiv, $blankDiv);
                 let optAnsArr = [];
-                let isRadio = true;
-
-                if (JSON.parse(actionInstance.customProperties[Constants.getCorrectAnswerIndex()].value)[resQuestCount].length > 1) {
-                    isRadio = false;
-                }
                 question.options.forEach((option, optind) => {
                     /* User Responded */
                     let userResponse = [];
                     let userResponseAnswer = "";
-                    let correctAnsArr = [];
                     for (let i = 0; i < actionDataRowsLength; i++) {
                         if (actionDataRows[i].creatorId == userId) {
                             userResponse = actionDataRows[i].columnValues;
@@ -1140,18 +1056,20 @@ function createQuestionView(userId) {
                             for (let j = 1; j <= userResponseLength; j++) {
                                 if (Utils.isJson(userResponse[j]) == true) {
                                     let userResponseAns = JSON.parse(userResponse[j]);
-                                    let userResponseAnsLen = userResponseAns.length;
-                                    if (userResponseAnsLen > 1) {
-                                        for (let k = 0; k < userResponseAnsLen; k++) {
-                                            if (userResponseAns[k] == option.name) {
-                                                userResponseAnswer = userResponseAns[k];
-                                            } else {
-                                                continue;
+                                    if(userResponseAns != null){
+                                        let userResponseAnsLen = userResponseAns.length;
+                                        if (userResponseAnsLen > 1) {
+                                            for (let k = 0; k < userResponseAnsLen; k++) {
+                                                if (userResponseAns[k] == option.name) {
+                                                    userResponseAnswer = userResponseAns[k];
+                                                } else {
+                                                    continue;
+                                                }
                                             }
-                                        }
-                                    } else {
-                                        if (userResponseAns[0] == option.name) {
-                                            userResponseAnswer = userResponseAns[0];
+                                        } else {
+                                            if (userResponseAns[0] == option.name) {
+                                                userResponseAnswer = userResponseAns[0];
+                                            }
                                         }
                                     }
                                 } else {
@@ -1174,15 +1092,18 @@ function createQuestionView(userId) {
                         for (let k = 0; k < correctResponseAnsLen; k++) {
                             if (correctResponseAns[k] == option.name) {
                                 correctAnswer = correctResponseAns[k];
-                                correctAnsArr = correctResponseAns;
                             }
                         }
                     }
 
                     let optName = option.displayName;
-                    let optAttachmentId = option.attachments != 0 ? option.attachments[0].id : "";
+                    let optAttachmentId = ""
+                    if(option.attachments != 0) {
+                        optAttachmentId = option.attachments[0].id;
+                    }
 
-                    if (isRadio) {
+                    console.log("asdsada");
+                    if (question.valueType == "SingleOption") {
                         let $radioOption = getRadioOptions(
                             optName,
                             question.name,
@@ -1191,7 +1112,7 @@ function createQuestionView(userId) {
                             correctAnswer,
                             optAttachmentId
                         );
-                        $blankDiv.append($radioOption);
+                        UxUtils.setAppend($blankDiv, $radioOption);
                     } else {
                         let $checkOption = getCheckOptions(
                             optName,
@@ -1201,7 +1122,7 @@ function createQuestionView(userId) {
                             correctAnswer,
                             optAttachmentId
                         );
-                        $blankDiv.append($checkOption);
+                        UxUtils.setAppend($blankDiv, $checkOption);
                     }
                     if (answerIs.toLowerCase() == "correct") {
                         optAnsArr[optind] = answerIs;
@@ -1209,32 +1130,50 @@ function createQuestionView(userId) {
                         optAnsArr[optind] = "incorrect";
                     }
 
-                    let result = "";
                     if (answerIs.toLowerCase() == "correct") {
-                        result = correctKey;
+                        Localizer.getString(answerIs.toLowerCase()).then(function (result) {
+                            UxUtils.setHtml($questionDiv.find("#status-" + question.name), `<span class="semi-bold text-success">${result}</span>`);
+                        });
                     } else {
-                        result = incorrectKey;
+                        Localizer.getString(answerIs.toLowerCase()).then(function (result) {
+                            UxUtils.setHtml($questionDiv.find("#status-" + question.name), `<span class="semi-bold text-danger">${result}</span>`);
+                        });
                     }
-                    $questionDiv.find("#status-" + question.name).html(`<span class="semi-bold ${answerIs.toLowerCase() == "correct" ? "text-success" : "text-danger"}">${result}</span>`);
                 });
 
                 if (optAnsArr.includes("incorrect") != true) {
                     score++;
                 }
-                $("div#root").append($questionDiv);
+                UxUtils.setAppend("div#root", $questionDiv);
                 questionCount++;
                 resQuestCount++;
+                total++;
             }
         });
+        if (resQuestCount > 0) {
+            let localeQuest = "";
+            if (resQuestCount > 1) {
+                localeQuest = questionsKey;
+            } else {
+                localeQuest = questionKey;
+            }
+            Localizer.getString("totalQuestionTraining", resQuestCount, localeQuest).then(function(result) {
+                UxUtils.setAppend($(".training-contents").parents("div.card-box"), UxUtils.getContentTitleSection(result));
+            });
+        }
     });
 
     let scorePercentage = (score / total) * Constants.getPrecentageHundred();
     if (scorePercentage % 1 != 0) {
         scorePercentage = scorePercentage.toFixed(2);
     }
-    if (questionCount > 0){
-        Localizer.getString("score", ":").then(function (result) {
-            $("#root > div.progress-section").after(UxUtils.getScoreContainer(result, scorePercentage));
+    if (questionCount > 0) {
+        Localizer.getString("score", ":").then(function(result) {
+            if (isLanding == true) {
+                UxUtils.setAfter("#root .date-text", UxUtils.getScoreContainer(result, scorePercentage));
+            } else {
+                UxUtils.setAfter("#root > div.progress-section", UxUtils.getScoreContainer(result, scorePercentage));
+            }
         });
     }
 }
@@ -1249,34 +1188,34 @@ function createQuestionView(userId) {
  * @param attachmentId String contains attachment id of option
  */
 function getRadioOptions(text, name, id, userResponse, correctAnswer, attachmentId) {
-    let $oDiv = $(`<div class=""></div>`);
+    let $oDiv = $(UxUtils.divTemplate("", ""));
     /*  If answer is correct  and answered */
     if ($.trim(userResponse) == $.trim(id) && $.trim(correctAnswer) == $.trim(id)) {
-        $oDiv.append(UxUtils.getRadioInnerResponderQuestionSuccess(id, text));
+        UxUtils.setAppend($oDiv, UxUtils.getRadioInnerResponderQuestionSuccess(id, text));
         if (answerIs == "") {
-            answerIs = "Correct";
+            answerIs = Constants.getCorrectString();
         }
     } else if (($.trim(userResponse) == $.trim(id) && $.trim(correctAnswer) != $.trim(userResponse))) {
         /* If User Response is correct and answered incorrect */
-        $oDiv.append(UxUtils.getRadioInnerResponderQuestionCorrect(id, text));
-        answerIs = "Incorrect";
+        UxUtils.setAppend($oDiv, UxUtils.getRadioInnerResponderQuestionCorrect(id, text));
+        answerIs = Constants.getIncorrectString();
     } else if (($.trim(userResponse) != $.trim(id) && $.trim(correctAnswer) == $.trim(id))) {
         /* If User Response is incorrect and not answered */
-        $oDiv.append(UxUtils.getRadioInnerResponderQuestionCorrect2(id, text));
-        answerIs = "Incorrect";
+        UxUtils.setAppend($oDiv, UxUtils.getRadioInnerResponderQuestionCorrect2(id, text));
+        answerIs = Constants.getIncorrectString();
     } else {
-        $oDiv.append(UxUtils.getRadioInnerResponderQuestionNormal(id, text));
+        UxUtils.setAppend($oDiv, UxUtils.getRadioInnerResponderQuestionNormal(id, text));
     }
 
     if (attachmentId.length > 0) {
         let req = ActionHelper.getAttachmentInfo(actionId, attachmentId);
         $oDiv.find("label.custom-radio").attr("id", attachmentId);
-        ActionHelper.executeApi(req).then(function (response) {
+        ActionHelper.executeApi(req).then(function(response) {
             console.info("Attachment - Response: " + JSON.stringify(response));
-            $oDiv.find("label.custom-radio#" + attachmentId).prepend(UxUtils.getOptionImage(response.attachmentInfo.downloadUrl));
-            Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, `#${id} img.opt-image`);
+            UxUtils.setPrepend($oDiv.find("label.custom-radio#" + attachmentId), UxUtils.getOptionImage(response.attachmentInfo.downloadUrl));
+            Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, `#${attachmentId} img.opt-image`);
         })
-        .catch(function (error) {
+        .catch(function(error) {
             console.error("AttachmentAction - Error: " + JSON.stringify(error));
         });
     }
@@ -1293,34 +1232,34 @@ function getRadioOptions(text, name, id, userResponse, correctAnswer, attachment
  * @param attachmentId String contains attachment id of option
  */
 function getCheckOptions(text, name, id, userResponse, correctAnswer, attachmentId) {
-    let $oDiv = $(`<div class=""></div>`);
+    let $oDiv = $(UxUtils.divTemplate("", ""));
     /*  If answer is correct  and answered */
     if ($.trim(userResponse) == $.trim(id) && $.trim(correctAnswer) == $.trim(id)) {
-        $oDiv.append(UxUtils.getCheckboxForInnerResponderQuestionSuccess(id, text));
+        UxUtils.setAppend($oDiv, UxUtils.getCheckboxForInnerResponderQuestionSuccess(id, text));
         if (answerIs == "") {
-            answerIs = "Correct";
+            answerIs = Constants.getCorrectString();
         }
     } else if (($.trim(userResponse) == $.trim(id) && $.trim(correctAnswer) != $.trim(userResponse))) {
         /* If User Response is correct and answered incorrect */
-        $oDiv.append(UxUtils.getCheckboxForInnerResponderQuestionCorrect(id, text));
-        answerIs = "Incorrect";
+        UxUtils.setAppend($oDiv, UxUtils.getCheckboxForInnerResponderQuestionCorrect(id, text));
+        answerIs = Constants.getIncorrectString();
     } else if (($.trim(userResponse) != $.trim(id) && $.trim(correctAnswer) == $.trim(id))) {
         /* If User Response is incorrect and not answered */
-        $oDiv.append(UxUtils.getCheckboxForInnerResponderQuestionCorrect2(id, text));
-        answerIs = "Incorrect";
+        UxUtils.setAppend($oDiv, UxUtils.getCheckboxForInnerResponderQuestionCorrect2(id, text));
+        answerIs = Constants.getIncorrectString();
     } else {
-        $oDiv.append(UxUtils.getCheckboxForInnerResponderQuestionNormal(id, text));
+        UxUtils.setAppend($oDiv, UxUtils.getCheckboxForInnerResponderQuestionNormal(id, text));
     }
 
     if (attachmentId.length > 0) {
         let req = ActionHelper.getAttachmentInfo(actionId, attachmentId);
         $oDiv.find("label.custom-check").attr("id", attachmentId);
-        ActionHelper.executeApi(req).then(function (response) {
+        ActionHelper.executeApi(req).then(function(response) {
             console.info("Attachment - Response: " + JSON.stringify(response));
-            $oDiv.find("label.custom-check#" + attachmentId).prepend(UxUtils.getOptionImage(response.attachmentInfo.downloadUrl));
-            Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, `#${id} img.opt-image`);
+            UxUtils.setPrepend($oDiv.find("label.custom-check#" + attachmentId), UxUtils.getOptionImage(response.attachmentInfo.downloadUrl));
+            Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, `#${attachmentId} img.opt-image`);
         })
-        .catch(function (error) {
+        .catch(function(error) {
             console.error("AttachmentAction - Error: " + JSON.stringify(error));
         });
     }
@@ -1341,42 +1280,24 @@ function getOptions(text, name, id, userResponse, correctAnswer, isText = "") {
         // This is for text block
         return true;
     }
-    let $oDiv = $('<div class="form-group"></div>');
+    let $oDiv = UxUtils.divTemplate("form-group", "");
 
     /*  If answer is correct  and answered */
     if (userResponse == id && correctAnswer == id) {
-        $oDiv.append(
-            '<div class="form-group alert alert-success"><p class="mb0">' +
-            text +
-            ' <i class="fa  pull-right fa-check"></i> </p></div>'
-        );
+        UxUtils.setAppend($oDiv, UxUtils.getSuccessOptionSection(text));
         if (answerIs == "") {
-            answerIs = "Correct";
+            answerIs = Constants.getCorrectString();
         }
     } else if (userResponse != id && correctAnswer == id) {
         /* If User Response is incorrect and not answered */
-        $oDiv.append(
-            '<div class="form-group alert alert-normal"><p class="mb0">' +
-            text +
-            ' <i class="fa fa-pull-right text-success fa-check"></p></div>'
-        );
+        UxUtils.setAppend($oDiv, UxUtils.getNormalCorrectOptionSection(text));
     } else if (userResponse == id && correctAnswer != id) {
         /* If User Response is incorrect and answered */
-        $oDiv.append(
-            '<div class="alert alert-danger"><p class="mb0">' +
-            text +
-            '<i class="fa fa-pull-right fa-close"></i></p></div>'
-        );
-        answerIs = "Incorrect";
-
+        UxUtils.setAppend($oDiv, UxUtils.getDangerOptionSection(text));
+        answerIs = Constants.getIncorrectString();
     } else {
-        $oDiv.append(
-            '<div class="form-group alert alert-normal""><p class="mb0">' +
-            text +
-            "</p></div>"
-        );
+        UxUtils.setAppend($oDiv, UxUtils.getNormalOptionSection(text));
     }
-
     return $oDiv;
 }
 
@@ -1386,7 +1307,7 @@ function getOptions(text, name, id, userResponse, correctAnswer, isText = "") {
  */
 function footer(userId) {
     Localizer.getString("back").then(function(result) {
-        $("#root div.question-content:last").append(UxUtils.getSummaryViewResponderSummaryFooter(userId, result));
+        UxUtils.setAfter("#root div.question-content:last", UxUtils.getSummaryViewResponderSummaryFooter(userId, result));
     });
 }
 
@@ -1395,7 +1316,7 @@ function footer(userId) {
  */
 function footer1() {
     Localizer.getString("back").then(function(result) {
-        $("#root > div.card-box").append(UxUtils.getSummaryViewTabFooter(result));
+        UxUtils.setAppend("#root > div.card-box", UxUtils.getSummaryViewTabFooter(result));
     });
 }
 
@@ -1403,21 +1324,21 @@ function footer1() {
  * @description Method contains section to date change of training
  */
 function changeDateSection() {
-    $("#root div:first").prepend(UxUtils.getChangeDateSection(changeDueDateKey, cancelKey, changeKey));
+    UxUtils.setPrepend("#root div:first", UxUtils.getChangeDateSection(changeDueDateKey, cancelKey, changeKey));
 }
 
 /**
  * @description Method contains section to close training
  */
 function closeTrainingSection() {
-    $("#root div:first").prepend(UxUtils.getCloseTrainingSection(closeTrainingKey, closeTrainingConfirmKey, cancelKey, confirmKey));
+    UxUtils.setPrepend("#root div:first", UxUtils.getCloseTrainingSection(closeTrainingKey, closeTrainingConfirmKey, cancelKey, confirmKey));
 }
 
 /**
  * @description Method contains section to delete training
  */
 function deleteTrainingSection() {
-    $("#root div:first").prepend(UxUtils.deleteTrainingSection(deleteTrainingKey, deleteTrainingConfirmKey, cancelKey, confirmKey));
+    UxUtils.setPrepend("#root div:first", UxUtils.deleteTrainingSection(deleteTrainingKey, deleteTrainingConfirmKey, cancelKey, confirmKey));
 }
 
 /*
@@ -1428,28 +1349,27 @@ function create_responder_nonresponders() {
         if (actionContext.userId == actionInstance.creatorId) {
             $("#root").html("");
             if ($(".tabs-content:visible").length <= 0) {
-                let $card1 = $('<div class="card-box"></div>');
+                let $card1 = $(UxUtils.divTemplate("card-box", ""));
                 let tabs = $(".tabs-content").clone();
-                $card1.append(tabs.clone());
-                $("#root").append($card1);
+                UxUtils.setAppend($card1, tabs.clone());
+                UxUtils.setAppend($("#root"), $card1);
                 footer1();
             }
-
             /*  Add Responders  */
             getResponders();
 
             /*  Add Non-reponders  */
             getNonresponders();
         } else {
-            alert("Visible to sender only");
+            // console.info("Visible to sender only");
         }
     } else {
         $("#root").html("");
         if ($(".tabs-content:visible").length <= 0) {
-            let $card1 = $('<div class="card-box"></div>');
+            let $card1 = $(UxUtils.divTemplate("card-box", ""));
             let tabs = $(".tabs-content").clone();
-            $card1.append(tabs.clone());
-            $("#root").append($card1);
+            UxUtils.setAppend($card1, tabs.clone());
+            UxUtils.setAppend($("#root"), $card1);
             footer1();
         }
 
@@ -1459,6 +1379,10 @@ function create_responder_nonresponders() {
         // Add Non-reponders
         getNonresponders();
     }
+    let memberCount = subscriberResponse.memberCount;
+    Localizer.getString("xofyPeopleResponded", actionSummary.rowCount, memberCount).then(function (result) {
+        UxUtils.setPrepend("#root", UxUtils.getTotalPeopleRespondedStringRespondersSection(result));
+    });
 }
 
 /**
@@ -1471,23 +1395,23 @@ function create_responder_nonresponders() {
  * @param attachmentId String contains attachment id of option
  */
 function getRadioOptionsCreator(text, optId, ind, result, attachmentId) {
-    let $oDiv = $(`<div class="form-group"></div>`);
+    let $oDiv = $(UxUtils.divTemplate("form-group", ""));
     /*  If answer is correct  and answered */
     if (result == "correct") {
-        $oDiv.append(UxUtils.getCorrectRadiobox(optId, ind, text));
+        UxUtils.setAppend($oDiv, UxUtils.getCorrectRadiobox(optId, ind, text));
     } else {
-        $oDiv.append(UxUtils.getRadioboxSimple(optId, ind, text));
+        UxUtils.setAppend($oDiv, UxUtils.getRadioboxSimple(optId, ind, text));
     }
     if (attachmentId != "" && attachmentId.length > 0) {
         let req = ActionHelper.getAttachmentInfo(actionId, attachmentId);
-        ActionHelper.executeApi(req).then(function (response) {
+        ActionHelper.executeApi(req).then(function(response) {
             console.info("Attachment - Response: " + JSON.stringify(response));
-            $oDiv.find("label.custom-radio").prepend(UxUtils.getOptionImageWithLoader(response.attachmentInfo.downloadUrl));
+            UxUtils.setPrepend($oDiv.find("label.custom-radio"), UxUtils.getOptionImageWithLoader(response.attachmentInfo.downloadUrl));
             Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, `#${optId} .opt-image`);
         })
-            .catch(function (error) {
-                console.error("AttachmentAction - Error: " + JSON.stringify(error));
-            });
+        .catch(function(error) {
+            console.error("AttachmentAction - Error: " + JSON.stringify(error));
+        });
     }
     return $oDiv;
 }
@@ -1502,20 +1426,20 @@ function getRadioOptionsCreator(text, optId, ind, result, attachmentId) {
  * @param attachmentId String contains attachment id of option
  */
 function getCheckOptionsCreator(text, optId, ind, result, attachmentId) {
-    let $oDiv = $(`<div class="form-group"></div>`);
+    let $oDiv = $(UxUtils.divTemplate("", ""));
     /*  If answer is correct  and answered */
     if (result == "correct") {
-        $oDiv.append(UxUtils.getCorrectCheckbox(optId, ind, text));
+        UxUtils.setAppend($oDiv, UxUtils.getCorrectCheckbox(optId, ind, text));
     } else {
-        $oDiv.append(UxUtils.getCheckboxSimple(optId, ind, text));
+        UxUtils.setAppend($oDiv, UxUtils.getCheckboxSimple(optId, ind, text));
     }
     if (attachmentId != "" && attachmentId.length > 0) {
         let req = ActionHelper.getAttachmentInfo(actionId, attachmentId);
-        ActionHelper.executeApi(req).then(function (response) {
+        ActionHelper.executeApi(req).then(function(response) {
             console.info("Attachment - Response: " + JSON.stringify(response));
-            $oDiv.find("label.custom-check").prepend(UxUtils.getOptionImageWithLoader(response.attachmentInfo.downloadUrl));
+            UxUtils.setPrepend($oDiv.find("label.custom-check"), UxUtils.getOptionImageWithLoader(response.attachmentInfo.downloadUrl));
             Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, `#${optId} .opt-image`);
-        }).catch(function (error) {
+        }).catch(function(error) {
             console.error("AttachmentAction - Error: " + JSON.stringify(error));
         });
     }
@@ -1533,14 +1457,13 @@ $(document).on("click", ".back", function() {
  * Event to click on back button and back to responder and non responder tab page
  */
 $(document).on("click", ".back1", function() {
-    let userId = $(this).attr("userid-data");
     create_responder_nonresponders();
 });
 
 /**
  * @event Change event for expiry date and time
  */
-$(document).on("change", "input[name='expiry_time'], input[name='expiry_date']", function () {
+$(document).on("change", "input[name='expiry_time'], input[name='expiry_date']", function() {
     $("#change-quiz-date").removeClass("disabled");
 });
 /**
@@ -1551,20 +1474,20 @@ KeyboardUtils.keydownClick(document, "#closeKey");
 /**
  * @event Click Event for back to responder and non responder page
  */
-$(document).on("click", "#closeKey", function () {
+$(document).on("click", "#closeKey", function() {
     let closeViewRequest = ActionHelper.closeView();
 
     ActionHelper
         .executeApi(closeViewRequest)
-        .then(function (batchResponse) {
+        .then(function(batchResponse) {
             console.info("BatchResponse: " + JSON.stringify(batchResponse));
         })
-        .catch(function (error) {
+        .catch(function(error) {
             console.error("Error3: " + JSON.stringify(error));
         });
 });
 
-$(document).on("click", "#change-quiz-date", function () {
+$(document).on("click", "#change-quiz-date", function() {
     let quizExpireDate = $("input[name='expiry_date']").val();
     let quizExpireTime = $("input[name='expiry_time']").val();
     actionInstance.expiryTime = new Date(quizExpireDate + " " + quizExpireTime).getTime();
@@ -1581,8 +1504,8 @@ KeyboardUtils.keydownClick(document, "#downloadImage");
  * @event Click event for download image in png
  */
 $(document).on({
-    click: function(e) {
-        let bodyContainerDiv = document.getElementsByClassName("container")[0];
+    click: function() {
+        let bodyContainerDiv = document.getElementById("root");
         let backgroundColorOfResultsImage = theme;
         $(".footer").hide();
         html2canvas(bodyContainerDiv, {
@@ -1620,7 +1543,7 @@ KeyboardUtils.keydownClick(document, "#downloadCSV");
  * @event Click event for download CSV
  */
 $(document).on({
-    click: function(e) {
+    click: function() {
         ActionHelper.downloadCSV(actionId, "training");
     }
 }, "#downloadCSV");
@@ -1639,42 +1562,43 @@ $(document).on({
         $(".change-date").remove();
         $(".close-quiz").remove();
         $(".delete-quiz").remove();
-
         changeDateSection();
-
-        let ddtt = ((actionInstance.customProperties[1].value).split("T"));
-        let dt = ddtt[0].split("-");
-        let weekDateFormat = new Date(dt[1]).toLocaleString("default", { month: "short" }) + " " + dt[2] + ", " + dt[0];
-        let timeData = new Date(actionInstance.expiryTime);
-        let hourData = timeData.getHours();
-        let minuteData = timeData.getMinutes();
-        let currentTime = hourData + ":" + minuteData;
-        $(".form_date input").val(weekDateFormat);
-        $(".form_date").attr({ "data-date": weekDateFormat });
+        let currentTime = new Date(actionInstance.expiryTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }).toLowerCase();
+        let setDate = new Date(actionInstance.expiryTime);
+        $(".form_date").attr({ "data-date": setDate });
+        let langObj = Utils.getLocaleForCalendar(context.locale);
+        let lang = langObj.lang;
         $(".form_time").datetimepicker({
-            language: "en",
-            weekStart: 1,
-            todayBtn: 1,
+            format: "HH:ii",
+            pickDate: "false",
             autoclose: 1,
-            todayHighlight: 1,
             startView: 1,
-            minView: 0,
             maxView: 1,
-            forceParse: 0
+            useCurrent: false,
+            minView: 0,
+            forceParse: 0,
+            todayHighlight: 1,
+            todayBtn: 1,
+            language: lang,
+            meridiem: ""
         });
-
         $(".form_time input").val(currentTime);
-
         let dateInput = $("input[name='expiry_date']");
-        let container = $(".bootstrap-iso form").length > 0 ? $(".bootstrap-iso form").parent() : "body";
+        let container = "";
+        if($(".bootstrap-iso form").length > 0) {
+            container = $(".bootstrap-iso form").parent();
+        } else {
+            container = "body";
+        }
         let options = {
-            format: "M dd, yyyy",
-            container: container,
+            "container": container,
             todayHighlight: true,
             autoclose: true,
-            orientation: "top"
+            orientation: "top",
+            language: lang
         };
         dateInput.datepicker(options);
+        dateInput.datepicker("setDate", setDate);
         return false;
     }
 }, ".change-due-by-event");
@@ -1682,7 +1606,7 @@ $(document).on({
 /**
  * @event Click event to close change, close and delete quiz confirm section
  */
-$(document).on("click", ".cancel-question-delete", function () {
+$(document).on("click", ".cancel-question-delete", function() {
     $(".change-date").remove();
     $(".close-quiz").remove();
     $(".delete-quiz").remove();
@@ -1691,14 +1615,14 @@ $(document).on("click", ".cancel-question-delete", function () {
 /**
  * @event Click event for delete quiz
  */
-$(document).on("click", "#delete-quiz", function () {
+$(document).on("click", "#delete-quiz", function() {
     ActionHelper.deleteActionInstance(actionId);
 });
 
 /**
  * @event Click event for change quiz expiry date
  */
-$(document).on("click", "#change-quiz-question", function () {
+$(document).on("click", "#change-quiz-question", function() {
     ActionHelper.closeActionInstance(actionId, actionInstance.version);
 });
 
@@ -1711,7 +1635,7 @@ KeyboardUtils.keydownClick(document, ".delete-quiz-event");
  * @event Click event to show delete quiz
  */
 $(document).on({
-    click: function (e) {
+    click: function(e) {
         e.preventDefault();
         $(".change-date").remove();
         $(".close-quiz").remove();
@@ -1730,7 +1654,7 @@ KeyboardUtils.keydownClick(document, ".close-quiz-event");
  * @event Click event to show close quiz
  */
 $(document).on({
-    click: function (e) {
+    click: function(e) {
         e.preventDefault();
         $(".change-date").remove();
         $(".close-quiz").remove();
@@ -1749,47 +1673,49 @@ KeyboardUtils.keydownClick(document, ".change-due-by-event");
  * @event Click event to show change due by date
  */
 $(document).on({
-    click: function (e) {
+    click: function(e) {
         e.preventDefault();
         $(".change-date").remove();
         $(".close-quiz").remove();
         $(".delete-quiz").remove();
-
         changeDateSection();
-
-        let ddtt = ((actionInstance.customProperties[1].value).split("T"));
-        let dt = ddtt[0].split("-");
-        let weekDateFormat = new Date(dt[1]).toLocaleString("default", { month: "short" }) + " " + dt[2] + ", " + dt[0];
-        let timeData = new Date(actionInstance.expiryTime);
-        let hourData = timeData.getHours();
-        let minuteData = timeData.getMinutes();
-        let currentTime = hourData + ":" + minuteData;
-        $(".form_date input").val(weekDateFormat);
-        $(".form_date").attr({ "data-date": weekDateFormat });
+        let currentTime = new Date(actionInstance.expiryTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }).toLowerCase();
+        let setDate = new Date(actionInstance.expiryTime);
+        $(".form_date input").val(setDate);
+        $(".form_date").attr({ "data-date": setDate });
+        let langObj = Utils.getLocaleForCalendar(context.locale);
+        let lang = langObj.lang;
         $(".form_time").datetimepicker({
-            language: "en",
-            weekStart: 1,
-            todayBtn: 1,
+            format: "HH:ii",
+            pickDate: "false",
             autoclose: 1,
-            todayHighlight: 1,
             startView: 1,
-            minView: 0,
             maxView: 1,
-            forceParse: 0
+            useCurrent: false,
+            minView: 0,
+            forceParse: 0,
+            todayHighlight: 1,
+            todayBtn: 1,
+            language: lang,
+            meridiem: ""
         });
-
         $(".form_time input").val(currentTime);
-
         let dateInput = $("input[name='expiry_date']");
-        let container = $(".bootstrap-iso form").length > 0 ? $(".bootstrap-iso form").parent() : "body";
+        let container = "";
+        if($(".bootstrap-iso form").length > 0) {
+            container = $(".bootstrap-iso form").parent();
+        } else {
+            container = "body";
+        }
         let options = {
-            format: "M dd, yyyy",
-            container: container,
+            "container": container,
             todayHighlight: true,
             autoclose: true,
-            orientation: "top"
+            orientation: "top",
+            language: lang
         };
         dateInput.datepicker(options);
+        dateInput.datepicker("setDate", setDate);
         return false;
     }
 }, ".change-due-by-event");
@@ -1804,7 +1730,7 @@ $(document).on("click", "#show-responders", function() {
 /**
  * Variable contains text section for media file
  */
-Localizer.getString("trainingContent").then(function (result) {
+Localizer.getString("trainingContent").then(function(result) {
     trainingContentKey = result;
     contentSection = UxUtils.getTrainingContentContainer(trainingContentKey);
 });
@@ -1823,7 +1749,6 @@ KeyboardUtils.keydownClick(document, ".back");
  * @event Keydown event for back button of responders result view
  */
 KeyboardUtils.keydownClick(document, ".back1");
-
 
 /**
  * @event Keydown event for result view of responders

@@ -29,15 +29,7 @@ export class UxUtils {
                         <label class="quiz-clear font-12 semi-bold mb--8 cursor-pointer pull-right theme-color training-clear clear-key" style="display:none" tabindex="0" role="input">${clearKey}</label>
                         <div class="clearfix"></div>
                         <div class="relative" tabindex="0" role="image">
-
-                            <div class="loader-cover cover-image-loader" style="display: none;">
-                                <div class="d-table-cell">
-                                    <div class="spinner-border" role="status">
-                                        <span class="sr-only">Loading...</span>
-                                    </div>
-                                </div>
-                            </div>
-
+                            ${Constants.getLoaderCover("cover-image-loader")}
                             <!-- hide this div after img added -->
                             <div class="photo-box card card-bg card-border max-min-220 upvj cursor-pointer" >
                                 <span class="tap-upload-label upload-cover-image-key">${uploadCoverImageKey}</span>
@@ -85,7 +77,6 @@ export class UxUtils {
                     <div class="training-card-section">
                         <div class="quiz-updated-img max-min-220 bdr-none bg-none cover-img cursor-pointer mb--16" style="display:none;">
                             <img src="" id="training-title-image" style="" class="quiz-updated-img card-bg card-border" style="display:none;">
-                            <input type="file" name="quiz_image" class="in-t form-control d-none" id="cover-image" accept="image/*" src="images/px-img.png">
                         </div>
                         <div class="row">
                             <div class="col-12">
@@ -93,6 +84,7 @@ export class UxUtils {
                                 <p class="text-justify font-12 text-break mb--16" id="training-description-content"></p>
                             </div>
                         </div>
+                        <input type="file" name="quiz_image" class="in-t form-control d-none" id="cover-image" accept="image/*" src="images/px-img.png">
                     </div>
                 </div>
             </div>
@@ -134,7 +126,9 @@ export class UxUtils {
                                     </a>
                                 </div>
                             </div>
-                            <div class="col-3 text-right"> <button type="button" class="btn btn-primary btn-sm pull-right submit-key" id="submit" tabindex="0" role="button" data-id="submit"> ${submitKey}</button></div>
+                            <div class="col-3 text-right"> 
+                                <button type="button" class="btn btn-primary btn-sm pull-right submit-key" id="submit" tabindex="0" role="button" data-id="submit"> ${submitKey}</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -148,7 +142,7 @@ export class UxUtils {
      * @param questionTitleKey sting contains question title label key
      * @param checkMeKey sting contains checkbox label key
      */
-    static getQuestionArea(questionKey, questionTitleKey, checkMeKey) {
+    static getQuestionArea(questionKey, questionTitleKey, checkMeKey, enterTheChioceKey, addMoreOptions) {
         return `<div class="question-section">
             <div class="container question-container" id="question1">
                 <div class="card-box card-border card-bg">
@@ -167,7 +161,7 @@ export class UxUtils {
                                 ${Constants.getUploadQuestionImageIcon()}
                                 <input type="file" name="question_image" class="d-none" accept="image/*" id="question-image-1"/>
                             </div>
-                            <input type="text" class="form-control in-t pl--32" placeholder="Type your question" aria-label="${questionTitleKey}" aria-describedby="basic-addon2" id="question-title" maxlength="5000">
+                            <input type="text" class="form-control in-t pl--32" placeholder="${questionTitleKey}" aria-label="${questionTitleKey}" aria-describedby="basic-addon2" id="question-title" maxlength="5000">
                         </div>
                     </div>
                     <div class="d-flex-ques">
@@ -185,7 +179,7 @@ export class UxUtils {
                                                     ${Constants.getUploadOptionImageIcon()}
                                                     <input type="file" name="option_image" class="d-none" accept="image/*" id="option-image-1"/>
                                                 </div>
-                                                <input type="text" class="form-control in-t opt-cls pl--32" placeholder="Enter your choice" aria-label="Option 1" aria-describedby="basic-addon2" id="option1" maxlength="1000" >
+                                                <input type="text" class="form-control in-t opt-cls pl--32" placeholder="${enterTheChioceKey}" aria-label="${enterTheChioceKey}" aria-describedby="basic-addon2" id="option1" maxlength="1000" >
                                                 <div class="input-group-append  input-tpt trash-ic cursor-pointer remove-option-href" tabindex="0" role="checkbox">
                                                     <span class="remove-option">
                                                         ${Constants.getTrashIcon()}
@@ -215,7 +209,7 @@ export class UxUtils {
                                                     ${Constants.getUploadOptionImageIcon()}
                                                     <input type="file" name="option_image" class="d-none" accept="image/*" id="option-image-2"/>
                                                 </div>
-                                                <input type="text" class="form-control in-t opt-cls pl--32" placeholder="Enter your choice" aria-label="Option 2" aria-describedby="basic-addon2" id="option2" maxlength="1000">
+                                                <input type="text" class="form-control in-t opt-cls pl--32" placeholder="${enterTheChioceKey}" aria-label="${enterTheChioceKey}" aria-describedby="basic-addon2" id="option2" maxlength="1000">
                                                 <div class="input-group-append input-tpt trash-ic cursor-pointer" tabindex="0" role="button">
                                                     <span class="remove-option">
                                                         ${Constants.getTrashIcon()}
@@ -234,9 +228,10 @@ export class UxUtils {
                                         </div>
                                     </div>
                                 </div>
+                                <span class="max-option-err-box text-danger font-12"></span>
                                 <div class="">
                                     <button type="button" class="teams-link add-options">
-                                        ${Constants.getPlusIcon()} Add options
+                                        ${Constants.getPlusIcon()} ${addMoreOptions}
                                     </button>
                                 </div>
                             </div>
@@ -250,11 +245,11 @@ export class UxUtils {
     /**
      * @Method to get Question button HTML
      */
-    static getAddQuestionButton() {
+    static getAddQuestionButton(addQuestionLabel) {
         return `<div class="container question_button">
             <div class="form-group">
                 <button type="button" class="btn btn-primary btn-sm" id="add-questions-same-section">
-                    ${Constants.getPlusIcon()} <span class="add-question-label">Add Questions</span></button>
+                    ${Constants.getPlusIcon()} <span class="add-question-label">${addQuestionLabel}</span></button>
             </div>
             <div class="discardContent"></div>
         </div>`;
@@ -263,7 +258,7 @@ export class UxUtils {
     /**
      * @Method to get Question section Footer area
      */
-    static getQuestionAreaFooter() {
+    static getQuestionAreaFooter(doneKey) {
         return `<div class="footer question-footer" >
             <div class="footer-padd bt">
                 <div class="container ">
@@ -276,56 +271,10 @@ export class UxUtils {
                             </a>
                         </div>
                         <div class="col-3 text-right">
-                            <button type="button" class="btn btn-primary btn-sm pull-right done-label" id="question-done"  tabindex="0" role="button" data-id="question-done"> Done</button>
+                            <button type="button" class="btn btn-primary btn-sm pull-right done-label" id="question-done"  tabindex="0" role="button" data-id="question-done"> ${doneKey}</button>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>`;
-    }
-
-    /**
-     * @Method to get Question Edit Section
-     * @param  counter string contains Section Id
-     * @param  questionTitle string contains Question Title
-     * @param  optionChecked string contains correct Options
-     */
-    static getEditQuestionArea(counter, questionTitle, optionChecked) {
-        return `<div class="card-box-question card-box card-border card-bg training-card-section section-div question-section-div" data-id="text-section-${counter}" id="section-${counter}">
-            ${optionChecked}
-            <div id="quest-text-${j}" class="d-none"></div>
-            <div class="d-table mb--4 pre-none">
-                <label class="font-12">
-                    <strong class="question-number-title bold">
-                        <label class="font-12">
-                            <span class="question-number">Question # </span><span class="counter">${counter}</span>
-                        </label>
-                    </strong>
-                </label>
-                <label class="float-right result-status" id="status-1">
-                </label>
-                <button type="button" class="close remove-text" data-dismiss="alert">
-                    <span aria-hidden="true">
-                        ${Constants.getTrashIcon()}
-                    </span>
-                    <span class="sr-only">Close</span>
-                </button>
-            </div>
-            <div>
-                <div class="quiz-updated-img bg-none bdr-none cover-img min-max-132 mb--4" style="{styleQuestionImage}">
-                    <p><span id="question_image">${questionImage}</span></p>
-                </div>
-                <div class="semi-bold font-16 mb--16 question-title">
-                    <p><label class="text-justify"><strong class="question">${questionTitle}</strong></label></p>
-                </div>
-            </div>
-            <div class="option-sec">
-                ${optionText}
-            </div>
-            <div class="input_section">
-                ${questionInput}
-                <textarea class="question-image d-none">${questionImagearray}</textarea>
-                ${optionAttachments}
             </div>
         </div>`;
     }
@@ -372,15 +321,15 @@ export class UxUtils {
     /**
      * @Method to get Text section HTML Form
      */
-    static getTextContentArea() {
+    static getTextContentArea(addTitlePlaceholder, addTextDescriptionPlaceholder) {
         return `<div class="text-section">
             <div class="container">
                 <div id="row" class="row">
                     <div class="col-sm-12 mb--16">
-                        <input type="url" class="form-control in-t semi-bold" name="text_title" id="training-text" value="" placeholder="Add content title">
+                        <input type="url" class="form-control in-t semi-bold" name="text_title" id="training-text" value="" placeholder="${addTitlePlaceholder}">
                     </div>
                     <div class="col-sm-12">
-                        <textarea class="font-12 in-t form-control text-label-placeholder" maxlength="${Constants.getInputMaxLength()}" rows="8" id="training-text-description" placeholder="Add Text"></textarea>
+                        <textarea class="font-12 in-t form-control text-label-placeholder" maxlength="${Constants.getInputMaxLength()}" rows="8" id="training-text-description" placeholder="${addTextDescriptionPlaceholder}"></textarea>
                     </div>
                     <div class="col-sm-12 discardContent"></div>
                 </div>
@@ -391,7 +340,7 @@ export class UxUtils {
     /**
      * @Method to get Text Section Edit Area
      * @param counter string contains div counter
-     * @param displayName string contains div Title 
+     * @param displayName string contains div Title
      * @param description string contains div Title Description
      * @param loaderClass string contains Load more Class
      * @param loaderCss string contains Load More Css
@@ -428,8 +377,8 @@ export class UxUtils {
                     <div class="row">
                         <div class="col-9 d-table">
                             <a class="cursor-pointer" id="back-text">
-                                <span tabindex="0" role="button" data-id="back-text" style="width: 15%;">
-                                    ${Constants.getRightCaratIcon()} <span class="back-key">Back</span>
+                                <span tabindex="0" role="button" data-id="back-text">
+                                    ${Constants.getRightCaratIcon()} <span class="back-key"></span>
                                 </span>
                             </a>
                         </div>
@@ -454,23 +403,16 @@ export class UxUtils {
                 <div id="root" class="">
                     <div class="">
                         <div class="form-group mb--16">
-                            <input type="url" class="form-control in-t semi-bold" name="image_text_title" id="image-training-text" value="" placeholder="Add content title">
+                            <input type="url" class="form-control in-t semi-bold" name="image_text_title" id="image-training-text" value="" placeholder="${addTitlePlaceholderKey}">
                         </div>
                         <div class="form-group mb--16">
                             <span class="float-right"><a class="upvj cursor-pointer change-link theme-color mb--4 d-block font-12 semi-bold" style="display:none!important">Edit</a></span>
                             <div class="clearfix"></div>
                             <div class="relative" tabindex="0" role="image">
                                 <div class="clearfix"></div>
-                                <div class="loader-cover show-image-loader" style="display:none;">
-                                    <div class="d-table-cell">
-                                        <div class="spinner-border" role="status">
-                                            <span class="sr-only">Loading...</span>
-                                        </div>
-                                    </div>
-                                </div>
-
+                                ${Constants.getLoaderCover("show-image-loader")}
                                 <div class="photo-box card cursor-pointer card-bg card-border max-min-220 upvj" >
-                                    <span class="tap-upload-photo-label">Upload images</span>
+                                    <span class="tap-upload-photo-label">${uploadImageLabelKey}</span>
                                 </div>
                                 <!-- show this div after img added -->
                                 <div class="updated-img update-carasoul card card-bg card-border max-min-220" style="display:none">
@@ -478,7 +420,7 @@ export class UxUtils {
                             </div>
                         </div>
                         <div class="form-group mb0">
-                            <textarea class="font-12 in-t form-control desc-content-about-placeholder" maxlength="${Constants.getInputMaxLength()}" id="photo-description" placeholder="What is the content about? (Optional)"></textarea>
+                            <textarea class="font-12 in-t form-control desc-content-about-placeholder" maxlength="${Constants.getInputMaxLength()}" id="photo-description" placeholder="${addDescriptionPlaceholderKey}"></textarea>
                             <textarea class="d-none" id="photo-attachments" ></textarea>
                         </div>
                     </div>
@@ -499,9 +441,9 @@ export class UxUtils {
                 <div class="container ">
                     <div class="row">
                         <div class="col-9 d-table">
-                            <a class=" cursor-pointer" id="back-photo">
-                                <span tabindex="0" role="button" data-id="back-photo">
-                                    ${Constants.getRightCaratIcon()} <span class="back-key">Back</span>
+                            <a>
+                                <span tabindex="0" role="button" data-id="back-photo" class="cursor-pointer" id="back-photo">
+                                    ${Constants.getRightCaratIcon()} <span class="back-key"></span>
                                 </span>
                             </a>
                         </div>
@@ -515,29 +457,21 @@ export class UxUtils {
     /**
      * @Method to get Video Form Section
      */
-    static getVideoContentArea() {
+    static getVideoContentArea(addTitlePlaceholderKey, addDescriptionPlaceholderKey, uploadVideoLabelKey) {
         return `<div class="text-section" >
             <div class="container">
                 <div id="root" class="">
                     <div class="">
                         <div class="form-group mb--16">
-                            <input type="url" class="form-control in-t semi-bold" name="video_text_title" id="video-training-text" value="" placeholder="Add content title">
+                            <input type="url" class="form-control in-t semi-bold" name="video_text_title" id="video-training-text" value="" placeholder="${addTitlePlaceholderKey}">
                         </div>
                         <div class="form-group mb--16">
                             <span class="float-right mb--4"><a class="upvj cursor-pointer change-link theme-color edit-key font-12 semi-bold" style="display:none">Edit</a></span>
                             <div class="clearfix"></div>
                             <div class="relative">
-
-                                <div class="loader-cover video-loader" style="display: none;">
-                                    <div class="d-table-cell">
-                                        <div class="spinner-border" role="status">
-                                            <span class="sr-only">Loading...</span>
-                                        </div>
-                                    </div>
-                                </div>
-
+                                ${Constants.getLoaderCover("video-loader")}
                                 <div class="video-box card card-bg card-border max-min-220 upvj cursor-pointer"  tabindex="0" role="image">
-                                    <span class="tap-upload-video-label">Tap to upload video</span>
+                                    <span class="tap-upload-video-label">${uploadVideoLabelKey}</span>
                                 </div>
                                 <div class="updated-video card card-bg card-border max-min-220 upvj" style="display:none">
                                     <div class="embed-responsive embed-responsive-21by9">
@@ -548,7 +482,7 @@ export class UxUtils {
                             </div>
                         </div>
                         <div class="form-group mb0">
-                            <textarea class="font-12 in-t form-control desc-content-about-placeholder" maxlength="${Constants.getInputMaxLength()}" id="video-description" placeholder="What is the content about? (Optional)"></textarea>
+                            <textarea class="font-12 in-t form-control desc-content-about-placeholder" maxlength="${Constants.getInputMaxLength()}" id="video-description" placeholder="${addDescriptionPlaceholderKey}"></textarea>
                             <textarea class="d-none" id="video-attachments" ></textarea>
                         </div>
                         <div class="form-group">
@@ -569,9 +503,9 @@ export class UxUtils {
                 <div class="container ">
                     <div class="row">
                         <div class="col-9 d-table">
-                            <a class=" cursor-pointer" id="back-video">
-                                <span tabindex="0" role="button" data-id="back-video">
-                                    ${Constants.getRightCaratIcon()} <span class="back-key">Back</span>
+                            <a>
+                                <span tabindex="0" role="button" data-id="back-video" class="cursor-pointer" id="back-video">
+                                    ${Constants.getRightCaratIcon()} <span class="back-key"></span>
                                 </span>
                             </a>
                         </div>
@@ -585,30 +519,22 @@ export class UxUtils {
     /**
      * @Method to get Document Form Section Area
      */
-    static getDocumentContentArea() {
+    static getDocumentContentArea(addTitlePlaceholder, addDescriptionPlaceholder, uploadFileLabel) {
         return `<div class="text-section" >
             <div class="container">
                 <div id="root" class="">
                     <div class="">
                         <div class="form-group mb--16">
-                            <input type="url" class="form-control in-t semi-bold" name="text_doc_title" id="doc-training-text" value="" placeholder="Add content title">
+                            <input type="url" class="form-control in-t semi-bold" name="text_doc_title" id="doc-training-text" value="" placeholder="${addTitlePlaceholder}">
                         </div>
                         <div class="form-group mb--16">
                             <span class="float-right mb--4"><a class="upvj cursor-pointer change-doc-link theme-color font-12 semi-bold" style="display:none">Edit</a></span>
                             <div class="clearfix"></div>
                             <div class="relative">
-
-                            <div class="loader-cover show-document-loader" style="display:none;">
-                                <div class="d-table-cell">
-                                    <div class="spinner-border" role="status">
-                                        <span class="sr-only">Loading...</span>
-                                    </div>
-                                </div>
-                            </div>
-
+                                ${Constants.getLoaderCover("show-document-loader")}
                                 <!-- hide this div afte img added -->
                                 <div class="doc-box card card-bg card-border max-min-220 upvj cursor-pointer" tabindex="0" role="doc">
-                                    <span class="tap-upload-files-label">Tap to upload files</span>
+                                    <span class="tap-upload-files-label">${uploadFileLabel}</span>
                                 </div>
                                 <!-- show this div afte img added -->
                                 <div class="doc-name">
@@ -616,7 +542,7 @@ export class UxUtils {
                             </div>
                         </div>
                         <div class="form-group mb0">
-                            <textarea class="in-t form-control desc-content-about-placeholder font-12" maxlength="${Constants.getInputMaxLength()}" id="document-description" placeholder="What is the content about? (Optional)"></textarea>
+                            <textarea class="in-t form-control desc-content-about-placeholder font-12" maxlength="${Constants.getInputMaxLength()}" id="document-description" placeholder="${addDescriptionPlaceholder}"></textarea>
                             <textarea id="document-attachment" class="d-none"></textarea>
                         </div>
                         <div class="form-group">
@@ -639,7 +565,7 @@ export class UxUtils {
                         <div class="col-9 d-table">
                             <a>
                                 <span tabindex="0" role="button" data-id="back-photo" class=" cursor-pointer" id="back-photo">
-                                    ${Constants.getRightCaratIcon()} <span class="back-key">Back</span>
+                                    ${Constants.getRightCaratIcon()} <span class="back-key"></span>
                                 </span>
                             </a>
                         </div>
@@ -739,9 +665,9 @@ export class UxUtils {
                             <div class="row">
                                 <div class="col-9">
                                     <div class="d-table">
-                                        <a id="back">
-                                            <span tabindex="0" class="cursor-pointer" role="button" data-id="back">
-                                                ${Constants.getRightCaratIcon()} <span class="back-key">Back</span>
+                                        <a>
+                                            <span tabindex="0" class="cursor-pointer" role="button" data-id="back" id="back">
+                                                ${Constants.getRightCaratIcon()} <span class="back-key"></span>
                                             </span>
                                         </a>
                                     </div>
@@ -761,24 +687,25 @@ export class UxUtils {
      */
     static getLoaderContentArea() {
         return `<div class="loader-overlay">
-            <div class="loader-outer">
-                <div class="spinner-border" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-            </div>
-        </div>`;
+                    <div class="loader-outer">
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </div>`;
     }
 
     /**
      * @Method to get Discard Content
      */
-    static getDiscardContentArea() {
+    static getDiscardContentArea(areYouSureKey, cancelKey, discardKey) {
         return `<div class="d-flex-alert mt--32">
             <div class="pr--8">
-                <label class="confirm-box text-danger"> Are you sure want to discard this content? </label>
+                <label class="confirm-box text-danger"> ${areYouSureKey} </label>
             </div>
             <div class=" pl--8 text-right">
-                <button type="button" class="btn btn-primary-outline btn-sm cancel cancel-question-delete mr--8">Cancel</button><button type="button" class="btn btn-primary btn-sm discard-success">Discard</button>
+                <button type="button" class="btn btn-primary-outline btn-sm cancel cancel-question-delete mr--8">${cancelKey}</button>
+                <button type="button" class="btn btn-primary btn-sm discard-success">${discardKey}</button>
             </div>
         </div>`;
     }
@@ -786,15 +713,15 @@ export class UxUtils {
     /**
      * @Method to get Confirm Box Content
      */
-    static getTextConfirmBox(dataId) {
+    static getTextConfirmBox(dataId, okKey, closeKey, confirmDeleteMsgKey) {
         return `<div class="confirm-box mt--16">
             <div class="d-flex-alert mb--8">
                 <div class="pr--8">
-                    <label class="confirm-box text-danger"> Are you sure you want to delete? </label>
+                    <label class="confirm-box text-danger"> ${confirmDeleteMsgKey} </label>
                 </div>
                 <div class=" pl--8 text-right">
-                    <button class="btn btn-primary btn-sm pull-right" data-id="${dataId}" id="confirm-delete-text">Ok</button>
-                    <button class="btn btn-primary-outline btn-sm pull-right mr--8" id="cancel-confirm">Close</button>
+                    <button class="btn btn-primary btn-sm pull-right" data-id="${dataId}" id="confirm-delete-text">${okKey}</button>
+                    <button class="btn btn-primary-outline btn-sm pull-right mr--8" id="cancel-confirm">${closeKey}</button>
                 </div>
         </div>`;
     }
@@ -802,16 +729,16 @@ export class UxUtils {
     /**
      * @Method to get Confirm Box to Delete  Question
      */
-    static getDeleteQuestionConfirmBox(dataId, ok, close) {
-        return `<div class="confirm-box">
-            <hr class="hr-danger">
-            <ul class="d-flex table-remove mb-0">
-                <li><span class="text-danger">Are you sure you want to delete?</span></li>
-                <li>
-                    <button class="btn btn-primary btn-sm pull-right" data-id="${dataId}" id="delete-question">${ok}</button>
-                    <button class="btn btn-primary-outline btn-sm pull-right mr--8" id="cancel-confirm">${close}</button>
-                </li>
-            </ul>
+    static getDeleteQuestionConfirmBox(dataId, okKey, closeKey, areYouSureKey) {
+        return `<div class="confirm-box mt--16">
+            <div class="d-flex-alert mb--8">
+                <div class="pr--8">
+                    <label class="confirm-box text-danger"> ${areYouSureKey} </label>
+                </div>
+                <div class=" pl--8 text-right">
+                    <button class="btn btn-primary pull-right" data-id="${dataId}" id="delete-question">${okKey}</button>
+                    <button class="btn btn-primary-outline pull-right mr--8" id="cancel-confirm">${closeKey}</button>
+                </div>
         </div>`;
     }
 
@@ -942,15 +869,15 @@ export class UxUtils {
                         <div class="hover-btn">
                             <div class="d-table mb--8 pre-none">
                                 <label class="font-16 semi-bold text-break"><span class="type">${imageTitle}</span></label>
+                                <label class="float-right result-status" id="status-1">
+                                    <button type="button" class="close remove-text" data-dismiss="alert">
+                                        <span aria-hidden="true" class="input-group-text remove-image-section input-tpt cursor-pointer">
+                                            ${Constants.getTrashIcon()}
+                                        </span>
+                                        <span class="sr-only">Close</span>
+                                    </button>
+                                </label>
                             </div>
-                            <label class="float-right result-status" id="status-1">
-                                <button type="button" class="close remove-text" data-dismiss="alert">
-                                    <span aria-hidden="true" class="input-group-text remove-image-section input-tpt cursor-pointer">
-                                        ${Constants.getTrashIcon()}
-                                    </span>
-                                    <span class="sr-only">Close</span>
-                                </button>
-                            </label>
                         </div>
                         <div class="clearfix"></div>
                     </div>
@@ -1071,8 +998,8 @@ export class UxUtils {
 
     /**
      * @Method to get Add Download Section
-     * @param {*} textNumber 
-     * @param {*} textData 
+     * @param {*} textNumber
+     * @param {*} textData
      */
     static getAddDownloadSection(textNumber, textData) {
         return `<div class="card-box card-bg card-border training-card-section section-div document-section-div">
@@ -1161,10 +1088,19 @@ export class UxUtils {
      * @param count string contains image counter
      * @param count string contains image src
      */
-    static getCarousalImages(count, resultLocale) {
-        return `<div class="carousel-item 12456 ${count == 0 ? "active" : ""}">
-            <img class="d-block w-100" src="${resultLocale}" alt="${count+1} slide">
-        </div>`;
+    static getCarousalImages(resultLocale, count, galeryId) {
+        return `<div class="carousel-item ${count == 0 ? "active" : ""}">
+                <a href="${resultLocale}" data-toggle="lightbox" data-gallery="gallery${galeryId}" data-type="image">
+                    <img class="w-100" src="${resultLocale}" alt="${count + 1} slide">
+                </a>
+            </div>`;
+    }
+
+    /**
+     * 
+     */
+    static getCarousalLiSection(uniqueCarouselId, count) {
+        return `<li data-target="#carouselExampleIndicators${uniqueCarouselId}" data-slide-to="${count}" class="${count == 0 ? "active": ""}"></li>`;
     }
 
     /**
@@ -1228,8 +1164,8 @@ export class UxUtils {
                             <a userid-data="${userId}" id="hide2">
                                 <span class="cursor-pointer back1"  tabindex="0" role="button">
                                     ${Constants.getRightCaratIcon()}
-                                <span class="back-key"> 
-                                    ${resultLocale}
+                                    <span class="back-key">
+                                        ${resultLocale}
                                     </span>
                                 </span>
                             </a>
@@ -1253,7 +1189,7 @@ export class UxUtils {
                         <a id="hide2">
                             <span class="cursor-pointer back" tabindex="0" role="button">
                                 ${Constants.getRightCaratIcon()}
-                                <span class="back-key"> 
+                                <span class="back-key">
                                     ${resultLocale}
                                 </span>
                             </span>
@@ -1306,6 +1242,24 @@ export class UxUtils {
     }
 
     /**
+     * @Method getNonRespondersInitials contains initals section area
+     * @param initials string non repsonders initials
+     * @param name string contains non responders name
+     */
+    static getNonRespondersInitials(initials, name) {
+        return `<tr>
+            <td>
+                <div class="d-flex">
+                    <div class="avtar">
+                        ${initials}
+                    </div>
+                    <div class="avtar-txt">${name}</div>
+                </div>
+            </td>
+        </tr>`;
+    }
+
+    /**
      * @Method contains total people responded area in summary view
      * @param xofy string total number of responders out of total members in the group
      */
@@ -1316,18 +1270,28 @@ export class UxUtils {
     }
 
     /**
+     * @Method contains total people responded area in summary view at responder and nonresponders section
+     * @param xofy string total number of responders out of total members in the group
+     */
+    static getTotalPeopleRespondedStringRespondersSection(xofy) {
+        return `<div class="row">
+            <div class="col-12">
+                <p class="font-12 semi-bold mb--4">${xofy}</p>
+            </div>
+        </div>`;
+    }
+
+    /**
      * @Method contains Participation progress bar
      * @param resultLocale String contains Localization of participation string
      * @param participationPercentage Float contains participation percentage
      */
     static getParticipationProgress(resultLocale, participationPercentage) {
-        return `<label class="mb--8">
-            <strong classs="semi-bold">
-                ${resultLocale}
-            </strong>
-        </label>
-        <div class="progress mb--8">
-            <div class="progress-bar bg-primary" role="progressbar" style="width: ${participationPercentage}%" aria-valuenow="${participationPercentage}" aria-valuemin="0" aria-valuemax="100">
+        return `<label class="mb--4">
+                <strong>${resultLocale} </strong>
+            </label>
+            <div class="progress mb-2">
+                <div class="progress-bar bg-primary" role="progressbar" style="width:${participationPercentage}%" aria-valuenow="${participationPercentage}" aria-valuemin="0" aria-valuemax="100">
             </div>
         </div>`;
     }
@@ -1502,7 +1466,8 @@ export class UxUtils {
                         <label class="confirm-box text-danger close-quiz-confirm-key">${closeTrainingConfirmKey}</label>
                         <div class="d-flex-alert mt--16 mb--8">
                             <div class=" pl--8 text-right">
-                                <button type="button" class="btn btn-primary-outline btn-sm cancel-question-delete mr--8 cancel-key">${cancelKey}</button><button type="button" class="btn btn-primary btn-sm confirm-key" id="change-quiz-question">${confirmKey}</button>
+                                <button type="button" class="btn btn-primary-outline btn-sm cancel-question-delete mr--8 cancel-key">${cancelKey}</button>
+                                <button type="button" class="btn btn-primary btn-sm confirm-key" id="change-quiz-question">${confirmKey}</button>
                             </div>
                         </div>
                     </div>
@@ -1709,12 +1674,7 @@ export class UxUtils {
      */
     static getQuestionImageWithLoader(imageUrl) {
         return `<div class="option-image-section relative cover-img min-max-132 mb--4">
-            <div class="loader-cover d-table">
-                <div class="d-table-cell">
-                    <div class="spinner-border" role="status">
-                    <span class="sr-only">Loading...</span></div>
-                </div>
-            </div>
+                ${Constants.getLoaderCover("d-table")}
             <img src="${imageUrl} " class="question-image img-responsive"  crossorigin="anonymous">
         </div>`;
     }
@@ -1725,12 +1685,7 @@ export class UxUtils {
      */
     static getOptionImageWithLoader(imageUrl) {
         return `<div class="option-image-section relative cover-img min-max-132 mb--4">
-            <div class="loader-cover d-table">
-                <div class="d-table-cell">
-                    <div class="spinner-border" role="status">
-                    <span class="sr-only">Loading...</span></div>
-                </div>
-            </div>
+            ${Constants.getLoaderCover("d-table")}
             <img src="${imageUrl}" class="opt-image img-responsive" crossorigin="anonymous">
         </div>`;
     }
@@ -1751,12 +1706,7 @@ export class UxUtils {
      */
     static quizTemplateImageWithLoader(imageUrl) {
         return `<div class="bg-none bdr-none quiz-updated-img relative cover-img min-max-132 mb--8">
-            <div class="loader-cover d-table">
-                <div class="d-table-cell">
-                    <div class="spinner-border" role="status">
-                    <span class="sr-only">Loading...</span></div>
-                </div>
-            </div>
+            ${Constants.getLoaderCover("d-table")}
             <img src="${imageUrl} " class="question-image img-responsive"  crossorigin="anonymous">
         </div>`;
     }
@@ -1794,12 +1744,7 @@ export class UxUtils {
      */
     static getQuizBannerImageWithLoader(url) {
         return `<div class="quiz-updated-img relative max-min-220 card-bg card-border cover-img upvj cursor-pointer mb--16 bg-none bdr-none">
-            <div class="loader-cover d-table">
-                <div class="d-table-cell">
-                    <div class="spinner-border" role="status">
-                    <span class="sr-only">Loading...</span></div>
-                </div>
-            </div>
+            ${Constants.getLoaderCover("d-table")}
             <img src="${url}" class="image-responsive quiz-template-image" crossorigin="anonymous">
         </div>`;
     }
@@ -1832,8 +1777,9 @@ export class UxUtils {
      * @Method for response Header view
      */
     static getResponseHeader() {
-        return `<div class="quiz-updated-img max-min-220 card-bg bdr-none bg-none card-border cover-img cursor-pointer mb--16 updated-img relative">
-            <img src="" id="quiz-title-image" style="" class="quiz-updated-img card-bg card-border heightfit">
+        return `<div class="container"><div class="quiz-updated-img max-min-220 card-bg bdr-none bg-none card-border cover-img cursor-pointer mb--16 updated-img relative" id="response-cover-img">
+            ${Constants.getLoaderCover("d-table")}
+            <img src="" id="quiz-title-image" style="" class="quiz-updated-img card-bg card-border heightfit d-none" >
             <input type="file" name="quiz_image" class="d-none" id="cover-image" accept="image/*" src="images/px-img.png">
         </div>
         <div class="row">
@@ -1850,12 +1796,12 @@ export class UxUtils {
                         <div class="card-box card-bg card-border mt--16">
                             <h4 class="font-16 bold">Training Contents</h4>
                             <div id="desc-section"></div>
-                            <P class="font-16 semi-bold mt--16" id="question-msg"> Total <span id="question-counter"> </span> questions in this training </P>
+                            <P class="font-16 semi-bold mt--16" id="question-msg"></P>
                         </div>
                 </div>
 
 
-        </div>`;
+        </div></div>`;
     }
 
     /**
@@ -1876,8 +1822,8 @@ export class UxUtils {
      * @Method for response text view Training Section
      */
     static getResponseTextTrainingSection() {
-        return `<div class="card-box card-blank">
-                        <label class="cover-image-label bold mb--8 text-break" id="text-description">Text</label>
+        return `<div class="card-box card-blank question-sec-card-box">
+                        <label class="cover-image-label font-16 semi-bold mb--8 text-break" id="text-description">Text</label>
                         <span class="quiz-clear  mb--8 cursor-pointer pull-right text-danger"></span>
                         <p class="text-justify font-12 text-break mt--8 text-content-section"> General Knowledge is the general awareness of the surroundings, plants, animals, famous personalities and occurrences happening around the world. General knowledge helps to build a person’s confidence level and sharpens his thinking
                             capacity too. GK covers a wide range of events from the past, present and what is likely to happen in the future. Young minds are more open to learning new things with enthusiasm. In this article, we bring some simple GK questions
@@ -2006,7 +1952,7 @@ export class UxUtils {
      * @param displayName string question title
      */
     static getQuestionTitleContainer(displayName) {
-        return `<div class="semi-bold font-16 mb--16 ">${displayName}</div>`;
+        return `<div class="semi-bold font-16 mb--16">${displayName}</div>`;
     }
 
     /**
@@ -2156,24 +2102,6 @@ export class UxUtils {
     }
 
     /**
-     * @Method for radiobox if answer is incorrect and user answered it
-     * @param id string identifire
-     * @param text string contains checkbox text
-     */
-    static getRadioInnerResponderQuestionCorrect(id, text) {
-        return `<div class="card-box card-bg card-border alert-danger mb--8">
-                <div class="radio-section custom-radio-outer" id="${id}">
-                    <label class="custom-radio d-block selected font-14">
-                        <span class="radio-block selected"></span>
-                        <div class="pr--32 check-in-div font-12">
-                        ${text}
-                        </div>
-                    </label>
-                </div>
-            </div>`;
-    }
-
-    /**
      * @Method contains score container section
      * @param resultLocale string Localization for score string
      * @param scorePercentage Float value contain score with two decimal
@@ -2215,10 +2143,18 @@ export class UxUtils {
     }
 
     /**
-     * @Method contains training template image in response view launch section
+     * @Method contains training template title in response view launch section
      * @Param trainingName contains training title
      */
     static trainingTitle(displayName) {
+        return `<p class="mt--16 font-16 semi-bold text-break">${displayName}</p>`;
+    }
+
+    /**
+     * @Method contains training content title in response view launch section
+     * @Param trainingName contains training title
+     */
+    static contentTitle(displayName) {
         return `<p class="mt--16 font-16 semi-bold">${displayName}</p>`;
     }
 
@@ -2289,7 +2225,7 @@ export class UxUtils {
                 </div>
             </div>
             <div class="option-sec">
-            ${optionText}
+                ${optionText}
             </div>
             <div class="input_section">
                 ${questionInput}
@@ -2297,6 +2233,597 @@ export class UxUtils {
                 ${optionAttachments}
             </div>
         </div>`;
+    }
+
+    /**
+     * @Method to get error div when remove option
+     * @param errorText string contains error text
+     */
+    static getOptionError(errorText) {
+        return `<div class="mt--8 mb--8 text-danger error-msg">${errorText}</div>`;
+    }
+
+    /**
+     * @Method contains correct option error section
+     * @param errorText string contains error text
+     */
+    static checkCorrectOptionError(errorText) {
+        return `<div class="clearfix"></div>
+                <label class="label-alert d-block option-required-err text-left pull-left mt--8 mb--16"><font>${errorText}</font></label>
+                <div class="clearfix"></div>`;
+    }
+
+    /**
+     * @Method contains response view launch section
+     *
+     */
+    static getThemeSection() {
+        return `<div class="row"><div class="col-12"><div id="root"></div></div></div>`;
+    }
+
+    /**
+     * @Method contains Body Card section
+     *
+     */
+    static getBodyCardSection() {
+        return `<div class="card"></div>`;
+    }
+
+    /**
+     * @Method contains Body Span section
+     *
+     */
+    static getBodySpanSection() {
+        return `<div class="col-sm-12"></div>`;
+    }
+
+    /**
+     * @Method contains training expired title
+     * @param trainingExpired string contains training Expired text
+     */
+    static getTrainingExpiredTitle(trainingExpired) {
+        return `<div class="form-group">${trainingExpired}</div>`;
+    }
+
+    /**
+     * @Method contains Multiple attempt string section
+     * @param result string contains multiple attempt section text
+     */
+    static getMultipleAttemptSection(result) {
+        return `<div><b> ${result} </b></div`;
+    }
+
+    /**
+     * @Method contains loader spinner section
+     *
+     */
+    static getLoaderSpinner() {
+        return `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`;
+    }
+
+    /**
+     * @Method contains radio button section
+     * @param text string contains Radio Button text
+     * @param name contains Radio Button name
+     * @param id string identifire
+     */
+    static getRadioButtonSection(text, name, id) {
+        return `<div class="option-sec">
+        <div class="card-box card-bg card-border mb--8">
+            <div class="radio-section custom-radio-outer" id="${id}" columnId="${name}" >
+                <label class="custom-radio d-block font-12 cursor-pointer selector-inp">
+                    <input type="radio" name="${name}" id="${id}">
+                        <span class="radio-block"></span>  <div class="pr--32 check-in-div">${text}</div>
+                </label>
+            </div>
+        </div>
+    </div>`;
+    }
+
+    /**
+     * @Method contains CheckBox button section
+     * @param text string contains Checkbox Button text
+     * @param name contains Checkbox Button name
+     * @param id string identifire
+     */
+    static getCheckboxButtonSection(text, name, id) {
+        return `<div class="option-sec">
+        <div class="card-box card-bg card-border mb--8">
+            <div class="radio-section custom-check-outer selector-inp" id="${id}" columnId="${name}" >
+                <label class="custom-check form-check-label d-block font-12">
+                    <input type="checkbox" class="radio-block" name="${name}" id="${id}">
+                        <span class="checkmark"></span> <div class="pr--32 check-in-div">${text}</div>
+                </label>
+            </div>
+        </div>
+    </div>`;
+    }
+
+    /**
+     * @Method contains question card-box section
+     */
+    static getQuestionCardBoxSection() {
+        return `<div class="card-box card-blank card-box-question"></div>`;
+    }
+
+    /**
+     * @Method contains question heading section
+     * @param questionNumber contains question counter
+     * @param questiondisplayName contains question display name text
+     */
+    static getQuestionHeadingSection(questionNumber, questiondisplayName) {
+        return `<div class="d-table mb--4 pre-none">
+                        <label class="font-12">
+                            <strong class="question-number-title bold" id="question-number-title">
+                                <label class="font-12">
+                                    <span class="training-type question-number">Question</span>&nbsp;#&nbsp;
+                                <span class="">${questionNumber}</span>
+                                </label>
+                            </strong>
+                        </label>
+                        <label class="float-right result-status" id="status-1"></label>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="quiz-updated-img cover-img min-max-132 mb--8 bg-none bdr-none" style="display:none" id="question-image">
+                        <img src="" class="image-responsive question-template-image heightfit" style="">
+                    </div>
+                    <div class="semi-bold font-16 mb--16 question-title"><p class="">${questiondisplayName}</p></div>`;
+    }
+
+    /**
+     * @Method contains question heading section
+     * @param trainingSummary string contains training summary text
+     */
+    static getTrainingSummaryViewSection(trainingSummary) {
+        return `<div class="section-3"><div class="container"><label><strong>${trainingSummary}</strong></label></div></div>`;
+    }
+
+    /**
+     * @Method contains Response View carousel section
+     */
+
+    static getResponseViewCarouselSection(uniqueCarouselId) {
+        return `<div id="carouselExampleIndicators${uniqueCarouselId}" class="carousel slide max-min-220" data-ride="carousel"></div>`;
+
+    }
+
+    /**
+     * @Method contains Response View carousel ol section
+     */
+    static getCarouselOlSection() {
+        return `<ol class="carousel-indicators"></ol>`;
+    }
+
+    /**
+     * @Method contains Response View carousel Inner section
+     */
+    static getCarouselInnerSection() {
+        return `<div class="carousel-inner"></div>`;
+    }
+
+    /**
+     * @Method contains Response View Training Document section
+     * @param url contains Document url
+     * @param documentName string contains Document name
+     */
+    static getTrainingDocumentSection(url, documentName) {
+        return `<p class="doc-name">${Constants.getDocumentIcon()} <a href="${url}" class="font-14 semi-bold teams-link a-link" download>${documentName}</a></p>`;
+    }
+
+    /**
+     * @Method contains contains Response View Training Video section
+     * @param url contains Video url
+     * @param videoName string contains video name
+     */
+    static getTrainingVideoSection(videoName, url) {
+        return `<div class="embed-responsive embed-responsive-4by3"><video controls="" playsinline class="video" id="${videoName}" src="${url}"></video></div>`;
+
+    }
+
+    /**
+     * @Method contains contains Response View Quiz Option Images Section
+     * @param videoName contains quiz option image url
+     */
+    static getQuizOptionImage(imgSource, galleryId, count = "0", className = "", boxId = "") {
+        return `<div class="option-image-section cover-img min-max-132 mb--4" id="quiz-ans-image">
+                    <a href="${imgSource}" data-toggle="lightbox" data-gallery="gallery${galleryId}" data-type="image">
+            <img class="${className}" src="${imgSource}" id="${boxId}" alt="${count + 1} slide">
+        </a></div>`;
+
+    }
+
+    /**
+     * @Method contains contains Response View Training section
+     */
+    static getTrainingSection() {
+        return `<div class="section-2"><div class="container"></div></div>`;
+
+    }
+
+    /**
+     * @Method contains Response View Next Button Span
+     */
+    static getNextBtnSpan() {
+        return `<span class="next-btn-sec"></span>`;
+
+    }
+
+    /**
+     * @Method to get Maximum image upload error
+     */
+    static getMaxImageAlert(errorText) {
+        return `<span class="text-danger error-msg float-right"> ${errorText}</span><div class="clearfix"></div>`;
+    }
+
+    /**
+     * @Method to get content limit
+     * @param errorText string contains error text
+     */
+    static getContentLimitExceed(errorText) {
+        return `<div class="mt--32 text-danger content-limit-exceed">${errorText}</div>`;
+    }
+
+    /**
+     * @Method to create div with class
+     * @param classData string contains html class value
+     * @param icData string contains html id value
+     */
+    static divTemplate(classData, idData = "") {
+        if (idData == "") {
+            return `<div class="${classData}"></div>`;
+        } else {
+            return `<div class="${classData}" id="${idData}"></div>`;
+        }
+    }
+
+    /**
+     * @Method to create div with class
+     * @param classData string contains html class value
+     * @param icData string contains html id value
+     */
+    static labelTemplate(classData, idData = "") {
+        if (idData == "") {
+            return `<label class="${classData}"></label>`;
+        } else {
+            return `<label class="${classData}" id="${idData}"></label>`;
+        }
+    }
+
+    /**
+     * @Method to clear html
+     * @param selector string contains html identifier selector
+     */
+    static clearHtml(selector) {
+        return $(selector).html("");
+    }
+
+    /**
+     * @Method to get responders inital with date
+     * @param myUserId string Identifier contains user name
+     * @param initials string contains user initals
+     * @param name string name contains user name
+     * @param respondeDate Date contains respond date
+     */
+    static getRespondersInitials(myUserId, initials, name, respondeDate) {
+        return `<table class="table" cellspacing="0" id="responder-table">
+            <tbody>
+                <tr id="${myUserId}" class="getresult cursor-pointer">
+                    <td>
+                        <div class="d-flex ">
+                            <div class="avtar">
+                                ${initials}
+                            </div>
+                            <div class="avtar-txt">${name}</div>
+                        </div>
+                    </td>
+                    <td class="text-right avtar-txt">
+                        ${respondeDate}
+                        ${Constants.getLeftCaratIcon()}
+                    </td>
+                </tr>
+            </tbody>
+        </table>`;
+    }
+
+    /**
+     * @Method to get content title with counter
+     * @param count Integer content number
+     * @param resultLocale string contains localization string
+     * @param displayName string name contains user name
+     */
+    static contentSection(count, resultLocale, displayName) {
+        return `<label class="mb0"><strong><span class="counter">${count}</span>.
+            <span class="training-type">${resultLocale}</span></strong>
+        </label>
+        <span class="float-right result"></span>
+        <p class="mb0 text-description text-justify">${displayName}</p>`;
+    }
+
+    /**
+     * @Method to get question title for result view
+     * @param count Integer content number
+     * @param displayName string name contains question title
+     */
+    static getQuestionTileWithCounter(count, displayName) {
+        return `"<strong>${count}. ${displayName}</strong>`;
+    }
+
+    /**
+     * @Method to get question identifier label
+     * @param id string for unique label identification
+     */
+    static questionIdentifierSection(id) {
+        return `<label class="float-right mb0" id="status-${id}"></label>`;
+    }
+
+    /**
+     * @Method to get correc or incorrct section
+     * @param answerIs string for correct or incorrect identificaiton
+     * @param resultLocale string for correct and incorrect locale
+     */
+    static getQuestionCorrectIncorrectSection(answerIs, resultLocale) {
+        return `<span class="${answerIs.toLowerCase() == "correct" ? "text-success" : "text-danger"}">${resultLocale}</span>`;
+    }
+
+    /**
+     * @Method to get content title at result view
+     * @param resultLocale string for content
+     */
+    static getContentTitleSection(resultLocale) {
+        return `<P class="font-16 semi-bold mt--16 text-break" id="question-msg">${resultLocale}</P>`;
+    }
+
+    /**
+     * @Method to set html block inside the html selector
+     * @param selector object html
+     * @param content string for content
+     */
+    static setHtml(selector, content) {
+        $(selector).html(content);
+    }
+
+    /**
+     * @Method to set text inside the html selector
+     * @param selector object html
+     * @param content string for content
+     */
+    static setText(selector, content) {
+        $(selector).text(content);
+    }
+
+    /**
+     * @Method to set html block after the html selector
+     * @param selector object html
+     * @param content string for content
+     */
+    static setAfter(selector, content) {
+        $(selector).after(content);
+    }
+
+    /**
+     * @Method to set html block before the html selector
+     * @param selector object html
+     * @param content string for content
+     */
+    static setBefore(selector, content) {
+        $(selector).before(content);
+    }
+
+    /**
+     * @Method to set html block append the html selector
+     * @param selector object html
+     * @param content string for content
+     */
+    static setAppend(selector, content) {
+        $(selector).append(content);
+    }
+
+    /**
+     * @Method to set html block prepend the html selector
+     * @param selector object html
+     * @param content string for content
+     */
+    static setPrepend(selector, content) {
+        $(selector).prepend(content);
+    }
+
+    /**
+     * @Method to get option section with success tickmark for correct selected option
+     * @param text string for option text
+     */
+    static getSuccessOptionSection(text) {
+        return `<div class="form-group alert alert-success">
+            <p class="mb0"> ${text} ${Constants.getSuccessTickIcon()} </p>
+        </div>`;
+    }
+
+    /**
+     * @Method to get option section with normal tickmark for correct but not selected option
+     * @param text string for option text
+     */
+    static getNormalCorrectOptionSection(text) {
+        return `<div class="form-group alert alert-normal"><p class="mb0"> ${text} ${Constants.getSuccessTickIcon()}</p></div>`;
+    }
+
+    /**
+     * @Method to get option section with danger for incorrect
+     * @param text string for option text
+     */
+    static getDangerOptionSection(text) {
+        return `<div class="alert alert-danger"><p class="mb0"> ${text} <i class="fa fa-pull-right fa-close"></i></p></div>`;
+    }
+
+    /**
+     * @Method to get option section with normal block
+     * @param text string for option text
+     */
+    static getNormalOptionSection(text) {
+        return `<div class="alert alert-danger"><p class="mb0"> ${text} <i class="fa fa-pull-right fa-close"></i></p></div>`;
+    }
+
+
+    /**
+     * Method to get remove Image loader from image section
+     * @param selector object html on which remove image
+     */
+    static removeImageLoaderText(selector) {
+        let tid = setInterval(() => {
+            $(selector).parent("div").find(".loader-cover").addClass("d-none");
+            clearInterval(tid);
+        }, Constants.setIntervalTimeHundred());
+    }
+
+    /**
+     * @Method to get Loader Area
+     */
+    static getLoaderArea() {
+        return `<div class="loader-cover">
+                    <div class="loader-outer">
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </div>`;
+    }
+
+    /**
+     * @Method contains single image carousel
+     * @param imageUrl string contains image url
+     */
+    static getSingleImageCarousel(imgSource, galleryId, count = "0", className = "", boxId = "") {
+        return `<div class="max-min-220 updated-img fixed-ar relative">
+            <a href="${imgSource}" data-toggle="lightbox" data-gallery="gallery${galleryId}" data-type="image">
+                <img class="${className}" src="${imgSource}" id="${boxId}" alt="${count + 1} slide">
+            </a></div>`;
+    }
+
+    static getImageModalPopUp(uniqueCarouselId, carasoulSliderImagesHtml) {
+        return `<div class="modal fade" id="model${uniqueCarouselId}" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="carouselExampleIndicatorModel${uniqueCarouselId}" class="carousel slide" data-ride="carousel">
+                                <div class="carousel-inner">
+                                    ${carasoulSliderImagesHtml}
+                                </div>
+                                <a class="carousel-control-prev" href="#carouselExampleIndicatorModel${uniqueCarouselId}" role="button" data-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                                <a class="carousel-control-next" href="#carouselExampleIndicatorModel${uniqueCarouselId}" role="button" data-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`
+    }
+
+    /**
+     * @Method contains textarea content
+     * @param name string  contains name value
+     * @param className string  contains Class value
+     * @param id string  contains id value
+     * @param value string  contains name value
+     * @param style string  contains style value
+     */
+    static createTextArea(name, className, id, value, style = "") {
+        return `<textarea name="${name}" class="${className} ${style}" id="${id}">${value}</textarea>`;
+    }
+
+    /**
+     * @Method contains Input content
+     * @param inputType string  contains input type value
+     * @param className string  contains Class value
+     * @param id string  contains id value
+     * @param value string  contains name value
+     * @param isChecked string contains checked value
+     */
+    static createInputBox(inputType, className, id, value, isChecked = "") {
+        return `<input type="${inputType}" class="${className}" id="${id}" value="${value}" ${isChecked}>`;
+    }
+
+    /**
+     * @Method contains Input content
+     * @param imgSource string  contains image path value
+     * @param className string  contains image path value
+     * @param count string  contains counter value
+     */
+    static createImageLightBox(imgSource, galleryId, count = "0", className = "", boxId = "") {
+        return `<a href="${imgSource}" data-toggle="lightbox" data-gallery="gallery${galleryId}" data-type="image">
+            <img class="${className}" src="${imgSource}" id="${boxId}" alt="${count + 1} slide">
+        </a>`;
+    }
+
+    /**
+     * @Method contains Input content
+     * @param textValue string  contains text value
+     * @param className string  contains class name value
+     * @param count string  contains id value
+     */
+    static createParagraphBox(textValue, className = "", boxId = "") {
+        return `<p class="${className}" id="${boxId}">${textValue}</p>`;
+    }
+
+    /**
+     * @Method contains Input content
+     * @param textValue string  contains text value
+     * @param className string  contains class name value
+     * @param boxId string  contains Id value
+     */
+    static createSpanBox(textValue, className, boxId) {
+        return `<span class="${className}" id="${boxId}">${textValue}</span>`;
+    }
+
+    /**
+     * @Method contains Input content
+     * @param textValue string  contains text value
+     * @param className string  contains class name value
+     * @param boxId string  contains Id value
+     */
+    static createLabelBox(textValue, className, boxId) {
+        return `<label class="${className}" id="${boxId}">${textValue}</label>`;
+    }
+
+    /**
+     * @Method contains Input content
+     * @param textValue string  contains text value
+     * @param className string  contains class name value
+     * @param boxId string  contains Id value
+     */
+    static createLabelWithFontBox(textValue, className, fontClass, boxId) {
+        return `<label class="${className}" id="${boxId}"><font class="${fontClass}">${textValue}</font></label>`;
+    }
+
+    /**
+     * @Method contains button content
+     * @param textValue string  contains text value
+     * @param className string  contains class name value
+     * @param boxId string  contains Id value
+     * @param attribute string  contains button attributes
+     */
+    static createButtonBox(textValue, className, boxId, attribute) {
+        return `<button class="${className}" id="${boxId}" ${attribute}>${textValue}</button>`;
+    }
+
+    /**
+     * @Method contains image content
+     * @param textValue string  contains text value
+     * @param className string  contains class name value
+     * @param boxId string  contains Id value
+     */
+    static createImageBox(imgSource, className, boxId) {
+        return `<img src="${imgSource}" class="${className}" id="${boxId}">`;
     }
 
 }

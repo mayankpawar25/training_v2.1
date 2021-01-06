@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import {
     Localizer,
     ActionHelper
@@ -9,7 +11,6 @@ import { Utils } from "../common/utils/Utils";
 let $root = "";
 let row = {};
 let actionInstance = null;
-let isShowAnswerEveryQuestion = "";
 let summaryAnswerResp = [];
 let memberIds = [];
 let myUserId = [];
@@ -24,21 +25,10 @@ let startKey = "";
 let noteKey = "";
 let correctKey = "";
 let incorrectKey = "";
-let correctAnswerIsKey = "";
 let submitKey = "";
 let nextKey = "";
 let backKey = "";
 let pagination = 0;
-let choiceAnyChoiceKey = "";
-let continueKey = "";
-let answerResponseKey = "";
-let yourAnswerKey = "";
-let correctAnswerKey = "";
-let yourAnswerIsKey = "";
-let quizSummaryKey = "";
-let quizExpiredKey = "";
-let rightAnswerIsKey = "";
-let questionSelectorCounter = 0;
 let trainingSummary = "";
 let trainingExpired = "";
 let doneKey = "";
@@ -58,11 +48,6 @@ async function getStringKeys() {
         $(".question-key").text(questionKey);
     });
 
-    Localizer.getString("questions").then(function(result) {
-        questionsKey = result;
-        $(".question-key").text(questionsKey);
-    });
-
     Localizer.getString("start").then(function(result) {
         startKey = result;
         $("#start").text(startKey);
@@ -73,49 +58,17 @@ async function getStringKeys() {
         $(".note-key").text(noteKey);
     });
 
-    Localizer.getString("chooseAnyChoice").then(function(result) {
-        choiceAnyChoiceKey = result;
-    });
-
-    Localizer.getString("continue").then(function(result) {
-        continueKey = result;
-    });
-
-    Localizer.getString("answerResponse").then(function(result) {
-        answerResponseKey = result;
-    });
-
     Localizer.getString("correct").then(function(result) {
         correctKey = result;
-    });
-
-    Localizer.getString("yourAnswer").then(function(result) {
-        yourAnswerKey = result;
     });
 
     Localizer.getString("incorrect").then(function(result) {
         incorrectKey = result;
     });
 
-    Localizer.getString("correctAnswer").then(function(result) {
-        correctAnswerKey = result;
-    });
-
-    Localizer.getString("yourAnswerIs").then(function(result) {
-        yourAnswerIsKey = result;
-    });
-
-    Localizer.getString("rightAnswerIs").then(function(result) {
-        rightAnswerIsKey = result;
-    });
-
     Localizer.getString("submit").then(function(result) {
         submitKey = result;
         $(".submit-key").text(submitKey);
-    });
-
-    Localizer.getString("quiz_summary").then(function(result) {
-        quizSummaryKey = result;
     });
 
     Localizer.getString("next").then(function(result) {
@@ -126,15 +79,6 @@ async function getStringKeys() {
     Localizer.getString("back").then(function(result) {
         backKey = result;
         $(".back-key").text(backKey);
-    });
-
-    Localizer.getString("quiz_expired").then(function(result) {
-        quizExpiredKey = result;
-        $("#quiz-expired-key").text(backKey);
-    });
-
-    Localizer.getString("correctAnswerIs").then(function(result) {
-        correctAnswerIsKey = result;
     });
 
     Localizer.getString("trainingSummary").then(function(result) {
@@ -157,19 +101,24 @@ async function getStringKeys() {
         previousKey = result;
         $(".next-btn-sec").text(previousKey);
     });
+
+    Localizer.getString("questions").then(function(result) {
+        questionsKey = result;
+    });
+
 }
 
 /**
  * @description Method to get theme and load page content
  * @param request object
  */
-async function getTheme(request) {
+async function loadResponseView(request) {
     let response = await ActionHelper.executeApi(request);
     let context = response.context;
     $("form.section-1").show();
     let theme = context.theme;
     $("link#theme").attr("href", "css/style-" + theme + ".css");
-    $("div.section-1").append(`<div class="row"><div class="col-12"><div id="root"></div></div></div>`);
+    UxUtils.setAppend("div.section-1", UxUtils.getThemeSection());
     $root = $("#root");
     setTimeout(() => {
         $("div.section-1").show();
@@ -206,7 +155,7 @@ async function getResponderIds(actionId) {
 $(document).ready(function() {
     request = ActionHelper.getContextRequest();
     getStringKeys();
-    getTheme(request);
+    loadResponseView(request);
 });
 
 /**
@@ -248,54 +197,55 @@ function createBody() {
     /*  Check Expiry date time  */
     let currentTime = new Date().getTime();
     if (actionInstance.expiryTime <= currentTime) {
-        let $card = $('<div class="card"></div>');
-        let $spDiv = $('<div class="col-sm-12"></div>');
-        let $sDiv = $(`<div class="form-group">${trainingExpired}</div>`);
-        $card.append($spDiv);
-        $spDiv.append($sDiv);
-        $root.append($card);
+        let $card = $(UxUtils.getBodyCardSection());
+        let $spDiv = $(UxUtils.getBodySpanSection());
+        let $sDiv = $(UxUtils.getTrainingExpiredTitle(trainingExpired));
+        UxUtils.setAppend($card, $spDiv);
+        UxUtils.setAppend($spDiv, $sDiv);
+        UxUtils.setAppend($root, $card);
     } else {
         $("div.section-1").show();
-        $("div.section-1").append(headSection1);
+        UxUtils.setAppend("div.section-1", headSection1);
         $("#section1-training-title").html(actionInstance.displayName);
         $("#section1-training-description").html(actionInstance.customProperties[0].value);
-        let allowMultipleAttempt = actionInstance.customProperties[5].value;
+        let allowMultipleAttempt = actionInstance.customProperties[Constants.getMultipleAttemptIndex()].value;
         $("#multiple-attempt").hide();
         $("#quiz-title-image").hide();
-
-        if ($.inArray(myUserId, memberIds) !== -1) {
-            $("#multiple-attempt").show();
-            if (allowMultipleAttempt == "No") {
-                Localizer.getString("multipleAttemptNo").then(function(result) {
-                    $("#allow-multiple-attempt").append(`<div><b> ${result} </b></div`);
-                    $("#start:button").prop("disabled", true);
-                });
+        let mid = setInterval(() => {
+            if ($.inArray(myUserId, memberIds) !== -1) {
+                $("#multiple-attempt").show();
+                if (allowMultipleAttempt == "No") {
+                    Localizer.getString("multipleAttemptNo").then(function(result) {
+                        UxUtils.setAppend("#allow-multiple-attempt", UxUtils.getMultipleAttemptSection(result));
+                        $("#start:button").prop("disabled", true);
+                    });
+                }
+                if (allowMultipleAttempt == "Yes") {
+                    Localizer.getString("multipleAttemptYes").then(function(result) {
+                        UxUtils.setAppend("#allow-multiple-attempt", UxUtils.getMultipleAttemptSection(result));
+                    });
+                }
+                clearInterval(mid);
             }
-
-            if (allowMultipleAttempt == "Yes") {
-                Localizer.getString("multipleAttemptYes").then(function(result) {
-                    $("#allow-multiple-attempt").append(`<div><b> ${result} </b></div`);
-                });
-            }
-        }
+        }, Constants.setIntervalTimeHundred());
 
         /* Create Text and Question summary */
+        let resQuestCount = 0;
         let imageCounter = 0;
         let successDownLoadImageCounter = 0;
         actionInstance.dataTables.forEach((dataTable, ind) => {
-            let isImage = false;
             if (dataTable.attachments.length > 0) {
                 imageCounter++;
-                isImage = true;
+                let uniqueIdCarousel = Constants.getUniqueId();
                 let req = ActionHelper.getAttachmentInfo(contextActionId, dataTable.attachments[0].id);
                 ActionHelper.executeApi(req).then(function(response) {
                         actionInstance.dataTables[ind].attachments[0].url = response.attachmentInfo.downloadUrl;
                         if (actionInstance.dataTables[ind].attachments[0].url != null) {
-                            $("#quiz-title-image").attr("src", actionInstance.dataTables[0].attachments[0].url);
-                            getClassFromDimension(response.attachmentInfo.downloadUrl, ".quiz-template-image");
+                            UxUtils.setAppend($("div.section-1").find("#response-cover-img"), UxUtils.createImageLightBox(actionInstance.dataTables[0].attachments[0].url, uniqueIdCarousel));
+                            Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, $(`a[data-gallery=gallery${uniqueIdCarousel}]`).find("img"));
                             $(".quiz-template-image").show();
                             $(".quiz-updated-img").show();
-                            removeImageLoader(".quiz-template-image");
+                            UxUtils.removeImageLoader(".quiz-updated-img");
                             successDownLoadImageCounter++;
                         }
                         ActionHelper.hideLoader();
@@ -305,7 +255,7 @@ function createBody() {
                         console.error("AttachmentAction - Errorquiz: " + JSON.stringify(error));
                     });
             }
-            $("#question-msg").hide();
+
             dataTable.dataColumns.forEach((data, index) => {
                 if (data.valueType == "LargeText") {
                     /* Call Text Section 1 */
@@ -313,7 +263,7 @@ function createBody() {
                     let counter = $("div.card-box").length;
                     let textTitle = data.displayName;
                     if (data.name.indexOf("photo") >= 0) {
-                        $("#desc-section").append(textSection3);
+                        UxUtils.setAppend("#desc-section", textSection3);
                         $("div.desc-box p:last").attr("id", "contain-" + counterDescbox);
                         $("div.desc-box p#contain-" + counterDescbox).find("span.counter").text(counterDescbox);
                         $("div.desc-box p#contain-" + counter).find(".text-description").text(textTitle);
@@ -337,7 +287,7 @@ function createBody() {
                             });
                         }
                     } else if (data.name.indexOf("document") >= 0) {
-                        $("#desc-section").append(textSection3);
+                        UxUtils.setAppend("#desc-section", textSection3);
                         $("div.desc-box p:last").attr("id", "contain-" + counterDescbox);
                         $("div.desc-box p#contain-" + counterDescbox).find("span.counter").text(counterDescbox);
                         Localizer.getString("document").then(function(result) {
@@ -359,7 +309,7 @@ function createBody() {
                             });
                         }
                     } else if (data.name.indexOf("video") >= 0) {
-                        $("#desc-section").append(textSection3);
+                        UxUtils.setAppend("#desc-section", textSection3);
                         $("div.desc-box p:last").attr("id", "contain-" + counterDescbox);
                         $("div.desc-box p#contain-" + counterDescbox).find("span.counter").text(counterDescbox);
                         $("div.desc-box p#contain-" + counterDescbox).find(".text-description").text(textTitle);
@@ -383,7 +333,7 @@ function createBody() {
                             });
                         }
                     } else {
-                        $("#desc-section").append(textSection1);
+                        UxUtils.setAppend("#desc-section", textSection1);
                         $("div.desc-box p:last").attr("id", "contain-" + counterDescbox);
                         $("div.desc-box p#contain-" + counterDescbox).find("span.counter").text(counterDescbox);
                         Localizer.getString("text").then(function(result) {
@@ -393,16 +343,6 @@ function createBody() {
                     }
 
                 } else if (data.valueType == "SingleOption" || data.valueType == "MultiOption") {
-                    /* Call Question Section 1 */
-                    let correctAnswers = JSON.parse(actionInstance.customProperties[Constants.getCorrectAnswerIndex()].value);
-                    let questionCounter = correctAnswers.length;
-                    if (questionCounter > 0) {
-                        $("#question-msg").show();
-                        $("#question-counter").text(questionCounter);
-                    }
-                    Localizer.getString("question_with", Utils.numbertowords(Object.keys(data.options).length)).then(function(result) {
-                        //$("div.desc-box p#contain-" + counterDescbox).find("span.training-type").text(result);
-                    });
                     /* Question Attachments */
                     if (data.attachments.length > 0) {
                         imageCounter++;
@@ -416,6 +356,7 @@ function createBody() {
                                 console.error("AttachmentAction - Error: " + JSON.stringify(error));
                             });
                     }
+                    resQuestCount++;
                 }
 
                 $.each(data.options, function(optind, opt) {
@@ -432,14 +373,22 @@ function createBody() {
                             });
                     }
                 });
+
             });
+            if (resQuestCount > 0) {
+                let localeQuest = "";
+                if (resQuestCount > 1) {
+                    localeQuest = questionsKey;
+                } else {
+                    localeQuest = questionKey;
+                }
+                Localizer.getString("totalQuestionTraining", resQuestCount, localeQuest).then(function(result) {
+                    UxUtils.setAppend("#question-msg", result);
+                });
+            }
 
         });
-
-        //$("div.section-1").append(`<div class="container pb-100"></div>`);
-        $("div.section-1").after(footerSection1);
-        $("#start").addClass("disabled");
-        $("#start").prepend(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>`);
+        UxUtils.setAfter("div.section-1", footerSection1);
         let tid = setInterval(() => {
             if (imageCounter == successDownLoadImageCounter) {
                 $("#start").find(".spinner-border").remove();
@@ -452,78 +401,16 @@ function createBody() {
 }
 
 /**
- * @description Method to get image dimensions and image div dimensions
- * @param imageURL contains image url
- * @param selector contains image where url placed
- */
-function getClassFromDimension(imgURL, selector) {
-    let tmpImg = new Image();
-    tmpImg.src = imgURL;
-    let imgWidth = 0;
-    let imgHeight = 0;
-    $(tmpImg).on("load", function() {
-        imgWidth = tmpImg.width;
-        imgHeight = tmpImg.height;
-        let divWidth = Math.round($(selector).width());
-        let divHeight = Math.round($(selector).height());
-        let getClass = "";
-        if (imgHeight > divHeight) {
-            /* height is greater than width */
-            getClass = ("heightfit");
-        } else if (imgWidth > divWidth) {
-            /* width is greater than height */
-            getClass = ("widthfit");
-        } else {
-            /* small image */
-            getClass = ("smallfit");
-        }
-        $(selector).addClass(getClass);
-
-    });
-}
-
-/**
- * @description Method to get remove Image loader from image section
- * @param selector object html on which remove image
- */
-function removeImageLoader(selector) {
-    let tid = setInterval(() => {
-        if ($(selector).hasClass("heightfit") || $(selector).hasClass("widthfit") || $(selector).hasClass("smallfit")) {
-            $(".loader-cover").addClass("d-none");
-            clearInterval(tid);
-        }
-    }, Constants.setIntervalTimeHundred());
-}
-/**
  * @description Method to create question view
  * @param actionId string identifier
  */
 function createQuestionView(indexNum, questionNumber) {
-    let count = 1;
     actionInstance.dataTables.forEach((dataTable) => {
         dataTable.dataColumns.forEach((question, ind) => {
-
             if (ind == indexNum) {
-                let count = ind + 1;
-                let $card = $('<div class="card-box card-blank card-box-question"></div>');
-                let $questionHeading = `<div class="d-table mb--8 pre-none">
-                        <label class="font-12">
-                            <strong class="question-number-title bold>
-                                <label class="font-12">
-                                    <span class="training-type question-number">Question</span>&nbsp;#&nbsp;
-                                <span class="">${questionNumber}</span>
-                                </label>
-                            </strong>
-                        </label>
-                        <label class="float-right result-status" id="status-1"></label>
-                        <div class="clearfix"></div>
-                    </div>
-                    <div class="quiz-updated-img cover-img min-max-132 mb--8 bg-none bdr-none" style="display:none">
-                        <img src="" class="image-responsive question-template-image heightfit" style="">
-                    </div>
-                    <div class="semi-bold font-14 mb--16 question-title"><p class="">${question.displayName}</p></div>`;
-
-                $card.append($questionHeading);
+                let $card = $(UxUtils.getQuestionCardBoxSection());
+                let $questionHeading = UxUtils.getQuestionHeadingSection(questionNumber, question.displayName);
+                UxUtils.setAppend($card, $questionHeading);
                 //add radio button
                 if (question.valueType == "SingleOption") {
                     //add checkbox button
@@ -535,7 +422,7 @@ function createQuestionView(indexNum, questionNumber) {
                             option.name,
                             attachmentURL
                         );
-                        $card.append($radioOption);
+                        UxUtils.setAppend($card, $radioOption);
                     });
                 } else {
                     question.options.forEach((option) => {
@@ -546,18 +433,16 @@ function createQuestionView(indexNum, questionNumber) {
                             option.name,
                             attachmentURL
                         );
-                        $card.append($radioOption);
+                        UxUtils.setAppend($card, $radioOption);
                     });
                 }
-                $("div.section-2 > .container:first").append($card);
+                UxUtils.setAppend("div.section-2 > .container:first", $card);
             }
 
         });
-
-        count++;
     });
-    if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
-        $("#next").text("Check").attr("id", "check");
+    if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+        $("#next").text("Check").attr("id", "check").append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
     }
 }
 
@@ -568,16 +453,7 @@ function createQuestionView(indexNum, questionNumber) {
  * @param id string identifier
  */
 function getRadioButton(text, name, id, attachmentURL) {
-    let $divData = $(` <div class="option-sec">
-        <div class="card-box card-bg card-border mb--8">
-            <div class="radio-section custom-radio-outer" id="${id}" columnId="${name}" >
-                <label class="custom-radio d-block font-14 cursor-pointer selector-inp">
-                    <input type="radio" name="${name}" id="${id}">
-                        <span class="radio-block"></span>  <div class="pr--32 check-in-div">${text}</div>
-                </label>
-            </div>
-        </div>
-    </div>`);
+    let $divData = $(UxUtils.getRadioButtonSection(text, name, id));
     if (attachmentURL != "") {
         $divData.find(".custom-check").prepend(UxUtils.getOptionImageWithLoader(attachmentURL));
     }
@@ -591,18 +467,9 @@ function getRadioButton(text, name, id, attachmentURL) {
  * @param id string identifier
  */
 function getCheckboxButton(text, name, id, attachmentURL) {
-    let $divData = $(`<div class="option-sec">
-        <div class="card-box card-bg card-border mb--8">
-            <div class="radio-section custom-check-outer selector-inp" id="${id}" columnId="${name}" >
-                <label class="custom-check form-check-label d-block">
-                    <input type="checkbox" class="radio-block" name="${name}" id="${id}">
-                        <span class="checkmark"></span> <div class="pr--32 check-in-div">${text}</div>
-                </label>
-            </div>
-        </div>
-    </div>`);
+    let $divData = $(UxUtils.getCheckboxButtonSection(text, name, id));
     if (attachmentURL != "") {
-        $divData.find(".custom-check").prepend(UxUtils.getOptionImageWithLoader(attachmentURL));
+        // $divData.find(".custom-check").prepend(UxUtils.getOptionImageWithLoader(attachmentURL));
     }
     return $divData;
 }
@@ -613,11 +480,9 @@ function getCheckboxButton(text, name, id, attachmentURL) {
 function loadSummaryView() {
     $("div.section-2").hide();
     $("div.section-2-footer").hide();
-    isShowAnswerEveryQuestion = actionInstance.customProperties[3].value;
     if ($(".section-3").length <= 0) {
-        $("div.section-2").after(`<div class="section-3"><div class="container"><label><strong>${trainingSummary}</strong></label></div></div>`);
-        $("div.section-3 .container:first").append(headSection1);
-
+        UxUtils.setAfter("div.section-2", UxUtils.getTrainingSummaryViewSection(trainingSummary));
+        UxUtils.setAppend("div.section-3 .container:first", headSection1);
         /* Main Heading and Description */
         $("div.section-3 #multiple-attempt").hide();
         $("div.section-3 #quiz-title-image").hide();
@@ -626,23 +491,16 @@ function loadSummaryView() {
         $("div.section-3 #section1-training-description").hide();
         $("div.section-3 #question-msg").hide();
         /* Create Text and Question summary */
-        actionInstance.dataTables.forEach((dataTable, ind) => {
-            let questCount = 1;
-            dataTable.dataColumns.forEach((data, ind) => {
+        let resQuestCount = 0;
+        actionInstance.dataTables.forEach((dataTable) => {
+            dataTable.dataColumns.forEach((data) => {
                 $("div.section-3").show();
-                //$("div.section-3").append(textSection2);
                 if (data.valueType == "LargeText") {
-                    //$("div.section-3 .container:first").append(textSection2);
                     let counter = $("div.card-box").length;
                     let counterDescbox = $("div.desc-box").length;
                     /* Call Text Section 1 */
-                    //let counter = $(".section-3 div.card-box").length;
-                    //let textTitle = data.displayName;
-                    let textDescription = data.options[0].displayName;
-
                     let textTitle = data.displayName;
-                    //$("div.section-3 .container:first").append(textSection1);
-                    $("div.section-3 #desc-section").append(textSection1);
+                    UxUtils.setAppend("div.section-3 #desc-section", textSection1);
                     $("div.desc-box p:last").attr("id", "contain-" + counterDescbox);
                     $("div.desc-box p#contain-" + counterDescbox).find("span.counter").text(counterDescbox);
                     Localizer.getString("text").then(function(result) {
@@ -652,40 +510,35 @@ function loadSummaryView() {
 
                     if (data.name.indexOf("photo") >= 0) {
                         Localizer.getString("photo").then(function(result) {
-                            //$("div.card-box#content-" + counter).find(".training-type").text(result);
                             $("div.desc-box p#contain-" + counterDescbox).find("span.training-type").text(result);
                             $("div.desc-box p#contain-" + counterDescbox).text(textTitle);
                         });
                         let attachments = data.attachments;
-                        let $carousel = $(`<div id="carouselExampleIndicators" class="carousel slide max-min-220" data-ride="carousel"></div>`);
-                        let $olSection = $(`<ol class="carousel-indicators"></ol>`);
-                        let $carouselInner = $(`<div class="carousel-inner"></div>`);
-
+                        let $carousel = $(UxUtils.getResponseViewCarouselSection());
+                        let $olSection = $(UxUtils.getCarouselOlSection());
+                        let $carouselInner = $(UxUtils.getCarouselInnerSection());
                         if (attachments.length > 0) {
                             let count = 0;
-                            $carousel.append($olSection);
-                            $carousel.append($carouselInner);
-                            attachments.forEach(function(att, i) {
-                                let $imgDiv = $(`<div class="carousel-item ${count == 0 ? "active" : ""}">
-                                                        <img class="d-block w-100" src="${att.url}" alt="${count + 1} slide">
-                                                    </div>`);
-                                $carouselInner.append($imgDiv);
-                                $carousel.append(UxUtils.getCarouselSection());
+                            UxUtils.setAppend($carousel, $olSection);
+                            UxUtils.setAppend($carousel, $carouselInner);
+                            attachments.forEach(function(att) {
+                                let $imgDiv = $(UxUtils.getCarousalImages(count, att.url));
+                                UxUtils.setAppend($carouselInner, $imgDiv);
+                                UxUtils.setAppend($carousel, UxUtils.getCarouselSection());
                                 count++;
                             });
-                            $("div.card-box#content-" + counter).find("#text-description").after($carousel);
+                            UxUtils.setAfter($("div.card-box#content-" + counter).find("#text-description"), $carousel);
                             $(".carousel").carousel();
-                            //$(".carousel").after("<hr>");
                         }
                     } else if (data.name.indexOf("video") >= 0) {
                         Localizer.getString("video").then(function(result) {
                             $("div.card-box#content-" + counter).find(".training-type").text(result);
                         });
-                        $("div.card-box#content-" + counter).find("#text-description").after('<div class="embed-responsive embed-responsive-4by3"><video controls="" playsinline class="video" id="' + data.name + '" src="' + data.attachments[0].url + '"></video></div>');
+                        UxUtils.setAfter($("div.card-box#content-" + counter).find("#text-description"), UxUtils.getTrainingVideoSection(data.name, data.attachments[0].url));
                     } else if (data.name.indexOf("document") >= 0) {
                         Localizer.getString("document").then(function(result) {
                             $("div.card-box#content-" + counter).find(".training-type").text(result);
-                            $("div.card-box#content-" + counter).find("#text-description").after(`<p><a href="${data.attachments[0].url}" class="font-14 semi-bold teams-link a-link" download>${data.attachments[0].name}</a></p>`);
+                            UxUtils.setAfter($("div.card-box#content-" + counter).find("#text-description"), UxUtils.getTrainingDocumentSection(data.attachments[0].url, data.attachments[0].name));
                         });
                     }
                 } else if (data.valueType == "SingleOption" || data.valueType == "MultiOption") {
@@ -698,16 +551,28 @@ function loadSummaryView() {
                         $("div.section-3 .container:first div.col-12 div.card-box p#question-msg").show();
                         $("div.section-3 .container:first div.col-12 div.card-box  span#question-counter").text(questionCounter);
                     }
-                    $("div#desc-section").append(questionSection1);
+                    UxUtils.setAppend("div#desc-section", questionSection1);
                     $("div.desc-box p:last").attr("id", "contain-" + counterDescbox);
                     $("div.desc-box p#contain-" + counterDescbox).find("span.counter").text(counterDescbox);
                     Localizer.getString("question_with", Utils.numbertowords(Object.keys(data.options).length)).then(function(result) {
                         $("div.desc-box p#contain-" + counterDescbox).find("span.training-type").text(result);
                         $("div.desc-box p#contain-" + counterDescbox).text(textTitle).hide();
                     });
+                    resQuestCount++;
                 }
             });
 
+            if (resQuestCount > 0) {
+                let localeQuest = "";
+                if (resQuestCount > 1) {
+                    localeQuest = questionsKey;
+                } else {
+                    localeQuest = questionKey;
+                }
+                Localizer.getString("totalQuestionTraining", resQuestCount, localeQuest).then(function(result) {
+                    UxUtils.setAppend(".section-3 #question-msg", result);
+                });
+            }
             let $mb16Div2 = $(`<div class="mt--16"></div>`);
             /*  Check Show Correct Answer  */
             if (Object.keys(row).length > 0) {
@@ -715,10 +580,11 @@ function loadSummaryView() {
                 let score = 0;
                 $(".section-2").find("div.card-box-question").each(function(i, val) {
                     let cardQuestion = $(val).clone().show();
-                    $(".section-3").find(".container:first").append(cardQuestion);
+                    UxUtils.setAppend($(".section-3").find(".container:first"), cardQuestion);
                     let correctAnswerString = "";
                     let userAnswerString = "";
                     let userAnswerArray = row[i + 1];
+
                     if ($(val).find(".option-sec input[type='radio']").length > 0) {
                         if (Utils.isJson(correctAnswer)) {
                             correctAnswer = JSON.parse(correctAnswer);
@@ -737,7 +603,6 @@ function loadSummaryView() {
                             correctAnswer = JSON.parse(correctAnswer);
                         }
                         correctAnswerString = correctAnswer[i];
-                        //correctAnswerString = correctAnswer[questCount].join(",");
                         $(val).find(".option-sec input[type='checkbox']").each(function(optindex, opt) {
                             let optId = $(opt).attr("id");
                             if (correctAnswer[i].includes(optId)) {
@@ -765,19 +630,18 @@ function loadSummaryView() {
                     scoreIs = parseFloat(scoreIs).toFixed(2);
                 }
                 Localizer.getString("score", ":").then(function(result) {
-                    $($mb16Div2).append(UxUtils.getScoreResponseView(result, scoreIs));
+                    UxUtils.setAppend($mb16Div2, UxUtils.getScoreResponseView(result, scoreIs));
                 });
 
                 let summeryQuestionCounter = $("div.section-3 .container:first div.col-12 div.card-box div#desc-section div.question-box-sec").length;
                 if (summeryQuestionCounter > 0) {
-                    $(".section-3 .row").before($mb16Div2);
+                    UxUtils.setBefore("div.section-3 .container:first div#response-cover-img ", $mb16Div2);
                 }
 
                 $(".summary-section").find(".option-sec .card-box").removeClass("alert-success");
             }
         });
-        $("div.section-3 .container:first").after(footerSection3);
-        //$("div.section-3 .container:first").after(UxUtils.getSummarySectionFooter(completeTrainingKey));
+        UxUtils.setAfter("div.section-3 .container:first", footerSection3);
     }
 
 }
@@ -848,10 +712,9 @@ function createTrainingSection(indexNum) {
                 if (ind == indexNum) {
                     let x = ind + 1;
                     $("#x").text(x);
-                    let y = $("#y").text();
                     if (data.valueType == "LargeText") {
                         /* Call Text Section 1 */
-                        $("div.section-2 > .container:first").append(textSection2);
+                        UxUtils.setAppend("div.section-2 > .container:first", textSection2);
                         let counter = $("div.section-2 .container > div.card-box").length;
                         let textTitle = data.displayName;
                         let textDescription = data.options[0].displayName;
@@ -860,50 +723,77 @@ function createTrainingSection(indexNum) {
                         $("div.section-2 > .container:first > div.card-box:last").find(".text-content-section").text(textDescription);
                         $("div.section-2 > .container:first > div.card-box:last").attr("id", "page-" + counter);
                         if (data.name.indexOf("photo") >= 0) {
+                            UxUtils.setAppend($("div.section-2 > .container:first > div.card-box:last").find("#text-description"), loader);
                             Localizer.getString("photo").then(function(result) {
                                 $("div.section-2 > .container:first > div.card-box:last").find("span.section-type-title").text(result);
                             });
+                            let uniqueCarouselId = Constants.getUniqueId();
                             let attachments = data.attachments;
-                            let $carousel = $('<div id="carouselExampleIndicators" class="carousel slide max-min-220" data-ride="carousel"></div>');
-                            let $olSection = $('<ol class="carousel-indicators"></ol>');
-                            let $carouselInner = $('<div class="carousel-inner"></div>');
-                            if (attachments.length > 0) {
+                            let $carousel = $(UxUtils.getResponseViewCarouselSection(uniqueCarouselId));
+                            let $olSection = $(UxUtils.getCarouselOlSection());
+                            let $carouselInner = $(UxUtils.getCarouselInnerSection());
+                            let filesAmount = attachments.length;
+                            let photoUploadCounter = 0;
+                            if (attachments.length > 1) {
                                 let count = 0;
-                                $carousel.append($olSection);
-                                $carousel.append($carouselInner);
-                                attachments.forEach(function(att, i) {
-                                    let $imgDiv = $(`<div class="carousel-item ${count == 0 ? "active" : ""}">
-                                                        <img class="d-block w-100" src="${att.url}" alt="${count + 1} slide">
-                                                    </div>`);
-                                    $carouselInner.append($imgDiv);
-                                    $carousel.append(UxUtils.getCarouselSection());
+                                UxUtils.setAppend($carousel, $olSection);
+                                UxUtils.setAppend($carousel, $carouselInner);
+                                attachments.forEach(function(att) {
+                                    let $imgDiv = $(UxUtils.getCarousalImages(att.url, count, uniqueCarouselId));
+                                    UxUtils.setAppend($carouselInner, $imgDiv);
+                                    UxUtils.setAppend($carousel, UxUtils.getCarouselSection());
                                     count++;
+                                    photoUploadCounter++;
                                 });
-                                $("div.section-2 .container:first div.card-box:visible").find("#text-description").after($carousel);
+                                UxUtils.setAfter($("div.section-2 .container:first div.card-box:visible").find("#text-description"), $carousel);
                                 $(".carousel").carousel();
-                                //$(".carousel").after("<hr>");
+                                UxUtils.setAppend($carousel, UxUtils.getCarousalPagination(uniqueCarouselId));
+                            } else {
+                                let uniqueIdCarousel = Constants.getUniqueId();
+                                photoUploadCounter++;
+                                UxUtils.setAppend($("div.section-2 > .container:first > div.card-box:last").find("#text-description"), UxUtils.getSingleImageCarousel(attachments[0].url, uniqueIdCarousel));
                             }
+                            let tid = setInterval(() => {
+                                if (photoUploadCounter == filesAmount) {
+                                    $("div.section-2 > .container:first > div.card-box").find(".loader-cover").remove();
+                                    clearInterval(tid);
+                                }
+                            }, Constants.setIntervalTimeHundred());
                         } else if (data.name.indexOf("document") >= 0) {
+                            UxUtils.setAppend($("div.section-2 > .container:first").find("#text-description"), loader);
                             Localizer.getString("document").then(function(result) {
                                 $("div.section-2 > .container:first > div.card-box:last").find("span.section-type-title").text(result);
                             });
-                            $("div.section-2 > .container:first > div.card-box:last").find("#text-description").after(`<p class="doc-name">${Constants.getDocumentIcon()} <a href="${data.attachments[0].url}" class="font-14 semi-bold teams-link a-link" download>${data.attachments[0].name}</a></p>`);
+                            if (data.attachments[0].url != null) {
+                                let tid = setInterval(() => {
+                                    $("div.section-2 > .container:first > div.card-box").find(".loader-cover").remove();
+                                    clearInterval(tid);
+                                }, Constants.setIntervalTimeHundred());
+                            }
+                            UxUtils.setAfter($("div.section-2 > .container:first > div.card-box:last").find("#text-description"), UxUtils.getTrainingDocumentSection(data.attachments[0].url, data.attachments[0].name));
                         } else if (data.name.indexOf("video") >= 0) {
                             let textTitle = data.displayName;
                             let textDescription = data.options[0].displayName;
-                            $("div.section-1").append(textSection3);
+                            UxUtils.setAppend("div.section-1", textSection3);
                             $("div.section-2 > .container:first > div.card-box:last").find("span.counter").text(counter);
                             $("div.section-2 > .container:first > div.card-box:last").find("#text-description").text(textTitle);
                             $("div.section-2 > .container:first > div.card-box:last").find(".text-content-section").text(textDescription);
+                            UxUtils.setAppend($("div.section-2 > .container:first").find("#text-description"), loader);
                             Localizer.getString("video").then(function(result) {
                                 $("div.section-2 > .container:first > div.card-box:last").find("span.section-type-title").text(result);
                                 $("div.section-2 > .container:first > div.card-box:last").find("img.image-sec").remove();
                                 $("div.section-2 > .container:first > div.card-box:last").attr("id", data.name);
                             });
-                            $("div.section-2 > .container:first > div.card-box:last").find("#text-description").after('<div class="embed-responsive embed-responsive-4by3"><video controls="" playsinline class="video" id="' + data.name + '" src="' + data.attachments[0].url + '"></video></div>');
+                            if (data.attachments[0].url != null) {
+                                let tid = setInterval(() => {
+                                    $("div.section-2 > .container:first > div.card-box").find(".loader-cover").remove();
+                                    clearInterval(tid);
+                                }, Constants.setIntervalTimeHundred());
+                            }
+                            UxUtils.setAfter($("div.section-2 > .container:first > div.card-box:last").find("#text-description"), UxUtils.getTrainingVideoSection(data.name, data.attachments[0].url));
                         } else {
                             /* text */
-                            $("div.section-1").append(textSection1);
+                            UxUtils.setAppend("div.section-1", textSection1);
                             $("div.card-box:last").find("span.counter").text(counter);
                             $("div.card-box:last").find("#text-description").text(textTitle);
 
@@ -911,20 +801,46 @@ function createTrainingSection(indexNum) {
 
                     } else if (data.valueType == "SingleOption" || data.valueType == "MultiOption") {
                         createQuestionView(indexNum, questCounter);
+                        $("div.section-2 > .container:first > div.card-box:last").attr("id", "quiz-" + questCounter);
+                        let filesAmountHeaderImg = data.attachments.length;
+                        let photoUploadCounterHeaderImg = 0;
+                        let uniqueIdCarousel = Constants.getUniqueId();
                         let counter = $("div.section-2 .container > div.card-box").length;
+                        $("div.section-2 > .container:first > div.card-box:last").find(".result-status").attr("id", "status-" + counter);
                         if (data.attachments.length > 0) {
-                            $(".question-template-image").attr("src", data.attachments[0].url);
+                            $("div.section-2 > .container:first > div.card-box:last").find("#question-image > img").before(loader);
+                            UxUtils.setAppend($("div.section-2 #quiz-" + questCounter).find("div#question-image"), UxUtils.createImageLightBox(data.attachments[0].url, uniqueIdCarousel));
+                            Utils.getClassFromDimension(data.attachments[0].url, $(`a[data-gallery=gallery${uniqueIdCarousel}]`).find("img"));
                             $(".quiz-updated-img").show();
+                            if (data.attachments[0].url != null) {
+                                photoUploadCounterHeaderImg++;
+                            }
                         }
+                        let tid = setInterval(() => {
+                            if (photoUploadCounterHeaderImg == filesAmountHeaderImg) {
+                                $("div.section-2 > .container:first > div.card-box:last > div.quiz-updated-img").find(".loader-cover").remove();
+                                clearInterval(tid);
+                            }
+                        }, Constants.setIntervalTimeHundred());
                         if (data.options.length > 0) {
                             $.each(data.options, function(i, opt) {
-                                if (opt.attachments != undefined && opt.attachments.length > 0) {
+                                if (opt.attachments != undefined && opt.attachments.length > 0 && opt.attachments[0].url != null) {
+
+                                    $("div.section-2 > .container:first > div.card-box.card-box-question").find(`div#question${questCounter}option${i + 1}`).before(loader);
+
                                     let imageUrl = opt.attachments[0].url;
-                                    $("div.section-2 > .container:first > div.card-box.card-box-question")
-                                        .find(`input#question${questCounter}option${i + 1}`)
-                                        .before(`<div class="option-image-section cover-img min-max-132 mb--4" id="quiz-ans-image">
-                                                <img src="${imageUrl}" class="opt-image img-responsive heightfit">
-                                            </div>`);
+                                    if (opt.attachments[0].url != null) {
+                                        $("div.section-2 > .container:first > div.card-box.card-box-question")
+                                            .find(`input#question${questCounter}option${i + 1}`)
+                                            .before(UxUtils.getQuizOptionImage(imageUrl, uniqueIdCarousel));
+                                        $(`a[data-gallery=gallery${uniqueIdCarousel}]`).each(function(imageIndex, imageAnchSection) {
+                                            Utils.getClassFromDimension(imageUrl, $(imageAnchSection).find("img"));
+                                        });
+                                    } else {
+                                        $("div.section-2 > .container:first > div.card-box.card-box-question").find(`div#question${questCounter}option${i + 1}`).find("#question-image").hide();
+                                    }
+                                    // $(`div#question${questCounter}option${i + 1}`).find(".loader-cover").remove();
+                                    $("div.section-2 > .container:first > div.card-box.card-box-question").find(`div#question${questCounter}option${i + 1}`).parents(".option-sec").find("div.loader-cover").hide();
                                 }
                             });
                         }
@@ -933,10 +849,10 @@ function createTrainingSection(indexNum) {
                     }
                 }
                 if ($("#x").text() == $("#y").text()) {
-                    $(".footer.section-2-footer .check-key").text(doneKey);
-                    $(".footer.section-2-footer #next").text(doneKey);
+                    $(".footer.section-2-footer .check-key").text(doneKey).append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
+                    $(".footer.section-2-footer #next").text(doneKey).append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
                     $(".footer.section-2-footer #next").addClass("done-key");
-                    $(".footer.section-2-footer #check").text(doneKey);
+                    $(".footer.section-2-footer #check").text(doneKey).append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
                     $(".footer.section-2-footer #check").addClass("done-key");
                     $(".footer.section-2-footer .check-key").removeClass(".check-key").addClass("done-key");
                 }
@@ -958,14 +874,9 @@ $(document).on("click", ".done-key", function() {
 $(document).on("click", "#start", function() {
     $("div.section-1").hide();
     $("div.section-1-footer").hide();
-    $("div.section-1").after(`<div class="section-2"><div class="container"></div></div>`);
-
+    UxUtils.setAfter("div.section-1", UxUtils.getTrainingSection());
     /* Show first section */
-    $("div.section-2").after(footerSection2);
-    //$("div.section-2").after(UxUtils.getResponseTrainingSectionFooter(previousKey, nextKey));
-
-    //$("div.section-2").append(`<div class="container pb-100"></div>`);
-
+    UxUtils.setAfter("div.section-2", footerSection2);
     createTrainingSection(pagination);
     $("#back").prop("disabled", true);
     $("#back").addClass("disabled");
@@ -975,6 +886,7 @@ $(document).on("click", "#start", function() {
  * @event click on check button for getting correct or incorrect answer
  */
 $(document).on("click", "#check", function() {
+
     /* Question Validations */
     let data = [];
     let answerKeys = Utils.isJson(actionInstance.customProperties[Constants.getCorrectAnswerIndex()].value) ? JSON.parse(actionInstance.customProperties[Constants.getCorrectAnswerIndex()].value) : actionInstance.customProperties[Constants.getCorrectAnswerIndex()].value;
@@ -986,42 +898,41 @@ $(document).on("click", "#check", function() {
     let attrName = "";
     let isChecked = false;
 
+    let quesIndex = "";
+    let quesIndexArr = "";
+    let rowIndex = "";
+
     $("div.card-box:visible").find("input[type='checkbox']:checked").each(function(ind, ele) {
         if ($(ele).is(":checked")) {
+            quesIndex = $(this).parents(".card-box-question").attr("id");
+            quesIndexArr = quesIndex.split("quiz-");
+            rowIndex = quesIndexArr[quesIndexArr.length - 1];
             checkCounter++;
             selectedAnswer.push($.trim($(ele).attr("id")));
             attrName = $(ele).attr("name");
             data.push($(this).attr("id"));
             isChecked = true;
+            allOptions.push($.trim($(this).attr("id")));
         }
     });
 
-    $("div.card-box:visible").find("input[type='checkbox']").each(function(ind, ele) {
-        allOptions.push($.trim($(this).attr("id")));
-    });
-
     $("div.card-box:visible").find("input[type='radio']:checked").each(function(ind, ele) {
+        data = "";
+        checkCounter++;
+        selectedAnswer.push($.trim($(ele).attr("id")));
+        attrName = $(ele).attr("name");
         allOptions.push($.trim($(this).attr("id")));
+        quesIndex = $(this).parents(".card-box-question").attr("id");
+        quesIndexArr = quesIndex.split("quiz-");
+        rowIndex = quesIndexArr[quesIndexArr.length - 1];
+        data = $(this).attr("id");
+        isChecked = true;
     });
 
-    if (!row[(questionSelectorCounter + 1)]) {
-
-        row[(questionSelectorCounter + 1)] = [];
+    if (!row[rowIndex]) {
+        row[rowIndex] = [];
     }
-    row[(questionSelectorCounter + 1)] = JSON.stringify(data);
-
-    $("div.card-box:visible").find("input[type='radio']:checked").each(function(ind, ele) {
-        if ($(ele).is(":checked")) {
-            checkCounter++;
-            selectedAnswer.push($.trim($(ele).attr("id")));
-            attrName = $(ele).attr("name");
-
-            if (!row[(questionSelectorCounter + 1)]) { row[(questionSelectorCounter + 1)] = []; }
-            row[(questionSelectorCounter + 1)] = $(this).attr("id");
-
-            isChecked = true;
-        }
-    });
+    row[rowIndex] = JSON.stringify(data);
 
     if (checkCounter <= 0) {
         $("#next").prop("disabled", true).addClass("disabled");
@@ -1057,16 +968,16 @@ $(document).on("click", "#check", function() {
                 return false;
             }
         });
-
-        let correctValue = correctAnsArr.join();
-        if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+        let statusID = $("#x").text();
+        if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
             if (correctAnswer == true) {
-                $("div.card-box:last").find(".result").remove();
-                $(".result-status").append('<span class="text-success semi-bold">Correct</span>');
+                $("div.card-box:visible").find("label.result-status span:last").remove();
+
+                UxUtils.setAppend($("div.card-box:visible").find("#status-" + statusID), UxUtils.getCorrectArea(correctKey));
 
                 $.each(answerKeys[(attrName - 1)], function(ii, subarr) {
                     correctAnsArr.push($.trim($("#" + subarr).text()));
-                    $("#" + subarr).find("div.check-in-div").append(`&nbsp;<i class="success-with-img">${Constants.getSuccessTickIcon()}</i>`);
+                    UxUtils.setAppend($("#" + subarr).find("div.check-in-div"), `&nbsp;<i class="success-with-img">${Constants.getSuccessTickIcon()}</i>`);
                 });
 
                 $.each(allOptions, function(i, val) {
@@ -1074,14 +985,14 @@ $(document).on("click", "#check", function() {
                         $("div.option-sec").find("div#" + val).parent().addClass("alert-success");
                     }
                 });
-                $("#check").text("Next").attr("id", "next");
+                $("#check").text("Next").attr("id", "next").append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
 
             } else {
-                $("div.card-box:last").find(".result").remove();
-                $(".result-status").append('<span class="text-danger semi-bold">Incorrect</span>');
+                $("div.card-box:visible").find("label.result-status span:last").remove();
+                UxUtils.setAppend($("div.card-box:visible").find("#status-" + statusID), UxUtils.getIncorrectArea(incorrectKey));
                 $.each(answerKeys[(attrName - 1)], function(ii, subarr) {
                     correctAnsArr.push($.trim($("#" + subarr).text()));
-                    $("#" + subarr).find("div.check-in-div").append(`&nbsp;<i class="success-with-img">${Constants.getSuccessTickIcon()}</i>`);
+                    UxUtils.setAppend($("#" + subarr).find("div.check-in-div"), `&nbsp;<i class="success-with-img">${Constants.getSuccessTickIcon()}</i>`);
                 });
 
                 $.each(allOptions, function(i, val) {
@@ -1089,8 +1000,7 @@ $(document).on("click", "#check", function() {
                         $("div.option-sec").find("div#" + val).parent().addClass("alert-danger");
                     }
                 });
-
-                $("#check").text("Next").attr("id", "next");
+                $("#check").text("Next").attr("id", "next").append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
             }
 
             $("div.section-2").find("div.card-box:visible").find("input").each(function(ind, ele) {
@@ -1105,11 +1015,10 @@ $(document).on("click", "#check", function() {
 
     } else {
         Localizer.getString("notePleaseChooseChoice").then(function(result) {
-            $("div.section-2").find("div.card-box:visible").find(".option-sec:last").append(`<p class="mt--32 text-danger choice-required-err"><font>${result}</font></p>`);
+            $("div.section-2").find("div.card-box:visible").find(".choice-required-err").remove();
+            UxUtils.setAppend($("div.section-2").find("div.card-box:visible").find(".option-sec:last"), `<p class="mt--32 text-danger choice-required-err"><font>${result}</font></p>`);
         });
     }
-
-
 });
 
 /**
@@ -1130,8 +1039,6 @@ $(document).on("change", "input[type='radio'], input[type='checkbox']", function
  */
 $(document).on("click", "#next", function() {
 
-    //$("#back").addClass("disabled");
-    //$("#back").removeClass("disabled");
     let data = [];
     let limit = $("#y").text();
 
@@ -1156,21 +1063,31 @@ $(document).on("click", "#next", function() {
                 attrName = $(ele).attr("name");
                 data.push($(this).attr("id"));
                 isChecked = true;
+                let quesIndex = $(this).parents(".card-box-question").attr("id");
+                let quesIndexArr = quesIndex.split("quiz-");
+                let rowIndex = quesIndexArr[quesIndexArr.length - 1];
+                if (!row[rowIndex]) {
+                    row[rowIndex] = [];
+                }
+                row[rowIndex] = JSON.stringify(data);
             }
         });
-        if (!row[(questionSelectorCounter + 1)]) { row[(questionSelectorCounter + 1)] = []; }
-        row[(questionSelectorCounter + 1)] = JSON.stringify(data);
+
         $("div.card-box:visible").find("input[type='radio']:checked").each(function(ind, ele) {
             if ($(ele).is(":checked")) {
                 checkCounter++;
                 selectedAnswer.push($.trim($(ele).attr("id")));
                 attrName = $(ele).attr("name");
-                if (!row[(questionSelectorCounter + 1)]) { row[(questionSelectorCounter + 1)] = []; }
-                row[(questionSelectorCounter + 1)] = $(this).attr("id");
                 isChecked = true;
+                let quesIndex = $(this).parents(".card-box-question").attr("id");
+                let quesIndexArr = quesIndex.split("quiz-");
+                let rowIndex = quesIndexArr[quesIndexArr.length - 1];
+                if (!row[rowIndex]) {
+                    row[rowIndex] = [];
+                }
+                row[rowIndex] = $(this).attr("id");
             }
         });
-
         if (checkCounter <= 0) {
             $("#next").prop("disabled", true).addClass("disabled");
         } else {
@@ -1208,14 +1125,10 @@ $(document).on("click", "#next", function() {
                 correctAnsArr.push($.trim($("#" + subarr).text()));
             });
 
-            let correctValue = correctAnsArr.join();
-
-            if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+            if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
                 if (correctAnswer == true) {
                     /* If Correct Answer */
                     pagination++;
-                    questionSelectorCounter++;
-
                     let limit = $("#y").text();
                     if (pagination < limit) {
                         $("#next").prop("disabled", false).removeClass("disabled");
@@ -1229,8 +1142,8 @@ $(document).on("click", "#next", function() {
                             setTimeout(
                                 function() {
                                     if ($("div.card-box:visible").find(".training-type").text() == "Question") {
-                                        if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
-                                            $("#next").text("Check").attr("id", "check");
+                                        if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+                                            $("#next").html(`Check ${Constants.getNextCaratIcon()}`).attr("id", "check");
                                         }
                                     }
                                 }, Constants.setIntervalTimeFiveHundred());
@@ -1245,8 +1158,7 @@ $(document).on("click", "#next", function() {
 
                     if (pagination < limit) {
                         $("#next").prop("disabled", false).removeClass("disabled");
-                        $("#back").prop("disabled", false).removeClass("disabled");;
-
+                        $("#back").prop("disabled", false).removeClass("disabled");
                         $("div.section-2 > .container:first > div.card-box:nth-child(" + pagination + ")").hide();
                         if ($("div.section-2 > .container:first > div.card-box").length <= pagination) {
                             createTrainingSection(pagination);
@@ -1255,8 +1167,8 @@ $(document).on("click", "#next", function() {
                             setTimeout(
                                 function() {
                                     if ($("div.card-box:visible").find(".training-type").text() == "Question") {
-                                        if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
-                                            $("#next").text("Check").attr("id", "check");
+                                        if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+                                            $("#next").html(`Check ${Constants.getNextCaratIcon()}`).attr("id", "check");
                                         }
                                     }
                                 }, Constants.setIntervalTimeFiveHundred());
@@ -1271,8 +1183,6 @@ $(document).on("click", "#next", function() {
                 /* If Question is not answerable */
                 let limit = $("#y").text();
                 pagination++;
-                questionSelectorCounter++;
-
                 if (pagination < limit) {
                     $("#next").prop("disabled", false).removeClass("disabled");
                     $("#back").prop("disabled", false).removeClass("disabled");
@@ -1285,8 +1195,8 @@ $(document).on("click", "#next", function() {
                         setTimeout(
                             function() {
                                 if ($("div.card-box:visible").find(".training-type").text() == "Question") {
-                                    if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
-                                        $("#next").text("Check").attr("id", "check");
+                                    if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+                                        $("#next").html(`Check ${Constants.getNextCaratIcon()}`).attr("id", "check");
                                     }
                                 }
                             }, Constants.setIntervalTimeFiveHundred());
@@ -1306,9 +1216,8 @@ $(document).on("click", "#next", function() {
                 }
             }
         } else {
-
             Localizer.getString("notePleaseChooseChoice").then(function(result) {
-                $("div.section-2").find("div.card-box:visible").find(".option-sec:last").append(`<p class="mt--32 text-danger choice-required-err"><font>${result}</font></p>`);
+                UxUtils.setAppend($("div.section-2").find("div.card-box:visible").find(".option-sec:last"), `<p class="mt--32 text-danger choice-required-err"><font>${result}</font></p>`);
             });
         }
 
@@ -1319,8 +1228,6 @@ $(document).on("click", "#next", function() {
         /* Not Question Type */
         pagination++;
         limit = $("#y").text();
-        //row[pagination] = "question" + pagination;
-
         if (pagination < limit) {
             $("#next").prop("disabled", false).removeClass("disabled");
             $("#back").prop("disabled", false).removeClass("disabled");
@@ -1333,8 +1240,8 @@ $(document).on("click", "#next", function() {
                 setTimeout(
                     function() {
                         if ($("div.card-box:visible").find(".training-type").text() == "Question") {
-                            if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
-                                $("#next").text("Check").attr("id", "check");
+                            if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+                                $("#next").html(`Check ${Constants.getNextCaratIcon()}`).attr("id", "check");
                             }
                         }
                     }, Constants.setIntervalTimeFiveHundred());
@@ -1350,10 +1257,10 @@ $(document).on("click", "#next", function() {
         }
     }
     if ($("#x").text() == $("#y").text()) {
-        $(".footer.section-2-footer .check-key").text(doneKey);
-        $(".footer.section-2-footer #next").text(doneKey);
+        $(".footer.section-2-footer .check-key").text(doneKey).append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
+        $(".footer.section-2-footer #next").text(doneKey).append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
         $(".footer.section-2-footer #next").addClass("done-key");
-        $(".footer.section-2-footer #check").text(doneKey);
+        $(".footer.section-2-footer #check").text(doneKey).append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
         $(".footer.section-2-footer #check").addClass("done-key");
         $(".footer.section-2-footer .check-key").removeClass(".check-key").addClass("done-key");
     }
@@ -1363,13 +1270,26 @@ $(document).on("click", "#next", function() {
  * @event click on back button
  */
 $(document).on("click", "#back", function() {
-    $("#next").text("Next");
+    let $countn = 0;
+    if ($countn >= 1) {
+        $("#next").after(UxUtils.getNextBtnSpan).find(".next-btn-sec").text("Next");
+        $("#check").after(UxUtils.getNextBtnSpan).find(".next-btn-sec").text("Next");
+        $countn++;
+    }
+    if ($("#next").hasClass("done-key")) {
+
+        $("#next").removeClass("done-key");
+
+        $("#next").text("");
+        $("#next").append(`<span class="next-btn-sec"></span>${Constants.getNextCaratIcon()}`).find(".next-btn-sec").text("Next");
+    }
+    $("#next").removeClass("done-key");
     $("#next").removeClass("done-key");
     if ($(".error-msg").length > 0) {
         $(".error-msg").remove();
     }
     if ($("#check").length > 0) {
-        $("#check").text("Next").attr("id", "next");
+        $("#check").html(`Next ${Constants.getNextCaratIcon()}`).attr("id", "next");
     }
     if (pagination < 1) {
         $("#back").prop("disabled", true).addClass("disabled");
@@ -1381,8 +1301,8 @@ $(document).on("click", "#back", function() {
         setTimeout(
             function() {
                 if ($("div.card-box:visible").find(".training-type").text() == "Question") {
-                    if (actionInstance.customProperties[3].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
-                        $("#next").text("Check").attr("id", "check");
+                    if (actionInstance.customProperties[Constants.getisShowAnswerEveryQuestionIndex()].value == "Yes" && $("div.card-box:visible").find("input").parent("label").attr("disabled") !== "disabled") {
+                        $("#next").html(`Check ${Constants.getNextCaratIcon()}`).attr("id", "check");
                     }
                 }
             }, Constants.setIntervalTimeFiveHundred());
@@ -1390,10 +1310,10 @@ $(document).on("click", "#back", function() {
         pagination--;
     }
     if ($("#x").text() == $("#y").text()) {
-        $(".footer.section-2-footer .check-key").text(doneKey);
-        $(".footer.section-2-footer #next").text(doneKey);
+        $(".footer.section-2-footer .check-key").text(doneKey).append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
+        $(".footer.section-2-footer #next").text(doneKey).append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
         $(".footer.section-2-footer #next").addClass("done-key");
-        $(".footer.section-2-footer #check").text(doneKey);
+        $(".footer.section-2-footer #check").text(doneKey).append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
         $(".footer.section-2-footer #check").addClass("done-key");
         $(".footer.section-2-footer .check-key").removeClass(".check-key").addClass("done-key");
     }
@@ -1465,4 +1385,17 @@ Localizer.getString("next").then(function(result) {
 Localizer.getString("completeTraining").then(function(result) {
     completeTrainingKey = result;
     footerSection3 = UxUtils.getSummarySectionFooter(completeTrainingKey);
+});
+
+/**
+ * Variable contains Loader
+ */
+let loader = UxUtils.getLoaderArea();
+
+/**
+ * @event Click to Show image lightbox
+ */
+$(document).on("click", '[data-toggle="lightbox"]', function(event) {
+    event.preventDefault();
+    $(this).ekkoLightbox();
 });
