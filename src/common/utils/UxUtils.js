@@ -1824,8 +1824,8 @@ export class UxUtils {
     static getResponseTextTrainingSection() {
         return `<div class="card-box card-blank question-sec-card-box">
                         <label class="cover-image-label font-16 semi-bold mb--8 text-break" id="text-description">Text</label>
-                        <span class="quiz-clear  mb--8 cursor-pointer pull-right text-danger"></span>
-                        <p class="text-justify font-12 text-break mt--8 text-content-section"> General Knowledge is the general awareness of the surroundings, plants, animals, famous personalities and occurrences happening around the world. General knowledge helps to build a person’s confidence level and sharpens his thinking
+                            <span class="quiz-clear  mb--8 cursor-pointer pull-right text-danger"></span>
+                            <p class="text-justify font-12 text-break mt--8 text-content-section"> General Knowledge is the general awareness of the surroundings, plants, animals, famous personalities and occurrences happening around the world. General knowledge helps to build a person’s confidence level and sharpens his thinking
                             capacity too. GK covers a wide range of events from the past, present and what is likely to happen in the future. Young minds are more open to learning new things with enthusiasm. In this article, we bring some simple GK questions
                             about India for Class 2 kids, which will arouse interest and curiosity among them to learn new things. We will cover everything that a class 2 kid ought to know about India and subjects of national importance.
                         </p>
@@ -2128,7 +2128,7 @@ export class UxUtils {
     static getYouAsIntial(result, userId) {
         return `<div class="card-blank"></div>
         ${this.breakline()}
-        <div class="d-flex cursor-pointer aggregrate-section" data-attr="home" id="${userId}">
+        <div class="d-flex aggregrate-section" data-attr="home" id="${userId}">
             <p class="semi-bold font-14">${result}</p>
         </div>${this.breakline()}`;
     }
