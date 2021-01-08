@@ -60,14 +60,13 @@ let confirmDeleteContentMsgKey = "";
 let cancelKey = "";
 let discardKey = "";
 
-let nweekKey = "";
 let weekKey = "";
 let hourKey = "";
 let hoursKey = "";
 let minuteKey = "";
 let minutesKey = "";
 let daysKey = "";
-let questionsKey = "";
+let context = "";
 
 /***********************************  Manage Questions *********************************/
 
@@ -86,7 +85,6 @@ $(document).on("click", ".moreless-button", function() {
         $(this).parent().find(".show-text").css({ "-webkit-line-clamp": Constants.webkitLineClampCssCount() });
     }
 });
-
 
 /**
  * @event to increase textarea height
@@ -894,7 +892,7 @@ $(document).on("change", "#upload-photo", function() {
             $(".text-section .photo-box").hide();
             $(".text-section .change-link").show();
             $(".text-section .label-alert").remove();
-            let response = readURL(this, `.${className}`);        
+            let response = readURL(this, `.${className}`);
             if (response) {
 
                 let input = this;
@@ -926,7 +924,7 @@ $(document).on("change", "#upload-photo", function() {
                         console.log("GetContext - Error2: " + JSON.stringify(error));
                     });
 
-            }else{
+            } else {
                 $(".show-image-loader").hide();
                 $(".text-section .photo-box").show();
                 $(".text-section .change-link").hide();
@@ -968,12 +966,12 @@ let imagesPreview = function(input, placeToInsertImagePreview) {
             }
         }
 
-        if($.inArray(false, returnArr) != -1){
+        if($.inArray(false, returnArr) != -1) {
             $("#photo-done").removeClass("disabled");
             $("#photo-done").find(Constants.getDisabledLoaderClass()).remove();
             UxUtils.setBefore("div.text-section:visible div.relative" , UxUtils.getMaxImageAlert(invalidFileFormatKey));
             return false;
-        }else{
+        } else {
             let uniqueCarouselId = Constants.getUniqueId();
             $(".update-carasoul").html("");
             let $carousel = $(UxUtils.getResponseViewCarouselSection(uniqueCarouselId));
@@ -1098,6 +1096,9 @@ $(document).on("change", "#upload-video", function() {
  * @event when upload document uploadedd
  */
 $(document).on("change", "#upload-document", function() {
+
+    let fileTypes = ["pdf", "docx", "doc", "txt", "xls", "xlsx", "odt", "pptx", "ppt","rtf"];
+    let isSuccess = "";
     // If file is blank then return back
     if (!$(this).val()) {
         return false;
@@ -1106,33 +1107,42 @@ $(document).on("change", "#upload-document", function() {
     if ($(this)[0].files[0].name != undefined || $(this)[0].files[0].name != null) {
         $(".doc-name").html("");
     }
-
+    $(".text-danger.error-msg").remove();
     $("#document-done").addClass("disabled");
     UxUtils.setAppend("#document-done" , Constants.getDisabledLoader());
 
     // Convert File size in Kb
-    let filesize = $(this)[0].files[0].size / Constants.getKbConvertConst();
-    let filename = $(this)[0].files[0].name;
-    let fileData = $(this)[0].files[0];
-    let fileTypeIcon = "";
-    fileTypeIcon = Constants.getDocumentIcon();
-    $("a.change-doc-link").show();
-    let attachment = ActionHelper.attachmentUpload(fileData, fileData["type"]);
-    let attachmentRequest = ActionHelper.requestAttachmentUploadDraft(attachment);
-    ActionHelper.executeApi(attachmentRequest)
-        .then(function(response) {
-            let newResponse = {
-                "name": filename + " (" + Math.round(filesize) + " Kb)",
-                "type": "Document",
-                "id": response.attachmentId
-            };
-            $("textarea#document-attachment").val(JSON.stringify(newResponse));
-            $("#document-done").removeClass("disabled");
-            $("#document-done").find(Constants.getDisabledLoaderClass()).remove();
-        });
-    $("label.label-alert").remove();
-    $(".doc-box").addClass("d-none");
-    UxUtils.setAppend(".doc-name" , `${fileTypeIcon}&nbsp; <a class="a-link">${$(this)[0].files[0].name} (${Math.round(filesize)} Kb)</a>`);
+    let input = $(this)[0];
+    let filesize = input.files[0].size / Constants.getKbConvertConst();
+    let filename = input.files[0].name;
+    let extension = input.files[0].name.split(".").pop().toLowerCase();
+    isSuccess = fileTypes.indexOf(extension) > -1;
+    if(isSuccess){
+        let fileData = input.files[0];
+        let fileTypeIcon = "";
+        fileTypeIcon = Constants.getDocumentIcon();
+        $("a.change-doc-link").show();
+        let attachment = ActionHelper.attachmentUpload(fileData, fileData["type"]);
+        let attachmentRequest = ActionHelper.requestAttachmentUploadDraft(attachment);
+        ActionHelper.executeApi(attachmentRequest)
+            .then(function(response) {
+                let newResponse = {
+                    "name": filename + " (" + Math.round(filesize) + " Kb)",
+                    "type": "Document",
+                    "id": response.attachmentId
+                };
+                $("textarea#document-attachment").val(JSON.stringify(newResponse));
+                $("#document-done").removeClass("disabled");
+                $("#document-done").find(Constants.getDisabledLoaderClass()).remove();
+            });
+        $(".doc-box").addClass("d-none");
+        UxUtils.setAppend(".doc-name" , `${fileTypeIcon}&nbsp; <a class="a-link">${$(this)[0].files[0].name} (${Math.round(filesize)} Kb)</a>`);
+    }else{
+        $(".doc-box").removeClass("d-none");
+        $("a.change-doc-link").hide();
+        $("#document-done").removeClass("disabled");
+        UxUtils.setBefore(".doc-box" , UxUtils.getMaxImageAlert(invalidFileFormatKey));
+    }
 });
 
 /**
@@ -1498,7 +1508,7 @@ async function getStringKeys() {
     Localizer.getString("addMoreOptions").then(function(result) {
         addMoreOptionsKey = result;
     });
-    
+
     Localizer.getString("addQuestions").then(function(result) {
         addQuestionsKey = result;
     });
@@ -1521,14 +1531,6 @@ async function getStringKeys() {
 
     Localizer.getString("discard").then(function(result) {
         discardKey = result;
-    });
-
-    Localizer.getString("questions").then(function(result) {
-        questionsKey = result;
-    });
-
-    Localizer.getString("nWeek", "1").then(function(result) {
-        nweekKey = result;
     });
 
     Localizer.getString("nWeek", " ").then(function(result) {
@@ -1554,8 +1556,6 @@ async function getStringKeys() {
     Localizer.getString("days").then(function(result) {
         daysKey = result;
     });
-
-
 }
 
 /**
@@ -1792,7 +1792,12 @@ function createAction(actionPackageId) {
         value: allowMultipleAttempt,
     });
     properties.push(getcorrectanswers);
-
+    properties.push({
+        name: "Locale",
+        valueType: ActionHelper.actionPropertyValueType(),
+        value: context.locale,
+    });
+    
     let action = {
         id: Utils.generateGUID(),
         actionPackageId: actionPackageId,
@@ -1854,9 +1859,7 @@ async function loadCreationView(request) {
         context = response.context;
         lastSession = context.lastSessionData;
         let theme = context.theme;
-        
         let formSection = UxUtils.getLandingContainer(uploadCoverImageKey, trainingTitleKey, trainingDescriptionOptionalKey, coverImageKey, clearKey, settingText, nextKey);
-
         $("link#theme").attr("href", "css/style-" + theme + ".css");
         UxUtils.setAppend("form.sec1" , formSection);
         UxUtils.setAppend("form.sec1" , settingSection);
@@ -2217,7 +2220,7 @@ async function loadCreationView(request) {
                     }
                 });
             });
-        }else{
+        } else {
             getStringKeys();
         }
         let dateInput = $("input[name='expiry_date']");
@@ -2231,7 +2234,7 @@ async function loadCreationView(request) {
         };
         dateInput.datepicker(options);
         dateInput.datepicker("setDate", setDate);
-        ActionHelper.hideLoader();        
+        ActionHelper.hideLoader();
     });
 }
 /***********************************  Other Actions *******************************/
@@ -2242,15 +2245,11 @@ async function loadCreationView(request) {
 $(document).on("click", "#back", function() {
     $(".section-2").hide();
     $(".section-2-footer").hide();
-
     $("#setting").hide();
-
     $(".section-1").show();
     $(".section-1-footer").show();
     $(".error-msg").remove();
-    
     $("#due").text(settingText);
-
 });
 
 /**
@@ -2428,7 +2427,6 @@ $(document).on("click", ".upvj", function(event) {
  * @event when change on setting inputs
  */
 $(document).on("change", `input[name="expiry_date"], input[name="expiry_time"], .visible-to, #show-correct-answer`, function() {
-    
     $(".invalid-date-err").remove();
     let getExpiryDate = $(`input[name="expiry_date"]`).datepicker("getDate");
     let getExpiryDateData = getExpiryDate.toString().split(" ");
@@ -2886,7 +2884,7 @@ $(document).on({
 /**
  * Variable contains form section
  */
-let formSection = UxUtils.getLandingContainer(uploadCoverImageKey, trainingTitleKey, trainingDescriptionOptionalKey, coverImageKey, clearKey, settingText, nextKey);
+// let formSection = UxUtils.getLandingContainer(uploadCoverImageKey, trainingTitleKey, trainingDescriptionOptionalKey, coverImageKey, clearKey, settingText, nextKey);
 
 /**
  * Variable contains training section
@@ -2962,10 +2960,4 @@ let settingSection = UxUtils.getSettingContentArea(dueByKey, resultVisibleToKey,
  * Variable contains Loader
  */
 let loader = UxUtils.getLoaderContentArea();
-
-/**
- * Variable contains Discard content
- */
-let discardContent = UxUtils.getDiscardContentArea();
-
 /***********************************  HTML Section Ends***************************/

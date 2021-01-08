@@ -350,7 +350,7 @@ function footerDownload() {
 function head() {
     let title = actionInstance.displayName;
     let description = actionInstance.customProperties[0]["value"];
-    let options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    let options = { weekday: "short", year: "numeric", month: "short", day: "numeric" };
     let expiryTime = new Date(actionInstance.expiryTime);
     let dueby = expiryTime.toLocaleDateString(context.locale, options);
     let $card = $(UxUtils.divTemplate("", ""));
@@ -380,7 +380,7 @@ function head() {
 function headCreator() {
     let title = actionInstance.displayName;
     let description = actionInstance.customProperties[0]["value"];
-    let options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    let options = { weekday: "short", year: "numeric", month: "short", day: "numeric" };
     let expiryTime = new Date(actionInstance.expiryTime);
     let dueby = expiryTime.toLocaleDateString(context.locale, options);
     let $card = $(UxUtils.divTemplate("", ""));
@@ -478,7 +478,7 @@ function scoreCalculate(userId) {
     actionInstance.dataTables.forEach((dataTable) => {
         dataTable.dataColumns.forEach((question) => {
             if (question.valueType == "SingleOption" || question.valueType == "MultiOption") {
-                total++;        
+                total++;
             }
         });
         // total = Object.keys(dataTable.dataColumns).length;
@@ -704,7 +704,7 @@ function createResponderQuestionView(userId, responder) {
                                 for (let j = 1; j <= userResponseLength; j++) {
                                     if (Utils.isJson(userResponse[j])) {
                                         let userResponseAns = JSON.parse(userResponse[j]);
-                                        if(userResponseAns != null){
+                                        if(userResponseAns != null) {
                                             let userResponseAnsLen = userResponseAns.length;
                                             if (userResponseAnsLen > 1) {
                                                 for (let k = 0; k < userResponseAnsLen; k++) {
@@ -869,7 +869,7 @@ function createCreatorQuestionView(userId) {
                                             userAnsString = responderAnsArr[0];
                                         }
                                     } else {
-                                        userAnsString = "";    
+                                        userAnsString = "";
                                     }
                                 } else {
                                     userAnsString = actionDataRows[i].columnValues[count];
@@ -898,7 +898,7 @@ function createCreatorQuestionView(userId) {
                                 for (let j = 1; j <= userResponseLength; j++) {
                                     if (Utils.isJson(userResponse[j])) {
                                         let userResponseAns = JSON.parse(userResponse[j]);
-                                        if(userResponseAns != null){
+                                        if(userResponseAns != null) {
                                             let userResponseAnsLen = userResponseAns.length;
                                             if (userResponseAnsLen > 1) {
                                                 for (let k = 0; k < userResponseAnsLen; k++) {
@@ -1056,7 +1056,7 @@ function createQuestionView(userId, isLanding) {
                             for (let j = 1; j <= userResponseLength; j++) {
                                 if (Utils.isJson(userResponse[j]) == true) {
                                     let userResponseAns = JSON.parse(userResponse[j]);
-                                    if(userResponseAns != null){
+                                    if(userResponseAns != null) {
                                         let userResponseAnsLen = userResponseAns.length;
                                         if (userResponseAnsLen > 1) {
                                             for (let k = 0; k < userResponseAnsLen; k++) {
@@ -1097,7 +1097,7 @@ function createQuestionView(userId, isLanding) {
                     }
 
                     let optName = option.displayName;
-                    let optAttachmentId = ""
+                    let optAttachmentId = "";
                     if(option.attachments != 0) {
                         optAttachmentId = option.attachments[0].id;
                     }

@@ -751,7 +751,7 @@ function createTrainingSection(indexNum) {
                             } else {
                                 let uniqueIdCarousel = Constants.getUniqueId();
                                 photoUploadCounter++;
-                                UxUtils.setAppend($("div.section-2 > .container:first > div.card-box:last").find("#text-description"), UxUtils.getSingleImageCarousel(attachments[0].url, uniqueIdCarousel));
+                                UxUtils.setAfter($("div.section-2 > .container:first > div.card-box:last").find("#text-description"), UxUtils.getSingleImageCarousel(attachments[0].url, uniqueIdCarousel));
                             }
                             let tid = setInterval(() => {
                                 if (photoUploadCounter == filesAmount) {

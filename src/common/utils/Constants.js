@@ -519,7 +519,7 @@ export class Constants {
     /**
      * @Method to get Invalid File Msg
      */
-    static getInvalidFileMsg() {
+    static getInvalidFileMsg(textMsg) {
         return `Invalid file formate`;
     }
 
