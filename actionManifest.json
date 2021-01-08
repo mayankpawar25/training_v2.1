@@ -15,7 +15,7 @@
     "actionModel": "actionModel.json",
     "views": {
         "CardView": {
-            "sourceLocation": "json/cardView.json"
+            "sourceLocation": "cardView.json"
         },
         "LaunchView": {
             "sourceLocation": "createView.html",
