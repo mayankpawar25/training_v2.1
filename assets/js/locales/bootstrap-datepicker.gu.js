@@ -1,7 +1,5 @@
-/**
- * Hindi translation for bootstrap-datepicker
- * Visar Uruqi <visar.uruqi@gmail.com>
- */
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
  (function($) {
     $.fn.datepicker.dates["gu"] = {
         days: ["રવિવાર", "સોમવાર", "મંગળવાર", "બુધવાર", "ગુરુવાર", "શુક્રવાર", "શનિવાર"],

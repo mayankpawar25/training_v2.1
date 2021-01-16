@@ -1,7 +1,5 @@
-/**
- * Malyalam translation for bootstrap-datepicker
- * Visar Uruqi <visar.uruqi@gmail.com>
- */
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
  (function($) {
     $.fn.datepicker.dates["ml"] = {
         days: ["ഞായർ", "തിങ്കൾ", "ചൊവ്വ", "ബുധൻ", "വ്യാഴം", "വെള്ളി", "ശനി"],

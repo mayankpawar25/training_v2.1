@@ -1,7 +1,5 @@
-/**
- * Kazakh translation for bootstrap-datepicker
- * Yerzhan Tolekov <era.tolekov@gmail.com>
- */
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 (function($) {
     $.fn.datepicker.dates["kk"] = {
         days: ["Жексенбі", "Дүйсенбі", "Сейсенбі", "Сәрсенбі", "Бейсенбі", "Жұма", "Сенбі"],

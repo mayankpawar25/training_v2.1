@@ -1,7 +1,5 @@
-/**
- * Serbian latin translation for bootstrap-datepicker
- * Bojan Milosavlević <milboj@gmail.com>
- */
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 (function($) {
     $.fn.datepicker.dates["sr-latin"] = {
         days: ["Nedelja","Ponedeljak", "Utorak", "Sreda", "Četvrtak", "Petak", "Subota"],

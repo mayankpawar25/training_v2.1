@@ -2,7 +2,8 @@
 // Licensed under the MIT License.
 import "../common/utils/JqueryGlobal";
 import "bootstrap/dist/js/bootstrap";
-import "ekko-lightbox";
+import "ekko-lightbox/dist/ekko-lightbox.js";
+import "ekko-lightbox/dist/ekko-lightbox.css";
 import { Localizer, ActionHelper } from "../common/ActionSdkHelper";
 import { Constants } from "../common/utils/Constants";
 import { UxUtils } from "../common/utils/UxUtils";
@@ -154,7 +155,7 @@ async function getResponderIds(actionId) {
 /**
  * @description Event when document is ready
  */
-$(document).ready(function() {
+$(function() {
     request = ActionHelper.getContextRequest();
     getStringKeys();
     loadResponseView(request);
@@ -875,6 +876,7 @@ function createTrainingSection(indexNum) {
 }
 
 // *********************************************** SUBMIT ACTION END***********************************************
+
 // *********************************************** OTHER ACTION STARTS***********************************************
 
 $(document).on("click", ".done-key", function() {
@@ -1347,6 +1349,14 @@ $(document).on("click", ".submit-form", function() {
         });
 });
 
+/**
+ * @event Click to Show image lightbox
+ */
+$(document).on("click", '[data-toggle="lightbox"]', function(event) {
+    event.preventDefault();
+    $(this).ekkoLightbox();
+});
+
 // *********************************************** OTHER ACTION END***********************************************
 /**
  * @description Variable contains head section
@@ -1404,11 +1414,3 @@ Localizer.getString("completeTraining").then(function(result) {
  * Variable contains Loader
  */
 let loader = UxUtils.getLoaderArea();
-
-/**
- * @event Click to Show image lightbox
- */
-$(document).on("click", '[data-toggle="lightbox"]', function(event) {
-    event.preventDefault();
-    $(this).ekkoLightbox();
-});

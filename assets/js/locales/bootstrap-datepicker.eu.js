@@ -1,7 +1,5 @@
-/**
- * Basque translation for bootstrap-datepicker
- * Arkaitz Etxeberria <kondi80@gmail.com>
- */
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 (function($) {
     $.fn.datepicker.dates["eu"] = {
         days: ["Igandea", "Astelehena", "Asteartea", "Asteazkena", "Osteguna", "Ostirala", "Larunbata"],
@@ -29,4 +27,4 @@
         format: "yyyy/mm/dd"
     };
 }(jQuery));
-
+

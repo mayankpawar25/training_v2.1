@@ -8,7 +8,8 @@ import "bootstrap-datetime-picker";
 import "../common/utils/BootstrapLocaleFile";
 import "bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css";
 import "bootstrap-datetime-picker/css/bootstrap-datetimepicker.min.css";
-import "ekko-lightbox";
+import "ekko-lightbox/dist/ekko-lightbox.js";
+import "ekko-lightbox/dist/ekko-lightbox.css";
 import { Localizer, ActionHelper } from "../common/ActionSdkHelper";
 import { UxUtils } from "../common/utils/UxUtils";
 import { Utils } from "../common/utils/Utils";
@@ -48,7 +49,7 @@ let trainingDescriptionOptionalKey = "";
 let addContentKey = "";
 let okKey = "";
 let closeKey = "";
-let saveAttachmentData = new Array(); // Add Training Banner Image
+let saveAttachmentData = [];
 let addTitlePlaceholderKey = "";
 let addDescriptionPlaceholderKey = "";
 let addTextDescriptionPlaceholderKey = "";
@@ -181,10 +182,10 @@ $(document).on("click", "#add-questions-same-section", function() {
     questionsSection = UxUtils.getQuestionArea(questionKey, questionTitleKey, checkMeKey, enterTheChioceKey, addMoreOptionsKey);
     UxUtils.setAppend("form.sec1", questionsSection);
     $("form > .question_button").remove();
-    $("div.question-container:visible").each(function(index, elem) {
+    $("div.question-container:visible").each(function(index, element) {
         questionCounter = index + 1;
-        UxUtils.setHtml($(elem).find("span.question-number"), UxUtils.getQuestionNumber(questionKey, questionCounter));
-        $(elem).attr({
+        UxUtils.setHtml($(element).find("span.question-number"), UxUtils.getQuestionNumber(questionKey, questionCounter));
+        $(element).attr({
             id: "question" + questionCounter
         });
     });
@@ -196,14 +197,7 @@ $(document).on("click", "#add-questions-same-section", function() {
 });
 
 /**
- * @event on back button on question area
- */
-$(document).on("click", "#back-question", function() {
-    confirmBox();
-});
-
-/**
- * @event to remove sections
+ * @event to remove image from question section
  */
 $(document).on("click", ".remove-image-section", function() {
     let dataId = $(this).parents(".question-container").attr("id");
@@ -460,35 +454,10 @@ $(document).on("click", ".show-setting", function() {
 /**
  * @Event to get on back button at content area
  */
-$(document).on("click", "#back-text, #back-photo, #back-video, #back-document", function() {
-    confirmBox();
-});
-
-/**
- * Add Show Confirm box for discard
- */
-function confirmBox() {
+$(document).on("click", "#back-text, #back-photo, #back-video, #back-document, #back-question", function() {
     let discardContent = UxUtils.getDiscardContentArea(confirmDeleteContentMsgKey, cancelKey, discardKey);
     UxUtils.setHtml("div.discardContent", discardContent);
-}
-
-/**
- * @Method to Go Back to previous step
- */
-function goBack() {
-    UxUtils.setHtml("div.discardContent", " ");
-    $(".section-2").show();
-    $(".section-2-footer").show();
-    $(".text-section").hide();
-    $(".text-footer").hide();
-    if (!$(".question-section").is(":visible")) {
-        $("form.sec1 div.section-2 div#root div.training-card-section:last").remove();
-    }
-    $(".question-section").hide();
-    $(".add_question_button").hide();
-    $(".question-footer").hide();
-    $(".question_button").hide();
-}
+});
 
 /**
  * @Event to Cancel Confirmation if don't want to discard content
@@ -501,7 +470,18 @@ $(document).on("click", ".cancel", function() {
  * If discard All changes and Go back to previous step
  */
 $(document).on("click", ".discard-success", function() {
-    goBack();
+    UxUtils.setHtml("div.discardContent", " ");
+    $(".section-2").show();
+    $(".section-2-footer").show();
+    $(".text-section").hide();
+    $(".text-footer").hide();
+    if (!$(".question-section").is(":visible")) {
+        $("form.sec1 div.section-2 div#root div.training-card-section:last").remove();
+    }
+    $(".question-section").hide();
+    $(".add_question_button").hide();
+    $(".question-footer").hide();
+    $(".question_button").hide();
 });
 
 /**
@@ -875,7 +855,7 @@ $(document).on("click", "#document-done", function() {
                 UxUtils.setHtml("div.doc-box", Constants.getDocumentIcon());
                 fileTypeIcon = Constants.getDocumentIcon();
                 UxUtils.setBefore($("#section-" + textNumber).find("#image-sec-" + textNumber).parents("div.row").find("p.document-description-preview"), UxUtils.createParagraphBox(`${fileTypeIcon} ${UxUtils.createSpanBox(`${$(`input[type="file"]#upload-document`)[0].files[0].name} (${Math.round(docfilesize)} Kb)`, "semi-bold teams-link a-link font-14", "")}`,"mb0 doc-name" ,""));
-            }
+    }
 });
 
 /**
@@ -1581,7 +1561,6 @@ async function getStringKeys() {
 function submitForm() {
     $("form.sec1").find("div.text-danger.error-msg.at-least-one-content-key").remove();
     getStringKeys();
-    console.log(getStringKeys());
     ActionHelper
         .executeApi(request)
         .then(function(response) {
@@ -1832,9 +1811,6 @@ function createAction(actionPackageId) {
             attachments: ($("#training-attachment-id").val()) ? [JSON.parse($("#training-attachment-id").val())] : []
         }],
     };
-
-    console.log("Action : ", JSON.stringify(action));
-
     let request = ActionHelper.createAction(action);
     ActionHelper
         .executeApi(request)
@@ -1851,7 +1827,7 @@ function createAction(actionPackageId) {
 /**
  * @event when document load is ready
  */
-$(document).ready(function() {
+$(function() {
     request = ActionHelper.getContextRequest();
     getStringKeys();
     loadCreationView(request);
@@ -1864,9 +1840,7 @@ $(document).ready(function() {
  * Method to get theme color and localization
  */
 async function loadCreationView(request) {
-
     getStringKeys();
-
     let response = await ActionHelper.executeApi(request);
     let context = response.context;
     let langObj = Utils.getLocaleForCalendar(context.locale);
@@ -1898,13 +1872,6 @@ async function loadCreationView(request) {
 
         /* If Edit back the quiz */
         if (lastSession != null) {
-            // let ddtt = ((lastSession.action.customProperties[1].value).split("T"));
-            // let dt = ddtt[0].split("-");
-            // weekDateFormat = new Date(dt[1]).toLocaleString("default", {
-            //     month: "short"
-            // }) + " " + dt[2] + ", " + dt[0];
-            // let ttTime = (ddtt[1].split("Z")[0]).split(":");
-            // currentTime = `${ttTime[0]}:${ ttTime[1]}`;
 
             let expiryTime = lastSession.action.expiryTime;
             setDate = new Date(expiryTime);
@@ -1973,17 +1940,6 @@ async function loadCreationView(request) {
 
         });
         $(".form_time input").val(currentTime);
-        // let dateInput = $(`input[name="expiry_date"]`);
-        // let container = $(".bootstrap-iso form").length > 0 ? $(".bootstrap-iso form").parent() : "body";
-        // let options = {
-        //     format: "dd-mm-yyyy",
-        //     container: container,
-        //     todayHighlight: true,
-        //     autoclose: true,
-        //     orientation: "top",
-        //     language: lang
-        // };
-
         if (lastSession != null) {
             $(".sec1").show();
             $(".section-1").hide();
@@ -2298,8 +2254,7 @@ $(document).on("click", "#next1", function() {
         .each(function() {
             let element = $(this);
             if (element.val() == "") {
-                $(this)
-                    .parents("div.card-box")
+                element.parents("div.card-box")
                     .removeClass("card-box")
                     .addClass("card-box-alert");
 
@@ -2441,185 +2396,39 @@ $(document).on("click", ".upvj", function(event) {
     }
 });
 
-/***********************************  Other Actions Ends ***************************/
-
-/***********************************  Settings ***************************/
-/**
- * @event when change on setting inputs
- */
-$(document).on("change", `input[name="expiry_date"], input[name="expiry_time"], .visible-to, #show-correct-answer`, function() {
-    $(".invalid-date-err").remove();
-    let getExpiryDate = $(`input[name="expiry_date"]`).datepicker("getDate");
-    let getExpiryDateData = getExpiryDate.toString().split(" ");
-    getExpiryDateData[4] = $("input[name='expiry_time']").val() + ":00";
-    let end = new Date(getExpiryDateData.join(" "));
-    $(".text-danger").parent("div.col-12").remove();
-    $("#back").removeClass("disabled");
-
-    let start = new Date();
-    let days = Utils.calcDateDiff(start, end, weekKey, hoursKey, hourKey, minutesKey, minuteKey, daysKey);
-
-    // let end = new Date($(`input[name="expiry_date"]`).val() + " " + $(`input[name="expiry_time"]`).val());
-    // let start = new Date();
-    // let days = calc_date_diff(start, end);
-
-    $(this).parents("div.row").find(".error-msg").remove();
-    if (days == undefined) {
-        let $errSec = $(UxUtils.createParagraphBox("", "text-danger error-msg"));
-        Localizer.getString("alert_invalid_date_time").then(function(result) {
-            UxUtils.setAppend($errSec , result);
-        });
-        UxUtils.setPrepend("small.invalid-date-error" , $errSec);
-        $("#back-setting").parents("a.cursur-pointer").addClass("disabled");
-        $("#back").addClass("disabled");
-        $("#back").find("span[tabindex=0]").addClass("disabled");
-    } else {
-        $("#back").removeClass("disabled");
-        $("#back").find("span[tabindex=0]").removeClass("disabled");
-        $("#back-setting").parents("a.cursur-pointer").removeClass("disabled");
-        let correctAnswer = $("#show-correct-answer:eq(0)").is(":checked") == true ? correctAnswerKey : "";
-        Localizer.getString("dueIn", days, correctAnswer).then(function(result) {
-            settingText = result;
-            $("span#due").text(settingText);
-        });
-    }
-});
-
-/********************************  Settings Ends ***********************/
-
-/***********************************  Methods ***************************/
-/**
- * Method to get date difference between two date
- * @param start datetime start date
- * @param end datetime end date
- */
-function calc_date_diff(start, end) {
-    let days = (end - start) / (1000 * 60 * 60 * 24);
-    let hourText = "";
-    let minuteText = "";
-
-    if (days > 6) {
-        let weeks = Math.ceil(days) / 7;
-        return Math.floor(weeks) + " week";
-    } else {
-        if (days < 1) {
-            let t1 = start.getTime();
-            let t2 = end.getTime();
-
-            let minsDiff = Math.floor((t2 - t1) / 1000 / 60);
-            let hourDiff = Math.floor(minsDiff / 60);
-            minsDiff = minsDiff % 60;
-
-            if (hourDiff > 1) {
-                hourText = "hours";
-            } else {
-                hourText = "hour";
-            }
-            if (hourDiff > 1) {
-                minuteText = "minutes";
-            } else {
-                minuteText = "minute";
-            }
-            if (hourDiff > 0 && minsDiff > 0) {
-                return hourDiff + " " + hourText + ", " + minsDiff + " " + minuteText;
-            } else if (hourDiff > 0 && minsDiff <= 0) {
-                return hourDiff + " " + hourText;
-            } else if (hourDiff <= 0 && minsDiff > 0) {
-                return minsDiff + " " + minuteText;
-            }
-        } else {
-            return Math.ceil(days) + " days";
-        }
-    }
-}
-
-/**
- * Method to get base64 data of file
- * @param input object html file type input element
- * @param elem object html elem where preview need to show
- */
-function readURL(input, elem) {
-    let fileTypes = ["jpg", "jpeg", "png", "gif", "webp", "jfif"];
-    let isSuccess = false;
-    $(elem).removeClass("heightfit");
-    $(elem).removeClass("widthfit");
-    $(elem).removeClass("smallfit");
-    if (input.files && input.files[0]) {
-        let reader = new FileReader();
-        let extension = input.files[0].name.split(".").pop().toLowerCase();
-        isSuccess = fileTypes.indexOf(extension) > -1;
-        if (isSuccess) {
-            reader.onload = function(e) {
-                let image = new Image();
-                image.src = e.target.result;
-
-                image.onload = function() {
-                    let imgWidth = this.width;
-                    let imgHeight = this.height;
-                    let divWidth = $(elem).width();
-                    let divHeight = $(elem).height();
-                    $(elem).attr("src", this.src);
-                    let classSelector = "";
-                    if (imgHeight > divHeight) {
-                        /* height is greater than width */
-                        classSelector = "heightfit";
-                    } else if (imgWidth > divWidth) {
-                        /* width is greater than height */
-                        classSelector = "widthfit";
-                    } else {
-                        /* small image */
-                        classSelector = "smallfit";
-                    }
-                    $(elem).addClass(classSelector);
-                    let tid = setInterval(() => {
-                        if ($(elem).hasClass(classSelector)) {
-                            $(".loader-cover").hide();
-                            clearInterval(tid);
-                        }
-                    }, Constants.setIntervalTimeHundred());
-                };
-            };
-        } else {
-            return false;
-        }
-        reader.readAsDataURL(input.files[0]); // convert to base64 string
-    }
-    return true;
-}
-
-/***********************************  Methods Ends ***************************/
-/***********************************  HTML Section ***************************/
-
 /**
  * @event Onclick Enter or Space Key click on back or submit button
  */
-$(document).on("keydown", "div[tabindex=0] , span[tabindex=0] , a[tabindex=0]", function(e) {
-    let key = e.which;
-    if (key === 13 || key === 32) {
-        e.preventDefault();
-        if ($(this).attr("role") == "checkbox") {
-            $(this).find("input[type=checkbox]").click();
-        }
-        if ($(this).attr("role") == "button") {
-            if ($(this).data("id") == "back" && $(this).hasClass("disabled")) {
-                return false;
+$(document).on({
+    keydown: function(e) {
+        let key = e.which;
+        // Replace this with constant Proper Naming Convension
+        if (key === Constants.getEnterKeyEvent() || key === Constants.getSpaceKeyEvent()) {
+            e.preventDefault();
+            if ($(this).attr("role") == "checkbox") {
+                $(this).find("input[type=checkbox]").click();
             }
-            $("#" + $(this).data("id")).click();
-        }
-        if ($(this).attr("role") == "input") {
-            $(".quiz-clear").click();
-        }
-        if ($(this).attr("role") == "image" || $(this).attr("role") == "doc") {
-            if ($(this).parents("div.section-1").length > 0) {
-                $(".section-2").find("div.training-card-section:first").find(`input[type="file"]`).click();
-            } else {
-                $(".section-2").find("div.training-card-section:last").find(`input[type="file"]`).click();
+            if ($(this).attr("role") == "button") {
+                if ($(this).data("id") == "back" && $(this).hasClass("disabled")) {
+                    return false;
+                }
+                $("#" + $(this).data("id")).click();
             }
-        }
-        return false;
-    }
+            if ($(this).attr("role") == "input") {
+                $(".quiz-clear").click();
+            }
 
-});
+            if ($(this).attr("role") == "image" || $(this).attr("role") == "doc") {
+                if ($(this).parents("div.section-1").length > 0) {
+                    $(".section-2").find("div.training-card-section:first").find(`input[type="file"]`).click();
+                } else {
+                    $(".section-2").find("div.training-card-section:last").find(`input[type="file"]`).click();
+                }
+            }
+            return false;
+        }
+    }
+}, "div[tabindex=0] , span[tabindex=0] , a[tabindex=0]");
 
 /**
  * @event Keydown and Click when question cover image changes
@@ -2777,7 +2586,7 @@ $(document).on("change", `input[name="option_image"]`, function() {
 /**
  * @event Keydown event for correct answer inputs
  */
-KeyboardUtils.keydownClick(document, ".check-me-title");
+KeyboardUtils.keydownClick(document, ".check-me-title , .clear-key");
 
 /**
  * @event Click event for correct answer inputs
@@ -2901,11 +2710,151 @@ $(document).on({
     }
 }, ".add-options");
 
-/*  HTML Sections  */
+/***********************************  Other Actions Ends ****************/
+
+/***********************************  Settings **************************/
+
 /**
- * Variable contains form section
+ * @event when change on setting inputs
  */
-// let formSection = UxUtils.getLandingContainer(uploadCoverImageKey, trainingTitleKey, trainingDescriptionOptionalKey, coverImageKey, clearKey, settingText, nextKey);
+$(document).on("change", `input[name="expiry_date"], input[name="expiry_time"], .visible-to, #show-correct-answer`, function() {
+    $(".invalid-date-err").remove();
+    let getExpiryDate = $(`input[name="expiry_date"]`).datepicker("getDate");
+    let getExpiryDateData = getExpiryDate.toString().split(" ");
+    getExpiryDateData[4] = $("input[name='expiry_time']").val() + ":00";
+    let end = new Date(getExpiryDateData.join(" "));
+    $(".text-danger").parent("div.col-12").remove();
+    $("#back").removeClass("disabled");
+
+    let start = new Date();
+    let days = Utils.calcDateDiff(start, end, weekKey, hoursKey, hourKey, minutesKey, minuteKey, daysKey);
+    $(this).parents("div.row").find(".error-msg").remove();
+    if (days == undefined) {
+        let $errSec = $(UxUtils.createParagraphBox("", "text-danger error-msg"));
+        Localizer.getString("alert_invalid_date_time").then(function(result) {
+            UxUtils.setAppend($errSec , result);
+        });
+        UxUtils.setPrepend("small.invalid-date-error" , $errSec);
+        $("#back-setting").parents("a.cursur-pointer").addClass("disabled");
+        $("#back").addClass("disabled");
+        $("#back").find("span[tabindex=0]").addClass("disabled");
+    } else {
+        $("#back").removeClass("disabled");
+        $("#back").find("span[tabindex=0]").removeClass("disabled");
+        $("#back-setting").parents("a.cursur-pointer").removeClass("disabled");
+        let correctAnswer = $("#show-correct-answer:eq(0)").is(":checked") == true ? correctAnswerKey : "";
+        Localizer.getString("dueIn", days, correctAnswer).then(function(result) {
+            settingText = result;
+            $("span#due").text(settingText);
+        });
+    }
+});
+
+/********************************  Settings Ends ***********************/
+
+/***********************************  Methods ***************************/
+/**
+ * Method to get date difference between two date
+ * @param start datetime start date
+ * @param end datetime end date
+ */
+function calc_date_diff(start, end) {
+    let days = (end - start) / (1000 * 60 * 60 * 24);
+    let hourText = "";
+    let minuteText = "";
+
+    if (days > 6) {
+        let weeks = Math.ceil(days) / 7;
+        return Math.floor(weeks) + " week";
+    } else {
+        if (days < 1) {
+            let t1 = start.getTime();
+            let t2 = end.getTime();
+
+            let minsDiff = Math.floor((t2 - t1) / 1000 / 60);
+            let hourDiff = Math.floor(minsDiff / 60);
+            minsDiff = minsDiff % 60;
+
+            if (hourDiff > 1) {
+                hourText = "hours";
+            } else {
+                hourText = "hour";
+            }
+            if (hourDiff > 1) {
+                minuteText = "minutes";
+            } else {
+                minuteText = "minute";
+            }
+            if (hourDiff > 0 && minsDiff > 0) {
+                return hourDiff + " " + hourText + ", " + minsDiff + " " + minuteText;
+            } else if (hourDiff > 0 && minsDiff <= 0) {
+                return hourDiff + " " + hourText;
+            } else if (hourDiff <= 0 && minsDiff > 0) {
+                return minsDiff + " " + minuteText;
+            }
+        } else {
+            return Math.ceil(days) + " days";
+        }
+    }
+}
+
+/**
+ * Method to get base64 data of file
+ * @param input object html file type input element
+ * @param elem object html elem where preview need to show
+ */
+function readURL(input, elem) {
+    let fileTypes = ["jpg", "jpeg", "png", "gif", "webp", "jfif"];
+    let isSuccess = false;
+    $(elem).removeClass("heightfit");
+    $(elem).removeClass("widthfit");
+    $(elem).removeClass("smallfit");
+    if (input.files && input.files[0]) {
+        let reader = new FileReader();
+        let extension = input.files[0].name.split(".").pop().toLowerCase();
+        isSuccess = fileTypes.indexOf(extension) > -1;
+        if (isSuccess) {
+            reader.onload = function(e) {
+                let image = new Image();
+                image.src = e.target.result;
+
+                image.onload = function() {
+                    let imgWidth = this.width;
+                    let imgHeight = this.height;
+                    let divWidth = $(elem).width();
+                    let divHeight = $(elem).height();
+                    $(elem).attr("src", this.src);
+                    let classSelector = "";
+                    if (imgHeight > divHeight) {
+                        /* height is greater than width */
+                        classSelector = "heightfit";
+                    } else if (imgWidth > divWidth) {
+                        /* width is greater than height */
+                        classSelector = "widthfit";
+                    } else {
+                        /* small image */
+                        classSelector = "smallfit";
+                    }
+                    $(elem).addClass(classSelector);
+                    let tid = setInterval(() => {
+                        if ($(elem).hasClass(classSelector)) {
+                            $(".loader-cover").hide();
+                            clearInterval(tid);
+                        }
+                    }, Constants.setIntervalTimeHundred());
+                };
+            };
+        } else {
+            return false;
+        }
+        reader.readAsDataURL(input.files[0]); // convert to base64 string
+    }
+    return true;
+}
+
+/***********************************  Methods Ends ***************************/
+
+/*  HTML Sections  */
 
 /**
  * Variable contains training section
@@ -2951,6 +2900,7 @@ let addPhotoSection = UxUtils.getImageContentArea(addTitlePlaceholderKey, addDes
  * Variable contains photo footer section
  */
 let addPhotoFooter = UxUtils.getImageContentFooter();
+
 /**
  * Variable contains video section
  */
@@ -2960,6 +2910,7 @@ let addVideoSection = UxUtils.getVideoContentArea(addTitlePlaceholderKey, addDes
  * Variable contains video footer section
  */
 let addVideoFooter = UxUtils.getVideoContentFooter();
+
 /**
  * Variable contains document section
  */
@@ -2969,17 +2920,14 @@ let addDocumentSection = UxUtils.getDocumentContentArea(addTitlePlaceholderKey, 
  * Variable contains document footer section
  */
 let addDocumentFooter = UxUtils.getDocumentContentFooter();
+
 /**
  * Variable contains setting section
  */
 let settingSection = UxUtils.getSettingContentArea(dueByKey, resultVisibleToKey, everyoneKey, onlyMeKey, showCorrectAnswerKey, answerCannotChangeKey, allowMultipleAttemptKey, assigneeTakeMultipleTraining);
-/**
- * Variable contains toggle section
- */
 
 /**
  * Variable contains Loader
  */
 let loader = UxUtils.getLoaderContentArea();
-/***********************************  HTML Section Ends***************************/
 /***********************************  HTML Section Ends***************************/

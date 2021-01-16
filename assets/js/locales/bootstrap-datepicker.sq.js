@@ -1,7 +1,5 @@
-/**
- * Albanian translation for bootstrap-datepicker
- * Tomor Pupovci <https://www.github.com/ttomor>
- */
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 (function($) {
     $.fn.datepicker.dates["sq"] = {
         days: ["E Diel", "E Hënë", "E Martē", "E Mërkurë", "E Enjte", "E Premte", "E Shtunë"],

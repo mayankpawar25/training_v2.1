@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 (function($) {
     $.fn.datepicker.dates["gl"] = {
         days: ["Domingo", "Luns", "Martes", "Mércores", "Xoves", "Venres", "Sábado"],

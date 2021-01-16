@@ -1,7 +1,5 @@
-/**
- * Korean translation for bootstrap-datepicker
- * This is a port from https://github.com/moment/moment/blob/develop/src/locale/ko.js
- */
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 (function($) {
     $.fn.datepicker.dates["ko"] = {
         days: ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"],

@@ -1,7 +1,5 @@
-/**
- * Welsh translation for bootstrap-datepicker
- * S. Morris <s.morris@bangor.ac.uk>
- */
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 (function($) {
     $.fn.datepicker.dates["cy"] = {
         days: ["Sul", "Llun", "Mawrth", "Mercher", "Iau", "Gwener", "Sadwrn"],

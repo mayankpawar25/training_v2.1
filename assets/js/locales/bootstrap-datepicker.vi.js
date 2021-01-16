@@ -1,7 +1,5 @@
-/**
- * Vietnamese translation for bootstrap-datepicker
- * An Vo <https://github.com/anvoz/>
- */
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 (function($) {
     $.fn.datepicker.dates["vi"] = {
         days: ["Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy"],

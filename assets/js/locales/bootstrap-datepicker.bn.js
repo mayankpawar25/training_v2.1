@@ -1,8 +1,5 @@
-/**
- * Bengali (Bangla) translation for bootstrap-datepicker
- * Karim Khan <kkhancse91@gmail.com>
- * Orif N. Jr. <orif.zade@gmail.com>
- */
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 (function($) {
   $.fn.datepicker.dates["bn"] = {
         days: ["রবিবার","সোমবার","মঙ্গলবার","বুধবার","বৃহস্পতিবার","শুক্রবার","শনিবার"],

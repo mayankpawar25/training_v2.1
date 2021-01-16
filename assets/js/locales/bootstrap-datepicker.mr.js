@@ -1,7 +1,5 @@
-/**
- * Marathi translation for bootstrap-datepicker
- * Sushant Pimple <pimplesushant@gmail.com>
- */
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
  (function($) {
     $.fn.datepicker.dates["mar"] = {
         days: ["रविवार", "सोमवार", "मंगळवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"],

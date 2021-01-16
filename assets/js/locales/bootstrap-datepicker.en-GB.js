@@ -1,7 +1,5 @@
-/**
- * British English translation for bootstrap-datepicker
- * Xavier Dutreilh <xavier@dutreilh.com>
- */
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 (function($) {
     $.fn.datepicker.dates["en-GB"] = {
         days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],

@@ -1,8 +1,5 @@
-/**
- * Estonian translation for bootstrap-datepicker
- * Ando Roots <https://github.com/anroots>
- * Fixes by Illimar Tambek <<https://github.com/ragulka>
- */
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 (function($) {
     $.fn.datepicker.dates["et"] = {
         days: ["Pühapäev", "Esmaspäev", "Teisipäev", "Kolmapäev", "Neljapäev", "Reede", "Laupäev"],
