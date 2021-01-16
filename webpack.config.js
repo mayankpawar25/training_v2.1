@@ -8,32 +8,51 @@ module.exports = env => {
         entry: {
             CreateView: "./src/creationView/CreateView.js",
             ResponseView: "./src/responseView/ResponseView.js",
-            DetailView: "./src/resultView/DetailView.js",
+            DetailView: "./src/resultView/DetailView.js"
         },
         output: {
             filename: "[name].js",
             path: path.resolve(__dirname, 'output/js')
         },
         resolve: {
-            extensions: ['.tsx', '.ts', '.js', ".css"]
+            extensions: ['.js', ".css"]
         },
         module: {
             rules: [{
-                    test: /\.tsx?$/,
-                    use: 'ts-loader',
-                    exclude: /node_modules/,
-                },
-                {
-                    test: /\.html?$/,
-                    use: [{
-                        loader: 'file-loader',
+                test: /\.html?$/,
+                use: [{
+                    loader: 'file-loader',
+                    options: {
+                        name: '[name].[ext]'
+                    }
+                }]
+            },
+            {
+                test: /\.css$/,
+                use: ['style-loader',
+                    {
+                        loader: 'css-loader',
                         options: {
-                            name: '[name].[ext]'
+                            url: true,
                         }
                     }]
-                }
-
-            ],
+            },
+            {
+                test: /\.(png|jpe?g|gif|svg)?$/,
+                use: [{
+                    loader: 'file-loader',
+                    options: {
+                        name: '[name].[ext]',
+                        outputPath: "../images",
+                        esModule: false
+                    }
+                }]
+            }
+            ]
+        },
+        performance: {
+            maxEntrypointSize: 512000,
+            maxAssetSize: 512000
         }
     };
 
@@ -46,7 +65,7 @@ module.exports = env => {
         // Exclude other entries from this html
         var excludeChunks = entries.filter(x => x != entry);
         config.plugins.push(new HtmlWebpackPlugin({
-            templateContent: '<div class="body-outer"></div>',
+            templateContent: '<div></div>',
             filename: `${entry}.html`,
             excludeChunks: excludeChunks
         }));
