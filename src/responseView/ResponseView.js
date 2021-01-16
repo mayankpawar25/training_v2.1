@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import {
-    Localizer,
-    ActionHelper
-} from "../common/ActionSdkHelper";
+import "../common/utils/JqueryGlobal";
+import "bootstrap/dist/js/bootstrap";
+import "ekko-lightbox";
+import { Localizer, ActionHelper } from "../common/ActionSdkHelper";
 import { Constants } from "../common/utils/Constants";
 import { UxUtils } from "../common/utils/UxUtils";
 import { Utils } from "../common/utils/Utils";
+import "../../assets/css/style-custom";
+import "../../assets/css/style-default";
 
 let $root = "";
 let row = {};
@@ -218,6 +220,7 @@ function createBody() {
                     Localizer.getString("multipleAttemptNo").then(function(result) {
                         UxUtils.setAppend("#allow-multiple-attempt", UxUtils.getMultipleAttemptSection(result));
                         $("#start:button").prop("disabled", true);
+                        $("#start:button").removeAttr("id");
                     });
                 }
                 if (allowMultipleAttempt == "Yes") {
@@ -586,6 +589,12 @@ function loadSummaryView() {
                     let userAnswerArray = row[i + 1];
 
                     if ($(val).find(".option-sec input[type='radio']").length > 0) {
+
+                        $(cardQuestion).find(".option-sec").each(function(i, optionSec) {
+                            $(optionSec).find(".custom-radio-outer").addClass("disabled");
+                            // $(optionSec).find("input[type=radio]").attr("disabled", true);
+                        });
+
                         if (Utils.isJson(correctAnswer)) {
                             correctAnswer = JSON.parse(correctAnswer);
                         }
@@ -599,6 +608,10 @@ function loadSummaryView() {
                             }
                         });
                     } else {
+                        $(cardQuestion).find(".option-sec").each(function(i, optionSec) {
+                            $(optionSec).find(".custom-check-outer").addClass("disabled");
+                            $(optionSec).find("input[type=checkbox]").attr("disabled", true);
+                        });
                         if (Utils.isJson(correctAnswer)) {
                             correctAnswer = JSON.parse(correctAnswer);
                         }

@@ -1,11 +1,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+
+import "../common/utils/JqueryGlobal";
+import "bootstrap/dist/js/bootstrap";
+import "bootstrap-datepicker";
+import "bootstrap-datetime-picker";
+import "../common/utils/BootstrapLocaleFile";
+import "bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css";
+import "bootstrap-datetime-picker/css/bootstrap-datetimepicker.min.css";
+import "ekko-lightbox";
 import { Localizer, ActionHelper } from "../common/ActionSdkHelper";
 import { UxUtils } from "../common/utils/UxUtils";
 import { Utils } from "../common/utils/Utils";
 import { Constants } from "../common/utils/Constants";
 import { KeyboardUtils } from "../common/utils/KeyboardUtils";
-import "../../assets/js/bootstrap-localefile";
+import "../../assets/css/style-custom";
+import "../../assets/css/style-default";
 
 let questions = new Array();
 let settingText = "";
@@ -59,6 +69,8 @@ let confirmDeleteMsgKey = "";
 let confirmDeleteContentMsgKey = "";
 let cancelKey = "";
 let discardKey = "";
+let questionLeftBlankKey = "";
+let invalidFileSizeMsgKey = "";
 
 let weekKey = "";
 let hourKey = "";
@@ -328,13 +340,9 @@ $(document).on("click", "#question-done", function() {
                             $(this).parents("div.card-box").removeClass("card-box").addClass("card-box-alert");
                         }
                         $(element).addClass("danger");
-                        Localizer.getString("questionLeftBlank").then(function(result) {
-                            $(".question-blank-key").text(result);
-                            UxUtils.setAfter($(element).parents("div.form-group-question").find(".question-number").parent("div"), UxUtils.createLabelWithFontBox(result, "label-alert d-block mb--4", "question-blank-key", ""));
-
-                            errorText += UxUtils.createParagraphBox(result, "", "");
-
-                        });
+                        $(".question-blank-key").text(questionLeftBlankKey);
+                        UxUtils.setAfter($(element).parents("div.form-group-question").find(".question-number").parent("div"), UxUtils.createLabelWithFontBox(questionLeftBlankKey, "label-alert d-block mb--4", "question-blank-key", ""));
+                        errorText += UxUtils.createParagraphBox(questionLeftBlankKey, "", "");
                         $(element).addClass("danger");
                     }
                 } else if (element.attr("id").startsWith("option")) {
@@ -1053,18 +1061,18 @@ $(document).on("change", "#upload-video", function() {
         return false;
     }
     let fileInput = $(this)[0];
-    $(".video-box").parents().find(".text-danger.font-12.pull-right").remove();
+    $(".video-box").parents(".text-section").find(".text-danger").remove();
     let videoSize = Constants.getVideoUploadingSize();
     let videoFormate = ["video/webm", "video/mp4", "video/avi", "video/ogv", "video/ogg"];
     if (fileInput.files.length > 0) {
         let inputVideoSize = fileInput.files[0].size;
         let sizeOf1MB = 1048576;
         if ((inputVideoSize / sizeOf1MB) > videoSize) {
-            UxUtils.setBefore($(".video-box").parent(".relative") , UxUtils.getMaxImageAlert(Constants.getInvalidFileSizeMsg()));
+            UxUtils.setBefore($(".video-box").parent(".relative") , UxUtils.getMaxImageAlert(invalidFileSizeMsgKey));
             return false;
         }
         if ($.inArray(fileInput.files[0].type, videoFormate) == -1) {
-            UxUtils.setBefore($(".video-box").parent(".relative") , UxUtils.getMaxImageAlert(Constants.getInvalidFileMsg()));
+            UxUtils.setBefore($(".video-box").parent(".relative") , UxUtils.getMaxImageAlert(invalidFileFormatKey));
             return false;
         }
         $("button#video-done").addClass("disabled");
@@ -1117,7 +1125,7 @@ $(document).on("change", "#upload-document", function() {
     let filename = input.files[0].name;
     let extension = input.files[0].name.split(".").pop().toLowerCase();
     isSuccess = fileTypes.indexOf(extension) > -1;
-    if(isSuccess){
+    if(isSuccess) {
         let fileData = input.files[0];
         let fileTypeIcon = "";
         fileTypeIcon = Constants.getDocumentIcon();
@@ -1137,7 +1145,7 @@ $(document).on("change", "#upload-document", function() {
             });
         $(".doc-box").addClass("d-none");
         UxUtils.setAppend(".doc-name" , `${fileTypeIcon}&nbsp; <a class="a-link">${$(this)[0].files[0].name} (${Math.round(filesize)} Kb)</a>`);
-    }else{
+    } else {
         $(".doc-box").removeClass("d-none");
         $("a.change-doc-link").hide();
         $("#document-done").removeClass("disabled");
@@ -1485,6 +1493,10 @@ async function getStringKeys() {
         invalidFileFormatKey = result;
     });
 
+    Localizer.getString("invalidFileSize").then(function(result) {
+        invalidFileSizeMsgKey = result;
+    });
+
     Localizer.getString("atleastOneQuestion").then(function(result) {
         atleastOneErrorKey = result;
     });
@@ -1556,6 +1568,11 @@ async function getStringKeys() {
     Localizer.getString("days").then(function(result) {
         daysKey = result;
     });
+
+    Localizer.getString("questionLeftBlank").then(function(result) {
+        questionLeftBlankKey = result;
+    });
+
 }
 
 /**
@@ -1797,7 +1814,6 @@ function createAction(actionPackageId) {
         valueType: ActionHelper.actionPropertyValueType(),
         value: context.locale,
     });
-    
     let action = {
         id: Utils.generateGUID(),
         actionPackageId: actionPackageId,
@@ -2234,6 +2250,11 @@ async function loadCreationView(request) {
         };
         dateInput.datepicker(options);
         dateInput.datepicker("setDate", setDate);
+        dateInput.datepicker().on("show", function () {
+            let $calendarSelector = $(".datepicker.datepicker-dropdown.dropdown-menu");
+            $calendarSelector.find(".prev").empty();
+            $calendarSelector.find(".next").empty();
+        });
         ActionHelper.hideLoader();
     });
 }
@@ -2960,4 +2981,5 @@ let settingSection = UxUtils.getSettingContentArea(dueByKey, resultVisibleToKey,
  * Variable contains Loader
  */
 let loader = UxUtils.getLoaderContentArea();
+/***********************************  HTML Section Ends***************************/
 /***********************************  HTML Section Ends***************************/

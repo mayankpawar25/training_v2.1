@@ -1,12 +1,20 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-
+import "../common/utils/JqueryGlobal";
+import "bootstrap/dist/js/bootstrap";
+import "bootstrap-datepicker";
+import "bootstrap-datetime-picker";
+import "../common/utils/BootstrapLocaleFile";
+import "bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css";
+import "bootstrap-datetime-picker/css/bootstrap-datetimepicker.min.css";
 import { Localizer, ActionHelper } from "../common/ActionSdkHelper";
 import * as html2canvas from "html2canvas";
 import { KeyboardUtils } from "../common/utils/KeyboardUtils";
 import { UxUtils } from "../common/utils/UxUtils";
 import { Utils } from "../common/utils/Utils";
 import { Constants } from "../common/utils/Constants";
+import "../../assets/css/style-custom";
+import "../../assets/css/style-default";
 
 let actionContext = null;
 let actionInstance = null;
@@ -53,7 +61,7 @@ let subscriberResponse = "";
 loadDetailView(request);
 
 /* Document get ready */
-$(document).ready(function() {
+$(function () {
     OnPageLoad();
 });
 
@@ -481,7 +489,6 @@ function scoreCalculate(userId) {
                 total++;
             }
         });
-        // total = Object.keys(dataTable.dataColumns).length;
 
         /* Correct Answer */
         let correctResponse = JSON.parse(
@@ -492,7 +499,7 @@ function scoreCalculate(userId) {
                 for (let c = 0; c < correctResponse.length; c++) {
                     let correctAnsString = "";
                     let userAnsString = "";
-                    if ($.isArray(correctResponse[c])) {
+                    if (Array.isArray(correctResponse[c])) {
                         if (correctResponse[c].length > 1) {
                             correctAnsString = correctResponse[c].join(",");
                         } else {
@@ -850,7 +857,7 @@ function createCreatorQuestionView(userId) {
                             for (let c = 0; c < correctResponse.length; c++) {
                                 let correctAnsString = "";
                                 let userAnsString = "";
-                                if ($.isArray(correctResponse[c])) {
+                                if (Array.isArray(correctResponse[c])) {
                                     if (correctResponse[c].length > 1) {
                                         correctAnsString = correctResponse[c].join(",");
                                     } else {

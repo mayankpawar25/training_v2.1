@@ -2769,7 +2769,7 @@ button.close {
 
 .footer #back svg {
     fill: var(--app-gray-02);
-    margin-top: -2px;
+    margin-top: -3px;
 }
 
 .content-menu .dropdown-menu a {
@@ -2861,27 +2861,27 @@ button.close {
 
 #back-text svg {
     fill: var(--app-gray-02);
-    margin-top: -2px;
+    margin-top: -3px;
 }
 
 #back-photo svg {
     fill: var(--app-gray-02);
-    margin-top: -2px;
+    margin-top: -3px;
 }
 
 #back-video svg {
     fill: var(--app-gray-02);
-    margin-top: -2px;
+    margin-top: -3px;
 }
 
 #back-question {
     fill: var(--app-gray-02);
-    margin-top: -2px;
+    margin-top: -3px;
 }
 
 #hide2 {
     fill: var(--app-gray-02);
-    margin-top: -2px;
+    margin-top: -3px;
 }
 
 .ekko-lightbox-nav-overlay a {
@@ -2945,6 +2945,31 @@ button.close {
 
 button.close svg {
     fill: var(--app-gray-02);
+}
+
+.max-min-220 a {
+    outline: none;
+}
+
+.min-max-132 a {
+    outline: none;
+}
+
+.carousel-item a {
+    outline: none;
+}
+
+#hide2 .cursor-pointer.back1 svg {
+    margin-top: -3px;
+}
+
+#hide2 .cursor-pointer.back svg {
+    margin-top: -3px;
+}
+
+.ekko-lightbox .modal-dialog {
+    min-width: 150px;
+    min-height: 150px;
 }
 
 @media screen and (max-width: 576px) {

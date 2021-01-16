@@ -517,20 +517,6 @@ export class Constants {
     }
 
     /**
-     * @Method to get Invalid File Msg
-     */
-    static getInvalidFileMsg(textMsg) {
-        return `Invalid file formate`;
-    }
-
-    /**
-     * @Method to get Invalid File Msg
-     */
-    static getInvalidFileSizeMsg() {
-        return `Video size limit exceed`;
-    }
-
-    /**
      * @Method to get load More counter Value
      */
     static webkitLineClampCssCount() {

@@ -126,7 +126,7 @@ export class UxUtils {
                                     </a>
                                 </div>
                             </div>
-                            <div class="col-3 text-right"> 
+                            <div class="col-3 text-right">
                                 <button type="button" class="btn btn-primary btn-sm pull-right submit-key" id="submit" tabindex="0" role="button" data-id="submit"> ${submitKey}</button>
                             </div>
                         </div>
@@ -1097,7 +1097,7 @@ export class UxUtils {
     }
 
     /**
-     * 
+     *
      */
     static getCarousalLiSection(uniqueCarouselId, count) {
         return `<li data-target="#carouselExampleIndicators${uniqueCarouselId}" data-slide-to="${count}" class="${count == 0 ? "active": ""}"></li>`;
@@ -2494,7 +2494,7 @@ export class UxUtils {
      * @param selector string contains html identifier selector
      */
     static clearHtml(selector) {
-        return $(selector).html("");
+        return $(selector).empty();
     }
 
     /**
@@ -2661,7 +2661,6 @@ export class UxUtils {
         return `<div class="alert alert-danger"><p class="mb0"> ${text} <i class="fa fa-pull-right fa-close"></i></p></div>`;
     }
 
-
     /**
      * Method to get remove Image loader from image section
      * @param selector object html on which remove image
@@ -2726,7 +2725,7 @@ export class UxUtils {
                         </div>
                     </div>
                 </div>
-            </div>`
+            </div>`;
     }
 
     /**
