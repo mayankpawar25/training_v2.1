@@ -10,7 +10,8 @@
         "deploy-debug": "npm run build && npm run zip && upload-action-package -z ./output/ActionPackage.zip -t ./output/ -l debug --ld ./output/ --lp training",
         "update-teams-app": "npm run build && npm run zip && upload-action-package -z ./output/ActionPackage.zip --ld ./output/ --lp training",
         "inner-loop": "create-inner-loop -p <packageId> -d ./output",
-        "lint": "tslint -c tslint.json -p tsconfig.json --fix"
+        "lint": "tslint -c tslint.json -p tsconfig.json --fix",
+        "eslint": "eslint **/*.js -c .eslintrc.js --fix"
     },
     "dependencies": {
         "@microsoft/m365-action-sdk": "https://int.static.actions.office365.com/sdk/v1.0.8/microsoft-m365-action-sdk.tgz",
