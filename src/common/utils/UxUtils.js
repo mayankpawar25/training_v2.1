@@ -1861,12 +1861,12 @@ export class UxUtils {
     /**
      * @Method for response text view Training Section
      */
-    static getSummarySectionFooter(completeTrainingKey) {
+    static getSummarySectionFooter(closeKey) {
         return `<div class="footer section-3-footer">
                     <div class="footer-padd bt">
                         <div class="container ">
                             <div class="row">
-                            <div class="col-12 text-right"> <button type="button" class="btn btn-primary btn-sm pull-right submit-form" id="submit"> ${completeTrainingKey}</button></div>
+                            <div class="col-12 text-right"> <button type="button" class="btn btn-primary btn-sm pull-right submit-form" id="submit"> ${closeKey}</button></div>
                             </div>
                         </div>
                     </div>

@@ -35,7 +35,7 @@ let pagination = 0;
 let trainingSummary = "";
 let trainingExpired = "";
 let doneKey = "";
-let completeTrainingKey = "";
+let closeKey = "";
 let previousKey = "";
 let footerSection1 = "";
 let footerSection2 = "";
@@ -94,10 +94,6 @@ async function getStringKeys() {
 
     Localizer.getString("done").then(function(result) {
         doneKey = result;
-    });
-
-    Localizer.getString("completeTraining").then(function(result) {
-        completeTrainingKey = result;
     });
 
     Localizer.getString("previous").then(function(result) {
@@ -1405,9 +1401,9 @@ Localizer.getString("next").then(function(result) {
 /**
  * @description Variable contains footer section
  */
-Localizer.getString("completeTraining").then(function(result) {
-    completeTrainingKey = result;
-    footerSection3 = UxUtils.getSummarySectionFooter(completeTrainingKey);
+Localizer.getString("close").then(function(result) {
+    closeKey = result;
+    footerSection3 = UxUtils.getSummarySectionFooter(closeKey);
 });
 
 /**
