@@ -107,7 +107,7 @@ export class ActionHelper {
      */
     static requestAttachmentUpload(attachment) {
         return new actionSDK.UploadAttachment.Request(attachment, function(status) {
-            console.log("Status: " + status);
+            console.log("Status: " + JSON.stringify(status));
         });
     }
 
@@ -117,7 +117,7 @@ export class ActionHelper {
      */
     static requestAttachmentUploadDraft(attachment) {
         return new actionSDK.UploadAttachmentDraft.Request(attachment, null, function(status) {
-            console.log("Status: " + status);
+            console.log("Status: " + JSON.stringify(status));
         });
     }
 

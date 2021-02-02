@@ -573,8 +573,9 @@ form {
     color: var(--app-white);
     border-color: transparent;
     box-shadow: var(--app-black-shadow-3) 0px 0.2rem 0.4rem -0.075rem;
-    outline: -webkit-focus-ring-color auto 5px !important;
+    outline: -webkit-focus-ring-color auto 5px;
     outline: revert;
+    box-shadow: 0 0 0 2pt var(--app-black) !important;
 }
 
 .btn-primary-outline {
@@ -595,8 +596,9 @@ form {
     background-color: var(--app-gray-09) tansparent !important;
     border-color: var(--app-gray-06) !important;
     box-shadow: 0 0 0 1px var(--app-black-shadow) !important;
-    outline: -webkit-focus-ring-color auto 5px !important;
+    outline: -webkit-focus-ring-color auto 5px;
     outline: revert;
+    box-shadow: 0 0 0 2pt var(--app-black) !important;
 }
 
 .bg-primary {
@@ -2274,11 +2276,16 @@ body {
     background: no-repeat 50% / 100% 100%;
 }
 
-.carousel-control-prev,
+
+/* .carousel-control-prev,
 .carousel-control-next {
     position: absolute;
     top: 56px;
     height: 32px;
+} */
+
+.updated-img.card {
+    justify-content: center;
 }
 
 span.file-counter {
@@ -2580,7 +2587,7 @@ label h4 {
 }
 
 .btn-plain:focus {
-    outline: -webkit-focus-ring-color auto 5px !important;
+    outline: -webkit-focus-ring-color auto 5px;
     outline: revert;
     box-shadow: none;
 }
@@ -2869,15 +2876,15 @@ button.close {
 @keyframes img-upload {
     0% {
         opacity: 0;
-    }
-    45% {
-        opacity: 0;
+        transition: ease-in;
     }
     55% {
         opacity: .5;
+        transition: ease-in;
     }
     100% {
         opacity: 1;
+        transition: ease-in;
     }
 }
 
@@ -2962,6 +2969,7 @@ button.close {
     height: 32px;
     font-size: 20px;
     margin: 0px 8px;
+    opacity: 0.2;
 }
 
 .ekko-lightbox-nav-overlay a:first-child span {
@@ -2972,6 +2980,14 @@ button.close {
     text-align: center !important;
     right: 0px;
     padding: 1px 0px 0px 0px;
+}
+
+.ekko-lightbox-nav-overlay a:last-child span:hover {
+    opacity: 1;
+}
+
+.ekko-lightbox-nav-overlay a:first-child span:hover {
+    opacity: 1;
 }
 
 .modal-body {
@@ -3047,14 +3063,22 @@ button.close svg {
 
 .max-min-220 a {
     outline: none;
+    box-shadow: none !important;
 }
 
 .min-max-132 a {
     outline: none;
+    box-shadow: none !important;
 }
 
 .carousel-item a {
     outline: none;
+    box-shadow: none !important;
+}
+
+.ekko-lightbox-nav-overlay a:focus {
+    outline: none;
+    box-shadow: none !important;
 }
 
 #hide2 .cursor-pointer.back1 svg {
@@ -3072,6 +3096,71 @@ button.close svg {
 .ekko-lightbox .modal-dialog {
     min-width: 150px;
     min-height: 150px;
+}
+
+.landing-form {
+    min-height: 480px;
+}
+
+.carousel-item img {
+    max-height: 148px;
+}
+
+.carousel-indicators {
+    display: none;
+}
+
+.question-sec-card-box.card {
+    justify-content: center;
+}
+
+
+/* [tabindex=""]:-moz-focusring {
+    -moz-outline: 2px solid;
+    -moz-outline-radius: 4px;
+    outline: 2px solid var(--app-black-hover);
+}
+
+[role="button"]:-moz-focusring {
+    -moz-outline: 2px solid;
+    -moz-outline-radius: 4px;
+    outline: 2px solid var(--app-black-hover);
+}
+
+[role="button"]:focus {
+    -moz-outline: 2px solid #000;
+    -moz-outline-radius: 4px;
+    outline: 2px solid var(--app-black-hover);
+} */
+
+[role="checkbox"]:focus {
+    /* -moz-outline: 2px solid #000;
+    -moz-outline-radius: 4px;
+    outline: 2px solid var(--app-black-hover); */
+    box-shadow: 0 0 0 2px var(--app-black) !important;
+    outline: none !important;
+    border-radius: 3px;
+}
+
+.carousel a[role="button"]:focus {
+    -moz-outline: 2px solid #000;
+    -moz-outline-radius: 4px;
+    outline: none;
+}
+
+:focus {
+    box-shadow: 0 0 0 2px var(--app-black) !important;
+    outline: none;
+    border-radius: 3px;
+}
+
+button:focus {
+    /* -moz-outline: 2px solid #000;
+    -moz-outline-radius: 4px;
+    outline: 2px solid var(--app-black-hover); */
+    box-shadow: 0 0 0 2px var(--app-black) !important;
+    outline: none !important;
+    border-radius: 3px;
 }
 
 @media screen and (max-width: 576px) {
@@ -3127,6 +3216,9 @@ button.close svg {
     .body-outer {
         bottom: 0px;
         padding-bottom: 80px;
+    }
+    .landing-form {
+        min-height: 520px;
     }
 }
 
@@ -3189,6 +3281,9 @@ button.close svg {
     }
     .p14 {
         padding: 0.875rem;
+    }
+    .landing-form {
+        min-height: 480px;
     }
 }
 

@@ -158,6 +158,41 @@ $(function() {
 });
 
 /**
+ * @event Onclick Enter or Space Key click on back or submit button
+ */
+$(document).on({
+    keydown: function(e) {
+        let key = e.which;
+        // Replace this with constant Proper Naming Convension
+        if (key === Constants.getEnterKeyEvent() || key === Constants.getSpaceKeyEvent()) {
+            e.preventDefault();
+            if ($(this).attr("role") == "checkbox") {
+                $(this).find("input").click();
+                // $(this).find("input[type=checkbox]").click();
+            }
+            if ($(this).attr("role") == "button") {
+                if ($(this).data("id") == "back" && $(this).hasClass("disabled")) {
+                    return false;
+                }
+                $("#" + $(this).data("id")).click();
+            }
+            if ($(this).attr("role") == "input") {
+                $(".quiz-clear").click();
+            }
+
+            if ($(this).attr("role") == "image" || $(this).attr("role") == "doc") {
+                if ($(this).parents("div.section-1").length > 0) {
+                    $(".section-2").find("div.training-card-section:first").find(`input[type="file"]`).click();
+                } else {
+                    $(".section-2").find("div.training-card-section:last").find(`input[type="file"]`).click();
+                }
+            }
+            return false;
+        }
+    }
+}, "div[tabindex=0] , span[tabindex=0] , a[tabindex=0]");
+
+/**
  * @description Method to create body when page load
  */
 function OnPageLoad() {
@@ -247,6 +282,9 @@ function createBody() {
                             $(".quiz-updated-img").show();
                             UxUtils.removeImageLoader(".quiz-updated-img");
                             successDownLoadImageCounter++;
+                            setTimeout(function() {
+                                $("div.section-1").find("#response-cover-img").removeClass("d-none");
+                            }, 1000);
                         }
                         ActionHelper.hideLoader();
 
@@ -585,18 +623,18 @@ function loadSummaryView() {
                     let userAnswerString = "";
                     let userAnswerArray = row[i + 1];
 
-                    if ($(val).find(".option-sec input[type='radio']").length > 0) {
+                    if ($(val).find(`.option-sec input[type="radio"]`).length > 0) {
 
                         $(cardQuestion).find(".option-sec").each(function(i, optionSec) {
                             $(optionSec).find(".custom-radio-outer").addClass("disabled");
-                            // $(optionSec).find("input[type=radio]").attr("disabled", true);
+                            $(optionSec).find("div[tabindex=0]").attr("tabindex", "-1");
                         });
 
                         if (Utils.isJson(correctAnswer)) {
                             correctAnswer = JSON.parse(correctAnswer);
                         }
                         correctAnswerString = correctAnswer[i];
-                        $(val).find(".option-sec input[type='radio']").each(function(optindex, opt) {
+                        $(val).find(`.option-sec input[type="radio"]`).each(function(optindex, opt) {
                             let optId = $(opt).attr("id");
                             if (correctAnswer[i].includes(optId)) {
                                 $(cardQuestion).find("input[type='radio']#" + optId).parent("label.custom-radio").find(".check-in-div").append(`&nbsp;<i class="success-with-img">
@@ -607,7 +645,7 @@ function loadSummaryView() {
                     } else {
                         $(cardQuestion).find(".option-sec").each(function(i, optionSec) {
                             $(optionSec).find(".custom-check-outer").addClass("disabled");
-                            $(optionSec).find("input[type=checkbox]").attr("disabled", true);
+                            $(optionSec).attr("tabindex", "-1");
                         });
                         if (Utils.isJson(correctAnswer)) {
                             correctAnswer = JSON.parse(correctAnswer);
@@ -733,6 +771,7 @@ function createTrainingSection(indexNum) {
                         $("div.section-2 > .container:first > div.card-box:last").find(".text-content-section").text(textDescription);
                         $("div.section-2 > .container:first > div.card-box:last").attr("id", "page-" + counter);
                         if (data.name.indexOf("photo") >= 0) {
+                            $("div.section-2 .container:first div.card-box:visible").find(".question-sec-card-box").removeClass("d-none");
                             UxUtils.setAppend($("div.section-2 > .container:first > div.card-box:last").find("#text-description"), loader);
                             Localizer.getString("photo").then(function(result) {
                                 $("div.section-2 > .container:first > div.card-box:last").find("span.section-type-title").text(result);
@@ -751,13 +790,13 @@ function createTrainingSection(indexNum) {
                                 attachments.forEach(function(att) {
                                     let $imgDiv = $(UxUtils.getCarousalImages(att.url, count, uniqueCarouselId));
                                     UxUtils.setAppend($carouselInner, $imgDiv);
-                                    UxUtils.setAppend($carousel, UxUtils.getCarouselSection());
+                                    // UxUtils.setAppend($carousel, UxUtils.getCarouselSection());
                                     count++;
                                     photoUploadCounter++;
                                 });
-                                UxUtils.setAfter($("div.section-2 .container:first div.card-box:visible").find("#text-description"), $carousel);
-                                $(".carousel").carousel();
+                                UxUtils.setAppend($("div.section-2 .container:first div.card-box:visible").find(".question-sec-card-box"), $carousel);
                                 UxUtils.setAppend($carousel, UxUtils.getCarousalPagination(uniqueCarouselId));
+                                $(".carousel").carousel();
                             } else {
                                 let uniqueIdCarousel = Constants.getUniqueId();
                                 photoUploadCounter++;
@@ -1018,8 +1057,10 @@ $(document).on("click", "#check", function() {
                 $(ele).parent("label").attr("disabled", true);
                 if ($(ele).parents("div.custom-radio-outer").length > 0) {
                     $(ele).parents("div.custom-radio-outer").addClass("disabled");
+                    $(ele).parents("div.option-sec").find("div[tabindex=0]").attr("tabindex", "-1");
                 } else {
-                    $(ele).parents("div.custom-check-outer").addClass("disabled");
+                    $(ele).find("input[type=checkbox]").attr("disabled", true);
+                    $(ele).parents("div.option-sec").find("div[tabindex=0]").attr("tabindex", "-1");
                 }
             });
         }

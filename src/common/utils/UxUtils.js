@@ -75,7 +75,7 @@ export class UxUtils {
             <div class="container">
                 <div id="root" class="">
                     <div class="training-card-section">
-                        <div class="quiz-updated-img max-min-220 bdr-none bg-none cover-img cursor-pointer mb--16" style="display:none;">
+                        <div class="quiz-updated-img max-min-220 bdr-none bg-none cover-img mb--16" style="display:none;">
                             <img src="" id="training-title-image" style="" class="quiz-updated-img card-bg card-border" style="display:none;">
                         </div>
                         <div class="row">
@@ -149,7 +149,7 @@ export class UxUtils {
                     <div class="form-group-question">
                         <div>
                             <span class="question-number font-12 bold input-group-text mb--8 input-tpt pl-0 strong cursor-pointer">${UxUtils.getQuestionNumber(questionKey, 1)}</span>
-                            <span class="input-group-text remove-question remove-option-q input-tpt cursor-pointer" aria-hidden="true" >
+                            <span class="input-group-text remove-question remove-option-q input-tpt cursor-pointer" aria-hidden="true" tabindex="0" role="button">
                                 ${Constants.getTrashIcon()}
                             </span>
                         </div>
@@ -406,12 +406,12 @@ export class UxUtils {
                             <input type="url" class="form-control in-t semi-bold" name="image_text_title" id="image-training-text" value="" placeholder="${addTitlePlaceholderKey}">
                         </div>
                         <div class="form-group mb--16">
-                            <span class="float-right"><a class="upvj cursor-pointer change-link theme-color mb--4 d-block font-12 semi-bold" style="display:none!important">Edit</a></span>
+                            <span class="float-right"><a class="upvj cursor-pointer change-link theme-color mb--4 d-block font-12 semi-bold" tabindex="0" role="image" style="display:none!important">Edit</a></span>
                             <div class="clearfix"></div>
-                            <div class="relative" tabindex="0" role="image">
+                            <div class="relative">
                                 <div class="clearfix"></div>
                                 ${Constants.getLoaderCover("show-image-loader")}
-                                <div class="photo-box card cursor-pointer card-bg card-border max-min-220 upvj" >
+                                <div class="photo-box card cursor-pointer card-bg card-border max-min-220 upvj" tabindex="0" role="image">
                                     <span class="tap-upload-photo-label">${uploadImageLabelKey}</span>
                                 </div>
                                 <!-- show this div after img added -->
@@ -466,7 +466,7 @@ export class UxUtils {
                             <input type="url" class="form-control in-t semi-bold" name="video_text_title" id="video-training-text" value="" placeholder="${addTitlePlaceholderKey}">
                         </div>
                         <div class="form-group mb--16">
-                            <span class="float-right mb--4"><a class="upvj cursor-pointer change-link theme-color edit-key font-12 semi-bold" style="display:none">Edit</a></span>
+                            <span class="float-right"><a class="upvj cursor-pointer change-link theme-color edit-key font-12 semi-bold mb--4" style="display:none">Edit</a></span>
                             <div class="clearfix"></div>
                             <div class="relative">
                                 ${Constants.getLoaderCover("video-loader")}
@@ -528,7 +528,7 @@ export class UxUtils {
                             <input type="url" class="form-control in-t semi-bold" name="text_doc_title" id="doc-training-text" value="" placeholder="${addTitlePlaceholder}">
                         </div>
                         <div class="form-group mb--16">
-                            <span class="float-right mb--4"><a class="upvj cursor-pointer change-doc-link theme-color font-12 semi-bold" style="display:none">Edit</a></span>
+                            <span class="float-right mb--4"><a class="upvj cursor-pointer change-doc-link theme-color font-12 semi-bold" tabindex="0" role="doc" style="display:none">Edit</a></span>
                             <div class="clearfix"></div>
                             <div class="relative">
                                 ${Constants.getLoaderCover("show-document-loader")}
@@ -537,8 +537,7 @@ export class UxUtils {
                                     <span class="tap-upload-files-label">${uploadFileLabel}</span>
                                 </div>
                                 <!-- show this div afte img added -->
-                                <div class="doc-name">
-                                </div>
+                                <div class="doc-name"></div>
                             </div>
                         </div>
                         <div class="form-group mb0">
@@ -635,7 +634,7 @@ export class UxUtils {
                     <div class="col-12 mt--24">
                         <div class="input-group form-check custom-check-outer" tabindex="0" role="checkbox">
                             <label class="custom-check form-check-label">
-                                <input type="checkbox" name="show_correctAnswer" id="show-correct-answer" value="Yes" tabindex="1" />
+                                <input type="checkbox" name="show_correctAnswer" id="show-correct-answer" value="Yes" tabindex="-1"/>
                                 <span class="checkmark"></span>
                                 <span class="show-correct-key setting-label">${showCorrectAnswerKey}</span><br>
                             </label><br>
@@ -646,7 +645,7 @@ export class UxUtils {
                     <div class="col-12 mt--24">
                         <div class="input-group  form-check custom-check-outer" tabindex="0" role="checkbox">
                             <label class="custom-check form-check-label">
-                                <input type="checkbox" name="allow_multiple_attempt" id="allow-multiple-attempt" value="Yes" checked="" tabindex="1" >
+                                <input type="checkbox" name="allow_multiple_attempt" id="allow-multiple-attempt" value="Yes" checked="" tabindex="-1">
                                 <span class="checkmark"></span>
                                 <span class="allow-multiple-attempt setting-label">${allowMultipleAttemptKey}Allow Multiple attempts</span><br>
                             </label>
@@ -1090,8 +1089,8 @@ export class UxUtils {
      */
     static getCarousalImages(resultLocale, count, galeryId) {
         return `<div class="carousel-item ${count == 0 ? "active" : ""}">
-                <a href="${resultLocale}" data-toggle="lightbox" data-gallery="gallery${galeryId}" data-type="image">
-                    <img class="w-100" src="${resultLocale}" alt="${count + 1} slide">
+                <a href="${resultLocale}" data-toggle="lightbox" data-gallery="gallery${galeryId}" data-type="image" class="parent d-flex justify-content-center">
+                    <img src="${resultLocale}" alt="${count + 1} slide">
                 </a>
             </div>`;
     }
@@ -1109,13 +1108,13 @@ export class UxUtils {
      */
     static getCarousalPagination(uniqueId) {
         return `<a class="carousel-control-prev" href="#carouselExampleIndicators${uniqueId}" role="button" data-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="sr-only">Previous</span>
-        </a>
-        <a class="carousel-control-next" href="#carouselExampleIndicators${uniqueId}" role="button" data-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="sr-only">Next</span>
-        </a>`;
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carouselExampleIndicators${uniqueId}" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>`;
     }
 
     /**
@@ -1777,7 +1776,8 @@ export class UxUtils {
      * @Method for response Header view
      */
     static getResponseHeader() {
-        return `<div class="container"><div class="quiz-updated-img max-min-220 card-bg bdr-none bg-none card-border cover-img cursor-pointer mb--16 updated-img relative" id="response-cover-img">
+        return `<div class="container"
+        ><div class="d-none quiz-updated-img max-min-220 card-bg bdr-none bg-none card-border cover-img  mb--16 updated-img relative" id="response-cover-img">
             ${Constants.getLoaderCover("d-table")}
             <img src="" id="quiz-title-image" style="" class="quiz-updated-img card-bg card-border heightfit d-none" >
             <input type="file" name="quiz_image" class="d-none" id="cover-image" accept="image/*" src="images/px-img.png">
@@ -1822,14 +1822,13 @@ export class UxUtils {
      * @Method for response text view Training Section
      */
     static getResponseTextTrainingSection() {
-        return `<div class="card-box card-blank question-sec-card-box">
-                        <label class="cover-image-label font-16 semi-bold mb--8 text-break" id="text-description">Text</label>
-                            <span class="quiz-clear  mb--8 cursor-pointer pull-right text-danger"></span>
-                            <p class="text-justify font-12 text-break mt--8 text-content-section"> General Knowledge is the general awareness of the surroundings, plants, animals, famous personalities and occurrences happening around the world. General knowledge helps to build a person’s confidence level and sharpens his thinking
-                            capacity too. GK covers a wide range of events from the past, present and what is likely to happen in the future. Young minds are more open to learning new things with enthusiasm. In this article, we bring some simple GK questions
-                            about India for Class 2 kids, which will arouse interest and curiosity among them to learn new things. We will cover everything that a class 2 kid ought to know about India and subjects of national importance.
-                        </p>
-                    </div>`;
+        return `<div class="card-box card-blank ">
+                    <label class="cover-image-label font-16 semi-bold mb--8 text-break" id="text-description">Text Title</label>
+                    <div class="updated-img question-sec-card-box card bg-none bdr-none card max-min-220 d-none">
+                        <span class="quiz-clear  mb--8 cursor-pointer pull-right text-danger"></span>
+                    </div>
+                    <p class="text-justify font-12 text-break mt--8 text-content-section">Text Description</p>
+                </div>`;
     }
 
     /**
@@ -1877,11 +1876,11 @@ export class UxUtils {
      * @Method for response text view Training Section
      */
     static getCarouselSection() {
-        return `<a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+        return `<a class="carousel-control-prev" href="#carouselExampleIndicators asdfasdf" role="button" data-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="sr-only">Previous</span>
                 </a>
-                <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                <a class="carousel-control-next" href="#carouselExampleIndicators asdfasdfasdf" role="button" data-slide="next">
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="sr-only">Next</span>
                 </a>`;
@@ -2055,7 +2054,8 @@ export class UxUtils {
         return `<div class="card-box card-bg card-border mb--8 ">
             <div class=" radio-section custom-check-outer " id="${id}" columnid="3 ">
                 <label class="custom-check d-block font-14">
-                    <span class="checkmark"></span><div class="pr--32 check-in-div font-12">${text}</div>
+                    <span class="checkmark"></span>
+                    <div class="pr--32 check-in-div font-12">${text}</div>
                 </label>
             </div>
         </div>`;
@@ -2169,17 +2169,17 @@ export class UxUtils {
      */
     static getOptionValue(optionsInputs, imagePreview, optionValue, questionOptionId, ifCorrectCheck, hideImage, optionCount) {
         return `<div class="option-div qna-option radio-outer card-box card-bg card-border mb--8">
-            <div class="radio-section custom-radio-outer" id="${questionOptionId}" columnid="${optionCount}">
-                <label class="custom-radio d-block font-14 selector-inp">
-                    <div class="option-image-section cover-img min-max-132 mb--4 ${hideImage}">
-                        ${imagePreview}
+                    <div class="radio-section custom-radio-outer" id="${questionOptionId}" columnid="${optionCount}">
+                        <label class="custom-radio d-block font-14 selector-inp">
+                            <div class="option-image-section cover-img min-max-132 mb--4 ${hideImage}">
+                                ${imagePreview}
+                            </div>
+                            <span class="radio-block"></span>
+                            <div class="pr--32 check-in-div">${optionValue} ${ifCorrectCheck}</div>
+                        </label>
                     </div>
-                    <span class="radio-block"></span>
-                    <div class="pr--32 check-in-div">${optionValue} ${ifCorrectCheck}</div>
-                </label>
-            </div>
-            ${optionsInputs}
-        </div>`;
+                    ${optionsInputs}
+                </div>`;
     }
 
     /**
@@ -2309,15 +2309,15 @@ export class UxUtils {
      */
     static getRadioButtonSection(text, name, id) {
         return `<div class="option-sec">
-        <div class="card-box card-bg card-border mb--8">
-            <div class="radio-section custom-radio-outer" id="${id}" columnId="${name}" >
-                <label class="custom-radio d-block font-12 cursor-pointer selector-inp">
-                    <input type="radio" name="${name}" id="${id}">
-                        <span class="radio-block"></span>  <div class="pr--32 check-in-div">${text}</div>
-                </label>
-            </div>
-        </div>
-    </div>`;
+                    <div class="card-box card-bg card-border mb--8" tabindex="0" role="checkbox">
+                        <div class="radio-section custom-radio-outer" id="${id}" columnId="${name}">
+                            <label class="custom-radio d-block font-12 cursor-pointer selector-inp">
+                                <input type="radio" name="${name}" id="${id}" tabindex="-1">
+                                <span class="radio-block"></span>  <div class="pr--32 check-in-div">${text}</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>`;
     }
 
     /**
@@ -2327,11 +2327,11 @@ export class UxUtils {
      * @param id string identifire
      */
     static getCheckboxButtonSection(text, name, id) {
-        return `<div class="option-sec">
+        return `<div class="option-sec" tabindex="0" role="checkbox">
         <div class="card-box card-bg card-border mb--8">
-            <div class="radio-section custom-check-outer selector-inp" id="${id}" columnId="${name}" >
+            <div class="radio-section custom-check-outer selector-inp" id="${id}" columnId="${name}">
                 <label class="custom-check form-check-label d-block font-12">
-                    <input type="checkbox" class="radio-block" name="${name}" id="${id}">
+                    <input type="checkbox" class="radio-block" name="${name}" id="${id}" tabindex="-1">
                         <span class="checkmark"></span> <div class="pr--32 check-in-div">${text}</div>
                 </label>
             </div>
@@ -2357,7 +2357,7 @@ export class UxUtils {
                             <strong class="question-number-title bold" id="question-number-title">
                                 <label class="font-12">
                                     <span class="training-type question-number">Question</span>&nbsp;#&nbsp;
-                                <span class="">${questionNumber}</span>
+                                    <span class="">${questionNumber}</span>
                                 </label>
                             </strong>
                         </label>
@@ -2365,7 +2365,6 @@ export class UxUtils {
                         <div class="clearfix"></div>
                     </div>
                     <div class="quiz-updated-img cover-img min-max-132 mb--8 bg-none bdr-none" style="display:none" id="question-image">
-                        <img src="" class="image-responsive question-template-image heightfit" style="">
                     </div>
                     <div class="semi-bold font-16 mb--16 question-title"><p class="">${questiondisplayName}</p></div>`;
     }
@@ -2383,7 +2382,7 @@ export class UxUtils {
      */
 
     static getResponseViewCarouselSection(uniqueCarouselId) {
-        return `<div id="carouselExampleIndicators${uniqueCarouselId}" class="carousel slide max-min-220" data-ride="carousel"></div>`;
+        return `<div id="carouselExampleIndicators${uniqueCarouselId}" class="carousel slide" data-ride="carousel"></div>`;
 
     }
 
@@ -2426,9 +2425,10 @@ export class UxUtils {
      */
     static getQuizOptionImage(imgSource, galleryId, count = "0", className = "", boxId = "") {
         return `<div class="option-image-section cover-img min-max-132 mb--4" id="quiz-ans-image">
-                    <a href="${imgSource}" data-toggle="lightbox" data-gallery="gallery${galleryId}" data-type="image">
-            <img class="${className}" src="${imgSource}" id="${boxId}" alt="${count + 1} slide">
-        </a></div>`;
+                    <a href="${imgSource}" data-toggle="lightbox" data-gallery="gallery${galleryId}" data-type="image" tabindex="-1">
+                        <img class="${className}" src="${imgSource}" id="${boxId}" alt="${count + 1} slide">
+                    </a>
+                </div>`;
 
     }
 
@@ -2759,7 +2759,7 @@ export class UxUtils {
      * @param count string  contains counter value
      */
     static createImageLightBox(imgSource, galleryId, count = "0", className = "", boxId = "") {
-        return `<a href="${imgSource}" data-toggle="lightbox" data-gallery="gallery${galleryId}" data-type="image">
+        return `<a href="${imgSource}" data-toggle="lightbox" data-gallery="gallery${galleryId}" data-type="image" tabindex="-1">
             <img class="${className}" src="${imgSource}" id="${boxId}" alt="${count + 1} slide">
         </a>`;
     }

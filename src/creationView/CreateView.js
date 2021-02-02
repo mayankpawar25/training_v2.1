@@ -850,11 +850,11 @@ $(document).on("click", "#document-done", function() {
                 }
                 $("#section-" + textNumber).find("textarea.textarea-document-attachment").val($("#document-attachment").val());
                 $("#section-" + textNumber).find("#image-sec-" + textNumber).attr("src", "images/doc.png");
-                let docfilesize = $(`input[type="file"]#upload-document`)[0].files[0].size / 1024;
+                let docfilesize = Utils.getFileSize($(`input[type="file"]#upload-document`)[0].files[0].size);
                 let fileTypeIcon = "";
                 UxUtils.setHtml("div.doc-box", Constants.getDocumentIcon());
                 fileTypeIcon = Constants.getDocumentIcon();
-                UxUtils.setBefore($("#section-" + textNumber).find("#image-sec-" + textNumber).parents("div.row").find("p.document-description-preview"), UxUtils.createParagraphBox(`${fileTypeIcon} ${UxUtils.createSpanBox(`${$(`input[type="file"]#upload-document`)[0].files[0].name} (${Math.round(docfilesize)} Kb)`, "semi-bold teams-link a-link font-14", "")}`,"mb0 doc-name" ,""));
+                UxUtils.setBefore($("#section-" + textNumber).find("#image-sec-" + textNumber).parents("div.row").find("p.document-description-preview"), UxUtils.createParagraphBox(`${fileTypeIcon} ${UxUtils.createSpanBox(`${$(`input[type="file"]#upload-document`)[0].files[0].name} (${docfilesize})`, "semi-bold teams-link a-link font-14", "")}`,"mb0 doc-name" ,""));
     }
 });
 
@@ -1101,7 +1101,7 @@ $(document).on("change", "#upload-document", function() {
 
     // Convert File size in Kb
     let input = $(this)[0];
-    let filesize = input.files[0].size / Constants.getKbConvertConst();
+    let filesize = Utils.getFileSize(input.files[0].size);
     let filename = input.files[0].name;
     let extension = input.files[0].name.split(".").pop().toLowerCase();
     isSuccess = fileTypes.indexOf(extension) > -1;
@@ -1115,7 +1115,7 @@ $(document).on("change", "#upload-document", function() {
         ActionHelper.executeApi(attachmentRequest)
             .then(function(response) {
                 let newResponse = {
-                    "name": filename + " (" + Math.round(filesize) + " Kb)",
+                    "name": filename + " (" + filesize + ")",
                     "type": "Document",
                     "id": response.attachmentId
                 };
@@ -1124,7 +1124,7 @@ $(document).on("change", "#upload-document", function() {
                 $("#document-done").find(Constants.getDisabledLoaderClass()).remove();
             });
         $(".doc-box").addClass("d-none");
-        UxUtils.setAppend(".doc-name" , `${fileTypeIcon}&nbsp; <a class="a-link">${$(this)[0].files[0].name} (${Math.round(filesize)} Kb)</a>`);
+        UxUtils.setAppend(".doc-name" , `${fileTypeIcon}&nbsp; <a class="a-link">${$(this)[0].files[0].name} (${filesize})</a>`);
     } else {
         $(".doc-box").removeClass("d-none");
         $("a.change-doc-link").hide();
@@ -2306,6 +2306,7 @@ $(document).on("click", "#next1", function() {
 $(document).on("change", "#cover-image", function() {
     $(".error-msg").remove();
     if ($(this).val()) {
+        $("div.cover-image-loader").show();
         let urlResponse = readURL(this, "#training-img-preview, #training-title-image", "next1");
         if (urlResponse == true) {
             // Create Light Box Slider
@@ -2317,6 +2318,7 @@ $(document).on("change", "#cover-image", function() {
                 UxUtils.setHtml($("#training-title-image").parents("div.quiz-updated-img") , UxUtils.createImageLightBox(event.target.result,(uniqueCarouselId+2),0,`training-updated-img quiz-updated-img card-bg card-border` , "training-title-image"));
                 Utils.getClassFromDimension(event.target.result, "#training-title-image");
                 Utils.getClassFromDimension(event.target.result,"#training-img-preview");
+                // $('div.cover-image-loader').hide();
                 $("#training-img-preview").parents("div.training-updated-img").show();
             };
             reader.readAsDataURL(input.files[0]);
