@@ -653,6 +653,9 @@ $(document).on("click", "#photo-done", function() {
                 $(this).find("span.counter").text(index);
             }
         });
+        if ($(".update-carasoul").hasClass('carousel-single-img')) {
+            $("#section-" + textNumber).find(".img-thumbnail-new").addClass('carousel-single-img');
+        }
         $("#section-" + textNumber).find("span.type").text(photoTitle);
         $("#section-" + textNumber).find(".textarea-photo-title").val(photoTitle);
         $("#section-" + textNumber).find(".textarea-photo-description").val(photoDesc);
@@ -868,6 +871,9 @@ $(document).on("change", "#upload-photo", function() {
         UxUtils.setAppend("#photo-done", Constants.getDisabledLoader());
         if ($(this)[0].files.length > 1) {
             if (imagesPreview(this, ".update-carasoul")) {
+                if($('.update-carasoul').hasClass('carousel-single-img')){
+                    $('.update-carasoul').removeClass('carousel-single-img');
+                }
                 $(".text-section .photo-box").hide();
                 $(".text-section .change-link").show();
                 $(".text-section .update-carasoul").show();
@@ -876,18 +882,19 @@ $(document).on("change", "#upload-photo", function() {
         } else {
             let uniqueCarouselId = Constants.getUniqueId();
             let className = "prev-single-image" + uniqueCarouselId;
-            $(".show-image-loader").show();
-            $(".text-section .photo-box").hide();
-            $(".text-section .change-link").show();
-            $(".text-section .label-alert").remove();
             let response = readURL(this, `.${className}`);
             if (response) {
+                $(".show-image-loader").show();
+                $(".text-section .photo-box").hide();
+                $(".text-section .change-link").show();
+                $(".text-section .label-alert").remove();
 
                 let input = this;
                 let reader = new FileReader();
                 reader.onload = function(event) {
-                    UxUtils.setHtml(".text-section .update-carasoul" , UxUtils.createImageLightBox(event.target.result,uniqueCarouselId));
+                    UxUtils.setHtml(".text-section .update-carasoul" , UxUtils.createImageLightBox(event.target.result,uniqueCarouselId , "",`smallfit`));
                 };
+                $('.update-carasoul').addClass('carousel-single-img');
                 reader.readAsDataURL(input.files[0]);
 
                 $(".text-section .update-carasoul").show();
@@ -913,9 +920,10 @@ $(document).on("change", "#upload-photo", function() {
                     });
 
             } else {
-                $(".show-image-loader").hide();
-                $(".text-section .photo-box").show();
-                $(".text-section .change-link").hide();
+
+                // $(".show-image-loader").hide();
+                // $(".text-section .photo-box").show();
+                // $(".text-section .change-link").hide();
                 $("#photo-done").removeClass("disabled");
                 $("#photo-done").find(Constants.getDisabledLoaderClass()).remove();
                 UxUtils.setBefore("div.text-section:visible div.relative" , UxUtils.getMaxImageAlert(invalidFileFormatKey));
@@ -993,7 +1001,7 @@ let imagesPreview = function(input, placeToInsertImagePreview) {
                             "id": response.attachmentId
                         };
                         newPhotos.push(attachmentData);
-                        $(input).parent().find("textarea.textarea-photo-attachments").val(JSON.stringify(newPhotos));
+                        $(input).parents('.text-section').find("textarea.textarea-photo-attachments").val(JSON.stringify(newPhotos));
                         $("div.text-section").find("textarea#photo-attachments").val(JSON.stringify(newPhotos));
                         photoUploadCounter++;
                     });
@@ -2306,9 +2314,9 @@ $(document).on("click", "#next1", function() {
 $(document).on("change", "#cover-image", function() {
     $(".error-msg").remove();
     if ($(this).val()) {
-        $("div.cover-image-loader").show();
         let urlResponse = readURL(this, "#training-img-preview, #training-title-image", "next1");
         if (urlResponse == true) {
+            $("div.cover-image-loader").show();
             // Create Light Box Slider
             let input = this;
             let reader = new FileReader();
@@ -2407,6 +2415,10 @@ $(document).on({
         // Replace this with constant Proper Naming Convension
         if (key === Constants.getEnterKeyEvent() || key === Constants.getSpaceKeyEvent()) {
             e.preventDefault();
+            if ($(this).attr("role") == "input") {
+                $(this).find('input').focus();
+            }
+            
             if ($(this).attr("role") == "checkbox") {
                 $(this).find("input[type=checkbox]").click();
             }
@@ -2453,7 +2465,9 @@ $(document).on({
 
 $(document).on("click", '[data-toggle="lightbox"]', function(event) {
     event.preventDefault();
-    $(this).ekkoLightbox();
+    $(this).ekkoLightbox({
+        alwaysShowClose: true
+    });
 });
 
 /**
@@ -2462,63 +2476,66 @@ $(document).on("click", '[data-toggle="lightbox"]', function(event) {
 $(document).on("change", `input[name="question_image"]`, function() {
     // $(".invalid-file-question").remove();
     $(this).parents("div.form-group-question").find("span.text-danger.error-msg").remove();
-    let urlReturn = readURL(this, $(this).parents("div.form-group-question").find(".question-preview-image"));
-    if (urlReturn == true) {
-        if (!$("#question-done").hasClass("disabled")) {
-            $("#question-done").addClass("disabled");
-            UxUtils.setAppend("#question-done" , Constants.getDisabledLoader());
-        }
-        buttonCounter++;
-        $("#question-done").attr({"data-count" : buttonCounter});
-        let input = this;
-        let reader = new FileReader();
-        reader.onload = function(event) {
-            let uniqueCarouselId = Constants.getUniqueId();
-            let questionId = "question" + uniqueCarouselId;
-            $(input).parents("div.question-container").attr({"data-id": questionId});
-            UxUtils.setHtml($(input).parents("div.form-group-question").find(".question-preview") , UxUtils.createImageLightBox(event.target.result,questionId,"0",`question-preview-image`,questionId));
-            Utils.getClassFromDimension(event.target.result,`#${questionId}`);
-        };
-        reader.readAsDataURL(input.files[0]);
-        $(this).parents("div.form-group-question").find(".question-preview").show();
-        $(".remove-option").hide();
+    if($(this).val()){
+        let urlReturn = readURL(this, $(this).parents("div.form-group-question").find(".question-preview-image"));
+        if (urlReturn == true) {
+            if (!$("#question-done").hasClass("disabled")) {
+                $("#question-done").addClass("disabled");
+                UxUtils.setAppend("#question-done" , Constants.getDisabledLoader());
+            }
+            buttonCounter++;
+            $("#question-done").attr({"data-count" : buttonCounter});
+            let input = this;
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                let uniqueCarouselId = Constants.getUniqueId();
+                let questionId = "question" + uniqueCarouselId;
+                $(input).parents("div.question-container").attr({"data-id": questionId});
+                UxUtils.setHtml($(input).parents("div.form-group-question").find(".question-preview") , UxUtils.createImageLightBox(event.target.result,questionId,"0",`question-preview-image`,questionId));
+                Utils.getClassFromDimension(event.target.result,`#${questionId}`);
+            };
+            reader.readAsDataURL(input.files[0]);
+            $(this).parents("div.form-group-question").find(".question-preview").show();
+            $(".remove-option").hide();
 
-        /* Perform image upload for question image */
-        let fileData = this;
-        if ($(fileData).val() != "") {
-            let coverImage = fileData.files[0];
-            let attachment = ActionHelper.attachmentUpload(coverImage, coverImage["type"]);
-            let attachmentRequest = ActionHelper.requestAttachmentUploadDraft(attachment);
-            let imgIndex = $(this).attr("id");
-            ActionHelper.executeApi(attachmentRequest)
-            .then(function(response) {
-                let attachmentData = {
-                    "name": "question-banner-" + imgIndex,
-                    type: "Image",
-                    id: response.attachmentId
-                };
-                let selector = $(this).parents(".question-container").attr("id");
-                if ($("#" + selector).find("#question-attachment-set").length > 0) {
-                    $("#" + selector).find("#question-attachment-set").val(JSON.stringify(attachmentData));
-                } else {
-                    UxUtils.setAfter(fileData , UxUtils.createTextArea("", "d-none", "question-attachment-set", JSON.stringify(attachmentData)));
-                }
-                buttonCounter--;
-                if(buttonCounter == 0) {
-                    $("#question-done").removeClass("disabled");
-                    $("#question-done").find(Constants.getDisabledLoaderClass()).remove();
-                }
-            })
-            .catch(function(error) {
-                console.log("GetContext - Error3: " + JSON.stringify(error));
-            });
+            /* Perform image upload for question image */
+            let fileData = this;
+            if ($(fileData).val() != "") {
+                let coverImage = fileData.files[0];
+                let attachment = ActionHelper.attachmentUpload(coverImage, coverImage["type"]);
+                let attachmentRequest = ActionHelper.requestAttachmentUploadDraft(attachment);
+                let imgIndex = $(this).attr("id");
+                ActionHelper.executeApi(attachmentRequest)
+                .then(function(response) {
+                    let attachmentData = {
+                        "name": "question-banner-" + imgIndex,
+                        type: "Image",
+                        id: response.attachmentId
+                    };
+                    let selector = $(this).parents(".question-container").attr("id");
+                    if ($("#" + selector).find("#question-attachment-set").length > 0) {
+                        $("#" + selector).find("#question-attachment-set").val(JSON.stringify(attachmentData));
+                    } else {
+                        // $("#question-attachment-set").
+                        UxUtils.setAfter(fileData , UxUtils.createTextArea("", "d-none", "question-attachment-set", JSON.stringify(attachmentData)));
+                    }
+                    buttonCounter--;
+                    if(buttonCounter == 0) {
+                        $("#question-done").removeClass("disabled");
+                        $("#question-done").find(Constants.getDisabledLoaderClass()).remove();
+                    }
+                })
+                .catch(function(error) {
+                    console.log("GetContext - Error3: " + JSON.stringify(error));
+                });
+            }
+        } else {
+            $(".question-preview-image").attr("src", "");
+            $(".question-preview").hide();
+            UxUtils.setBefore($(this).parents(".form-group-question").find(".question-preview") , UxUtils.getMaxImageAlert(invalidFileFormatKey));
+            $(this).parents("div.input-group-append").find("#question-attachment-id").remove();
+            $(this).parents("div.input-group-append").find("#question-attachment-set").remove();
         }
-    } else {
-        $(".question-preview-image").attr("src", "");
-        $(".question-preview").hide();
-        UxUtils.setBefore($(this).parents(".form-group-question").find(".question-preview") , UxUtils.getMaxImageAlert(invalidFileFormatKey));
-        $(this).parents("div.input-group-append").find("#question-attachment-id").remove();
-        $(this).parents("div.input-group-append").find("#question-attachment-set").remove();
     }
 });
 

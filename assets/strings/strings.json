@@ -317,7 +317,7 @@
     "_$manifest.msTeamsProps.name.full.comment": "{MaxLength=100}",
     "$manifest.msTeamsProps.name.short": "Training",
     "_$manifest.msTeamsProps.name.short.comment": "{MaxLength=30}",
-    "$manifest.msTeamsProps.description.full": "Training description",
+    "$manifest.msTeamsProps.description.full": "Create Training",
     "_$manifest.msTeamsProps.description.full.comment": "{MaxLength=4000}",
     "$manifest.msTeamsProps.description.short": "Collect data from your coworkers",
     "_$manifest.msTeamsProps.description.short.comment": "{MaxLength=80}"

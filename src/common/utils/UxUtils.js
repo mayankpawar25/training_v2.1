@@ -597,13 +597,13 @@ export class UxUtils {
                     </div>
                     <div class="clearfix"></div>
                     <div class="col-6 pr--4">
-                        <div class="input-group date form_date" data-date="1979-09-16T05:25:07Z" data-date-format="M dd, yyyy" data-link-field="dtp_input1">
-                            <input class="form-control in-t" size="16" name="expiry_date" type="text" value="" readonly>
+                        <div class="input-group date form_date" data-date="1979-09-16T05:25:07Z" data-date-format="M dd, yyyy" data-link-field="dtp_input1" tabindex="0" role="input">
+                            <input class="form-control in-t" size="16" name="expiry_date" type="text" value="" tabindex="-1" readonly>
                         </div>
                     </div>
                     <div class="col-6 pl--4">
-                        <div class="input-group date form_time" data-date="" data-date-format="hh:ii" data-link-field="dtp_input3" data-link-format="hh:ii">
-                            <input class="form-control in-t" name="expiry_time" size="16" type="text" value="" readonly>
+                        <div class="input-group date form_time" data-date="" data-date-format="hh:ii" data-link-field="dtp_input3" data-link-format="hh:ii" tabindex="0" role="input">
+                            <input class="form-control in-t" name="expiry_time" size="16" type="text" value="" tabindex="-1" readonly>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                             <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span></span>
                         </div>
@@ -1824,11 +1824,13 @@ export class UxUtils {
     static getResponseTextTrainingSection() {
         return `<div class="card-box card-blank ">
                     <label class="cover-image-label font-16 semi-bold mb--8 text-break" id="text-description">Text Title</label>
-                    <div class="updated-img question-sec-card-box card bg-none bdr-none card max-min-220 d-none">
-                        <span class="quiz-clear  mb--8 cursor-pointer pull-right text-danger"></span>
-                    </div>
+                    <div class="question-sec-card-box updated-img update-carasoul card card-bg card-border max-min-220 d-none"></div>
                     <p class="text-justify font-12 text-break mt--8 text-content-section">Text Description</p>
                 </div>`;
+    }
+
+    static getDiv() {
+        return `<div class="question-sec-card-box updated-img update-carasoul card card-bg card-border max-min-220"></div>`;
     }
 
     /**
@@ -2690,7 +2692,7 @@ export class UxUtils {
      * @param imageUrl string contains image url
      */
     static getSingleImageCarousel(imgSource, galleryId, count = "0", className = "", boxId = "") {
-        return `<div class="max-min-220 updated-img fixed-ar relative">
+        return `<div class="max-min-220 updated-img fixed-ar relative carousel-single-img">
             <a href="${imgSource}" data-toggle="lightbox" data-gallery="gallery${galleryId}" data-type="image">
                 <img class="${className}" src="${imgSource}" id="${boxId}" alt="${count + 1} slide">
             </a></div>`;
