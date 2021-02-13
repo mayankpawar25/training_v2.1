@@ -3,7 +3,7 @@
     "tag": "training-teams-app",
     "id": "<packageId>",
     "name": "Training",
-    "description": "Training",
+    "description": "Publish Trainings",
     "developer": {
         "name": "<name>",
         "websiteUrl": "<websiteUrl>",
@@ -36,8 +36,8 @@
             "full": "Training"
         },
         "description": {
-            "short": "Training description",
-            "full": "Training description"
+            "short": "Publish Training",
+            "full": "Publish trainings to your team and tack completion"
         },
         "icons": {
             "outline": "images/outline.png",
