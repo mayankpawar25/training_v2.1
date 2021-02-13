@@ -241,8 +241,9 @@ async function createBody() {
     /*  Head Section  */
     if (myUserId == dataResponse.context.userId && myUserId == actionInstance.creatorId) {
         isCreator = true;
-        headCreator();
-
+    }
+    head();
+    if(isCreator === true) {
         if (actionInstance.status == "Closed") {
             $(".close-quiz-event").remove();
             $(".change-due-by-event").remove();
@@ -250,8 +251,6 @@ async function createBody() {
         if (actionInstance.status == "Expired") {
             $(".change-due-by-event").remove();
         }
-    } else {
-        head();
     }
 
     /*  Person Responded X of Y Responses  */
@@ -362,57 +361,37 @@ function head() {
     let expiryTime = new Date(actionInstance.expiryTime);
     let dueby = expiryTime.toLocaleDateString(context.locale, options);
     let $card = $(UxUtils.divTemplate("", ""));
-    let $titleSec = $(UxUtils.getQuizTitleResponders(title));
-    let $descriptionSec = $(UxUtils.getQuizDescription(description));
-    let currentTimestamp = new Date().getTime();
-    let $dateSec = $(UxUtils.getResponderQuizDate(actionInstance.expiryTime, currentTimestamp, dueByKey, expiredOnKey, dueby));
-    UxUtils.setAppend($card, $titleSec);
-    UxUtils.setAppend($card, $descriptionSec);
-    UxUtils.setAppend($card, $dateSec);
-    UxUtils.setAppend("#root", $card);
-    if (actionInstance.dataTables[0].attachments.length > 0 && (actionInstance.dataTables[0].attachments[0].id != null || actionInstance.dataTables[0].attachments[0].id != "")) {
-        let req = ActionHelper.getAttachmentInfo(actionId, actionInstance.dataTables[0].attachments[0].id);
-        ActionHelper.executeApi(req).then(function(response) {
-                UxUtils.setPrepend("#root div:first", UxUtils.getQuizBannerImageWithLoader(response.attachmentInfo.downloadUrl));
-                Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, ".quiz-template-image");
-            })
-            .catch(function(error) {
-                console.error("AttachmentAction - Error: " + JSON.stringify(error));
-            });
+    let $titleDiv = "";
+    let $titleSec = "";
+    let $creatorButtons = "";
+    if (isCreator === true) {
+        $titleDiv = $(UxUtils.divTemplate("d-table mb--4", ""));
+        $titleSec = $(UxUtils.getQuizTitle(title));
+        $creatorButtons = $(UxUtils.creatorQuizDateManageSection(changeDueByKey, closeTrainingKey, deleteTrainingKey));
+    } else {
+        $titleSec = $(UxUtils.getQuizTitleResponders(title));
     }
-}
-
-/**
- * @description Method for creating head section for title, progress bar, dueby
- */
-function headCreator() {
-    let title = actionInstance.displayName;
-    let description = actionInstance.customProperties[0]["value"];
-    let options = { weekday: "short", year: "numeric", month: "short", day: "numeric" };
-    let expiryTime = new Date(actionInstance.expiryTime);
-    let dueby = expiryTime.toLocaleDateString(context.locale, options);
-    let $card = $(UxUtils.divTemplate("", ""));
-    let $titleDiv = $(UxUtils.divTemplate("d-table mb--4", ""));
-    let $titleSec = $(UxUtils.getQuizTitle(title));
-    console.log(dueby, "dueby");
-    let $creatorButtons = $(UxUtils.creatorQuizDateManageSection(changeDueByKey, closeTrainingKey, deleteTrainingKey));
     let $descriptionSec = $(UxUtils.getQuizDescription(description));
     let currentTimestamp = new Date().getTime();
     let $dateSec = $(UxUtils.getResponderQuizDate(actionInstance.expiryTime, currentTimestamp, dueByKey, expiredOnKey, dueby));
-    UxUtils.setAppend($titleDiv, $titleSec);
-    UxUtils.setAppend($titleDiv, $creatorButtons);
-    UxUtils.setAppend($card, $titleDiv);
+    if (isCreator === true) {
+        UxUtils.setAppend($titleDiv, $titleSec);
+        UxUtils.setAppend($titleDiv, $creatorButtons);
+        UxUtils.setAppend($card, $titleDiv);
+    } else {
+        UxUtils.setAppend($card, $titleSec);
+    }
     UxUtils.setAppend($card, $descriptionSec);
     UxUtils.setAppend($card, $dateSec);
     UxUtils.setAppend("#root", $card);
 
     if (actionInstance.dataTables[0].attachments.length > 0 && (actionInstance.dataTables[0].attachments[0].id != null || actionInstance.dataTables[0].attachments[0].id != "")) {
         let req = ActionHelper.getAttachmentInfo(actionId, actionInstance.dataTables[0].attachments[0].id);
-        ActionHelper.executeApi(req).then(function(response) {
-                UxUtils.setPrepend("#root div:first", UxUtils.getQuizBannerImageWithLoader(response.attachmentInfo.downloadUrl));
-                Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, ".quiz-template-image");
-            })
-            .catch(function(error) {
+        ActionHelper.executeApi(req).then(function (response) {
+            UxUtils.setPrepend("#root div:first", UxUtils.getQuizBannerImageWithLoader(response.attachmentInfo.downloadUrl));
+            Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, ".quiz-template-image");
+        })
+            .catch(function (error) {
                 console.error("AttachmentAction - Error: " + JSON.stringify(error));
             });
     }
