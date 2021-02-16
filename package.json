@@ -28,7 +28,7 @@
     },
     "devDependencies": {
         "@types/jquery": "3.5.5",
-        "action-package-deploy": "1.0.18",
+        "action-package-deploy": "1.0.22",
         "bestzip": "2.1.7",
         "clean-webpack-plugin": "3.0.0",
         "copy-webpack-plugin": "6.1.0",
