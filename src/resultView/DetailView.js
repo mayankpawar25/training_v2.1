@@ -66,8 +66,8 @@ $(function() {
     OnPageLoad();
 });
 
-$(document).on('click', 'a.dropdown-item ', function() {
-    $('body').find('div.show').removeClass('show');
+$(document).on("click", "a.dropdown-item ", function() {
+    $("body").find("div.show").removeClass("show");
 });
 
 /*
@@ -1450,7 +1450,7 @@ $(document).on("click", ".back1", function() {
 /**
  * @event Change event for expiry date and time
  */
-$(document).on("change", "input[name='expiry_time'], input[name='expiry_date']", function() {
+$(document).on("change", `input[name="expiry_time"], input[name="expiry_date"]`, function() {
     $("#change-quiz-date").removeClass("disabled");
 });
 /**
@@ -1475,9 +1475,9 @@ $(document).on("click", "#closeKey", function() {
 });
 
 $(document).on("click", "#change-quiz-date", function() {
-    let getExpiryDate = $("input[name='expiry_date']").datepicker("getDate");
+    let getExpiryDate = $(`input[name="expiry_date"]`).datepicker("getDate");
     let getExpiryDateData = getExpiryDate.toString().split(" ");
-    getExpiryDateData[4] = $("input[name='expiry_time']").val() + ":00";
+    getExpiryDateData[4] = $(`input[name="expiry_time"]`).val() + ":00";
     let end = new Date(getExpiryDateData.join(" "));
     actionInstance.expiryTime = new Date(end).getTime();
     actionInstance.customProperties[1].value = end;
@@ -1572,7 +1572,7 @@ $(document).on({
             meridiem: ""
         });
         $(".form_time input").val(currentTime);
-        let dateInput = $("input[name='expiry_date']");
+        let dateInput = $(`input[name="expiry_date"]`);
         let container = "";
         if ($(".bootstrap-iso form").length > 0) {
             container = $(".bootstrap-iso form").parent();
@@ -1694,7 +1694,7 @@ $(document).on({
             meridiem: ""
         });
         $(".form_time input").val(currentTime);
-        let dateInput = $("input[name='expiry_date']");
+        let dateInput = $(`input[name="expiry_date"]`);
         let container = "";
         if ($(".bootstrap-iso form").length > 0) {
             container = $(".bootstrap-iso form").parent();

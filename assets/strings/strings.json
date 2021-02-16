@@ -190,7 +190,7 @@
     "close": "Close",
     "_close.comment": "Close Label",
     "ok": "OK",
-    "ok.comment": "Ok Label",
+    "_ok.comment": "Ok Label",
     "confirm": "Confirm",
     "_confirm.comment": "Confirm button in summary view text",
     "confirmDeleteMsg": "Are you sure you want to delete?",

@@ -651,8 +651,8 @@ $(document).on("click", "#photo-done", function() {
                 $(this).find("span.counter").text(index);
             }
         });
-        if ($(".update-carasoul").hasClass('carousel-single-img')) {
-            $("#section-" + textNumber).find(".img-thumbnail-new").addClass('carousel-single-img');
+        if ($(".update-carasoul").hasClass("carousel-single-img")) {
+            $("#section-" + textNumber).find(".img-thumbnail-new").addClass("carousel-single-img");
         }
         $("#section-" + textNumber).find("span.type").text(photoTitle);
         $("#section-" + textNumber).find(".textarea-photo-title").val(photoTitle);
@@ -869,8 +869,8 @@ $(document).on("change", "#upload-photo", function() {
         UxUtils.setAppend("#photo-done", Constants.getDisabledLoader());
         if ($(this)[0].files.length > 1) {
             if (imagesPreview(this, ".update-carasoul")) {
-                if($('.update-carasoul').hasClass('carousel-single-img')){
-                    $('.update-carasoul').removeClass('carousel-single-img');
+                if($(".update-carasoul").hasClass("carousel-single-img")) {
+                    $(".update-carasoul").removeClass("carousel-single-img");
                 }
                 $(".text-section .photo-box").hide();
                 $(".text-section .change-link").show();
@@ -892,7 +892,7 @@ $(document).on("change", "#upload-photo", function() {
                 reader.onload = function(event) {
                     UxUtils.setHtml(".text-section .update-carasoul" , UxUtils.createImageLightBox(event.target.result,uniqueCarouselId , "",`smallfit`));
                 };
-                $('.update-carasoul').addClass('carousel-single-img');
+                $(".update-carasoul").addClass("carousel-single-img");
                 reader.readAsDataURL(input.files[0]);
 
                 $(".text-section .update-carasoul").show();
@@ -999,7 +999,7 @@ let imagesPreview = function(input, placeToInsertImagePreview) {
                             "id": response.attachmentId
                         };
                         newPhotos.push(attachmentData);
-                        $(input).parents('.text-section').find("textarea.textarea-photo-attachments").val(JSON.stringify(newPhotos));
+                        $(input).parents(".text-section").find("textarea.textarea-photo-attachments").val(JSON.stringify(newPhotos));
                         $("div.text-section").find("textarea#photo-attachments").val(JSON.stringify(newPhotos));
                         photoUploadCounter++;
                     });
@@ -1754,7 +1754,7 @@ function getCorrectAnswer() {
 function createAction(actionPackageId) {
     let trainingTitle = $("#training-title").val();
     let trainingDescription = $("#training-description").val();
-    let trainingExpireDate = $("input[name='expiry_date']").datepicker("getDate");
+    let trainingExpireDate = $(`input[name="expiry_date"]`).datepicker("getDate");
     let trainingExpireTime = $(`input[name="expiry_time"]`).val();
     let getExpiryDateData = trainingExpireDate.toString().split(" ");
     getExpiryDateData[4] = trainingExpireTime + ":00";
@@ -2200,7 +2200,7 @@ async function loadCreationView(request) {
         } else {
             getStringKeys();
         }
-        let dateInput = $("input[name='expiry_date']");
+        let dateInput = $(`input[name="expiry_date"]`);
         let container = $(".bootstrap-iso form").length > 0 ? $(".bootstrap-iso form").parent() : "body";
         let options = {
             container: container,
@@ -2323,7 +2323,6 @@ $(document).on("change", "#cover-image", function() {
                 UxUtils.setHtml($("#training-title-image").parents("div.quiz-updated-img") , UxUtils.createImageLightBox(event.target.result,(uniqueCarouselId+2),0,`training-updated-img quiz-updated-img card-bg card-border` , "training-title-image"));
                 Utils.getClassFromDimension(event.target.result, "#training-title-image");
                 Utils.getClassFromDimension(event.target.result,"#training-img-preview");
-                // $('div.cover-image-loader').hide();
                 $("#training-img-preview").parents("div.training-updated-img").show();
             };
             reader.readAsDataURL(input.files[0]);
@@ -2413,9 +2412,8 @@ $(document).on({
         if (key === Constants.getEnterKeyEvent() || key === Constants.getSpaceKeyEvent()) {
             e.preventDefault();
             if ($(this).attr("role") == "input") {
-                $(this).find('input').focus();
+                $(this).find("input").focus();
             }
-            
             if ($(this).attr("role") == "checkbox") {
                 $(this).find("input[type=checkbox]").click();
             }
@@ -2460,7 +2458,7 @@ $(document).on({
     }
 }, ".question-image, .option-image");
 
-$(document).on("click", '[data-toggle="lightbox"]', function(event) {
+$(document).on("click", `[data-toggle="lightbox"]`, function(event) {
     event.preventDefault();
     $(this).ekkoLightbox({
         alwaysShowClose: true
@@ -2473,7 +2471,7 @@ $(document).on("click", '[data-toggle="lightbox"]', function(event) {
 $(document).on("change", `input[name="question_image"]`, function() {
     // $(".invalid-file-question").remove();
     $(this).parents("div.form-group-question").find("span.text-danger.error-msg").remove();
-    if($(this).val()){
+    if($(this).val()) {
         let urlReturn = readURL(this, $(this).parents("div.form-group-question").find(".question-preview-image"));
         if (urlReturn == true) {
             if (!$("#question-done").hasClass("disabled")) {
@@ -2737,7 +2735,7 @@ $(document).on("change", `input[name="expiry_date"], input[name="expiry_time"], 
     $(".invalid-date-err").remove();
     let getExpiryDate = $(`input[name="expiry_date"]`).datepicker("getDate");
     let getExpiryDateData = getExpiryDate.toString().split(" ");
-    getExpiryDateData[4] = $("input[name='expiry_time']").val() + ":00";
+    getExpiryDateData[4] = $(`input[name="expiry_time"]`).val() + ":00";
     let end = new Date(getExpiryDateData.join(" "));
     $(".text-danger").parent("div.col-12").remove();
     $("#back").removeClass("disabled");

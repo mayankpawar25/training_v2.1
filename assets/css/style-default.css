@@ -1755,18 +1755,12 @@ a#back-setting svg {
     min-width: 208px;
 }
 
-
-/* .show-setting {
-   display: flex;
-} */
-
 .show-setting svg {
     margin-right: 16px;
     width: 16px;
     height: 16px;
     min-width: 16px;
     min-height: 16px;
-    /* margin-bottom: 8px; */
 }
 
 .show-setting {
@@ -2276,14 +2270,6 @@ body {
     background: no-repeat 50% / 100% 100%;
 }
 
-
-/* .carousel-control-prev,
-.carousel-control-next {
-    position: absolute;
-    top: 56px;
-    height: 32px;
-} */
-
 .updated-img.card {
     justify-content: center;
 }
@@ -2411,19 +2397,6 @@ span.file-counter {
 .choice-outer .option-div {
     position: relative;
 }
-
-
-/* .choice-outer .option-div::before {
-    content: '';
-    width: 12px;
-    height: 12px;
-    background-color: transparent;
-    border: 1px solid var(--app-gray-06);
-    position: absolute;
-    left: -20px;
-    top: 10px;
-    border-radius: 100%;
-} */
 
 .min-max-132 {
     max-height: 272px;
@@ -2699,12 +2672,6 @@ label h4 {
 .summary-section .card-box-question {
     margin-bottom: 16px;
 }
-
-
-/* .updated-img{
-    background-color: transparent !important;
-    border: none !important;
-} */
 
 .bdr-none {
     border: none !important;
@@ -2994,10 +2961,6 @@ button.close {
     padding: .5rem;
 }
 
-.ekko-lightbox-container {
-    /* min-height: 120px; */
-}
-
 .ekko-lightbox-nav-overlay {
     z-index: 1;
     position: fixed;
@@ -3117,11 +3080,6 @@ button.close svg {
     margin-top: -3px;
 }
 
-.ekko-lightbox .modal-dialog {
-    /* min-width: 150px;
-    min-height: 150px; */
-}
-
 .landing-form {
     min-height: 480px;
 }
@@ -3138,29 +3096,7 @@ button.close svg {
     justify-content: center;
 }
 
-
-/* [tabindex=""]:-moz-focusring {
-    -moz-outline: 2px solid;
-    -moz-outline-radius: 4px;
-    outline: 2px solid var(--app-black-hover);
-}
-
-[role="button"]:-moz-focusring {
-    -moz-outline: 2px solid;
-    -moz-outline-radius: 4px;
-    outline: 2px solid var(--app-black-hover);
-}
-
-[role="button"]:focus {
-    -moz-outline: 2px solid #000;
-    -moz-outline-radius: 4px;
-    outline: 2px solid var(--app-black-hover);
-} */
-
 [role="checkbox"]:focus {
-    /* -moz-outline: 2px solid #000;
-    -moz-outline-radius: 4px;
-    outline: 2px solid var(--app-black-hover); */
     box-shadow: 0 0 0 2px var(--app-black) !important;
     outline: none !important;
     border-radius: 3px;
@@ -3179,9 +3115,6 @@ button.close svg {
 }
 
 button:focus {
-    /* -moz-outline: 2px solid #000;
-    -moz-outline-radius: 4px;
-    outline: 2px solid var(--app-black-hover); */
     box-shadow: 0 0 0 2px var(--app-black) !important;
     outline: none !important;
     border-radius: 3px;
@@ -3195,17 +3128,10 @@ button:focus {
         width: 100%;
         max-width: 100%;
     }
-    /* body {
-        font-size: var(--font-12);
-    } */
     .body-outer {
         margin-top: 16px;
         padding: 16px 16px 16px 16px;
     }
-    /* .back-btn {
-        width: 0.65rem;
-        height: 0.65rem;
-    } */
     .footer {
         left: 0rem;
         right: 0rem;
@@ -3345,9 +3271,4 @@ button:focus {
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    /* -webkit-line-clamp: 2; */
-}
-
-.fixed-ar-16-9.relative {
-    /* text-align: center; */
 }

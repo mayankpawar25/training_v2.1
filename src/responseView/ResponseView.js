@@ -795,7 +795,7 @@ function createTrainingSection(indexNum) {
                                     photoUploadCounter++;
                                 });
 
-                                $("div.section-2 .container:first div.card-box:visible").find(".question-sec-card-box").removeClass('d-none');
+                                $("div.section-2 .container:first div.card-box:visible").find(".question-sec-card-box").removeClass("d-none");
 
                                 UxUtils.setAppend($("div.section-2 .container:first div.card-box:visible").find(".question-sec-card-box"), $carousel);
                                 // UxUtils.setAfter($("div.section-2 > .container:first > div.card-box:last").find("#text-description"), $carousel);
@@ -806,7 +806,7 @@ function createTrainingSection(indexNum) {
                                 let uniqueIdCarousel = Constants.getUniqueId();
                                 photoUploadCounter++;
                                 UxUtils.setAfter($("div.section-2 > .container:first > div.card-box:last").find("#text-description"), UxUtils.getSingleImageCarousel(attachments[0].url, uniqueIdCarousel));
-                                $("div.section-2 .container:first div.card-box:visible").find(".question-sec-card-box").addClass('d-none');
+                                $("div.section-2 .container:first div.card-box:visible").find(".question-sec-card-box").addClass("d-none");
                             }
                             let tid = setInterval(() => {
                                 if (photoUploadCounter == filesAmount) {
