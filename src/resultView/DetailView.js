@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
+
 import "../common/utils/JqueryGlobal";
 import "bootstrap/dist/js/bootstrap";
 import "bootstrap-datepicker";
@@ -63,6 +64,10 @@ loadDetailView(request);
 /* Document get ready */
 $(function() {
     OnPageLoad();
+});
+
+$(document).on('click', 'a.dropdown-item ', function() {
+    $('body').find('div.show').removeClass('show');
 });
 
 /*
@@ -243,7 +248,7 @@ async function createBody() {
         isCreator = true;
     }
     head();
-    if(isCreator === true) {
+    if (isCreator === true) {
         if (actionInstance.status == "Closed") {
             $(".close-quiz-event").remove();
             $(".change-due-by-event").remove();
@@ -387,11 +392,11 @@ function head() {
 
     if (actionInstance.dataTables[0].attachments.length > 0 && (actionInstance.dataTables[0].attachments[0].id != null || actionInstance.dataTables[0].attachments[0].id != "")) {
         let req = ActionHelper.getAttachmentInfo(actionId, actionInstance.dataTables[0].attachments[0].id);
-        ActionHelper.executeApi(req).then(function (response) {
-            UxUtils.setPrepend("#root div:first", UxUtils.getQuizBannerImageWithLoader(response.attachmentInfo.downloadUrl));
-            Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, ".quiz-template-image");
-        })
-            .catch(function (error) {
+        ActionHelper.executeApi(req).then(function(response) {
+                UxUtils.setPrepend("#root div:first", UxUtils.getQuizBannerImageWithLoader(response.attachmentInfo.downloadUrl));
+                Utils.getClassFromDimension(response.attachmentInfo.downloadUrl, ".quiz-template-image");
+            })
+            .catch(function(error) {
                 console.error("AttachmentAction - Error: " + JSON.stringify(error));
             });
     }
@@ -511,7 +516,6 @@ function scoreCalculate(userId) {
             }
         }
     });
-    console.log(`(${score} / ${total}) * 100`);
     let scoreIs = (score / total) * 100;
     if (scoreIs % 1 != 0) {
         scoreIs = scoreIs.toFixed(2);
@@ -916,7 +920,6 @@ function createCreatorQuestionView(userId) {
 
                             let correctResponseLength = Object.keys(correctResponse).length;
                             let optName = option.displayName;
-                            //console.log("Name teststst", option);
                             let attachmentId = option.attachments.length > 0 ? option.attachments[0].id : "";
                             let optId = option.name;
                             let $radioOption = "";
@@ -1087,8 +1090,6 @@ function createQuestionView(userId, isLanding) {
                     if (option.attachments != 0) {
                         optAttachmentId = option.attachments[0].id;
                     }
-
-                    console.log("asdsada");
                     if (question.valueType == "SingleOption") {
                         let $radioOption = getRadioOptions(
                             optName,

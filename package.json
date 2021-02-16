@@ -14,7 +14,7 @@
         "eslint": "eslint **/*.js -c .eslintrc.js --fix"
     },
     "dependencies": {
-        "@microsoft/m365-action-sdk": "https://int.static.actions.office365.com/sdk/v1.0.8/microsoft-m365-action-sdk.tgz",
+        "@microsoft/m365-action-sdk": "https://static.actions.office365.com/sdk/v1.0.8/microsoft-m365-action-sdk.tgz",
         "babel-polyfill": "6.26.0",
         "bootstrap": "4.5.0",
         "bootstrap-datepicker": "1.4.1",

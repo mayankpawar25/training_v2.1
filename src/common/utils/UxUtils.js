@@ -1777,7 +1777,7 @@ export class UxUtils {
      */
     static getResponseHeader() {
         return `<div class="container"
-        ><div class="d-none quiz-updated-img max-min-220 card-bg bdr-none bg-none card-border cover-img  mb--16 updated-img relative" id="response-cover-img">
+        ><div class="d-none quiz-updated-img max-min-220 card-bg bdr-none bg-none card-border cover-img  mb--16 updated-img relative carousel-single-img" id="response-cover-img">
             ${Constants.getLoaderCover("d-table")}
             <img src="" id="quiz-title-image" style="" class="quiz-updated-img card-bg card-border heightfit d-none" >
             <input type="file" name="quiz_image" class="d-none" id="cover-image" accept="image/*" src="images/px-img.png">

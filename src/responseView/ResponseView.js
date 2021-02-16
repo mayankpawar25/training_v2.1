@@ -1397,10 +1397,13 @@ $(document).on("click", ".submit-form", function() {
  */
 $(document).on("click", '[data-toggle="lightbox"]', function(event) {
     event.preventDefault();
-    $(this).ekkoLightbox();
+    $(this).ekkoLightbox({
+        alwaysShowClose: true
+    });
 });
 
-// *********************************************** OTHER ACTION END***********************************************
+// *********************************************** OTHER ACTION END ***********************************************
+
 /**
  * @description Variable contains head section
  */

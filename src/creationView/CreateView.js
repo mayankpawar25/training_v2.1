@@ -23,7 +23,6 @@ let settingText = "";
 let opt = "";
 let request;
 let lastSession = null;
-let choicesKey = "";
 let checkMeKey = "";
 let nextKey = "";
 let backKey = "";
@@ -62,7 +61,7 @@ let atleastOneErrorKey = "";
 let buttonCounter = 0;
 let loadMoreKey = "";
 let loadLessKey = "";
-let enterTheChioceKey = "";
+let enterTheChoiceKey = "";
 let addMoreOptionsKey = "";
 let addQuestionsKey = "";
 let doneKey = "";
@@ -80,6 +79,7 @@ let minuteKey = "";
 let minutesKey = "";
 let daysKey = "";
 let context = "";
+let questionIsRequiredKey = "";
 
 /***********************************  Manage Questions *********************************/
 
@@ -143,7 +143,7 @@ $(document).on("click", "#add-questions", function() {
         $("form.sec1 > .question_button").remove();
         $("form.sec1 > div.question-footer").remove();
     }
-    questionsSection = UxUtils.getQuestionArea(questionKey, questionTitleKey, checkMeKey, enterTheChioceKey, addMoreOptionsKey);
+    questionsSection = UxUtils.getQuestionArea(questionKey, questionTitleKey, checkMeKey, enterTheChoiceKey, addMoreOptionsKey);
     addQuestionButton = UxUtils.getAddQuestionButton(addQuestionsKey);
     questionFooter = UxUtils.getQuestionAreaFooter(doneKey);
 
@@ -179,7 +179,7 @@ $(document).on("click", "#add-questions-same-section", function() {
         return true;
     }
     let questionCounter;
-    questionsSection = UxUtils.getQuestionArea(questionKey, questionTitleKey, checkMeKey, enterTheChioceKey, addMoreOptionsKey);
+    questionsSection = UxUtils.getQuestionArea(questionKey, questionTitleKey, checkMeKey, enterTheChoiceKey, addMoreOptionsKey);
     UxUtils.setAppend("form.sec1", questionsSection);
     $("form > .question_button").remove();
     $("div.question-container:visible").each(function(index, element) {
@@ -264,8 +264,8 @@ $(document).on("click", ".remove-option", function() {
             .find(`div.option-div div.input-group input[type="text"]`)
             .each(function(index, elem) {
                 let counter = index + 1;
-                Localizer.getString("enterTheChioce").then(function(result) {
-                    enterTheChioceKey = result;
+                Localizer.getString("enterTheChoice").then(function(result) {
+                    enterTheChoiceKey = result;
                     $(elem).attr({ placeholder: result });
                 });
                 $(elem).attr({
@@ -313,12 +313,10 @@ $(document).on("click", "#question-done", function() {
                 .removeClass("card-box")
                 .addClass("card-box-alert");
             errorText += "Option check required";
-
             $([document.documentElement, document.body]).animate({
                 scrollTop: $(".option-required-err:last").offset().top - 200
             }, 1000);
         }
-
     });
 
     $("form")
@@ -1191,7 +1189,7 @@ $(document).on("click", "#next", function() {
                     questionNumber = element.parents("div.form-group").find("span.question-number").text();
                     errorText += "<h6><u>Question " + questionNumber + "</u> </h6>";
                 }
-                errorText += "<p>Question is required. </p>";
+                errorText += `<p>${questionIsRequiredKey}</p>`;
             } else if (element.attr("id").startsWith("option")) {
                 if (questionNumber != element.parents("div.card").find("span.question-number").text()) {
                     questionNumber = element
@@ -1268,11 +1266,6 @@ async function getStringKeys() {
     Localizer.getString("dueIn", " 1 week ", "").then(function(result) {
         settingText = result;
         $("#due").text(settingText);
-    });
-
-    Localizer.getString("choices").then(function(result) {
-        choicesKey = result;
-        $(".choice-label").text(choicesKey);
     });
 
     Localizer.getString("checkMe").then(function(result) {
@@ -1501,8 +1494,8 @@ async function getStringKeys() {
         loadLessKey = result;
     });
 
-    Localizer.getString("enterTheChioce").then(function(result) {
-        enterTheChioceKey = result;
+    Localizer.getString("enterTheChoice").then(function(result) {
+        enterTheChoiceKey = result;
     });
 
     Localizer.getString("addMoreOptions").then(function(result) {
@@ -1561,6 +1554,9 @@ async function getStringKeys() {
         questionLeftBlankKey = result;
     });
 
+    Localizer.getString("questionIsRequired").then(function(result) {
+        questionIsRequiredKey = result;
+    });
 }
 
 /**
@@ -1892,7 +1888,8 @@ async function loadCreationView(request) {
             /* Due Setting String */
             let end = new Date(setDate + " " + currentTime);
             let start = new Date();
-            let days = calc_date_diff(start, end);
+            // let days = calc_date_diff(start, end);
+            let days = Utils.calcDateDiff(start, end, weekKey, hoursKey, hourKey, minutesKey, minuteKey, daysKey);
             let correctAnswer = lastSession.action.customProperties[3].value == "Yes" ? correctAnswerKey : "";
             if (lastSession.action.customProperties[2].value == "Yes") {
                 $("#allow-multiple-attempt").prop("checked", true);
@@ -2429,7 +2426,7 @@ $(document).on({
                 $("#" + $(this).data("id")).click();
             }
             if ($(this).attr("role") == "input") {
-                $(".quiz-clear").click();
+                $(".quiz-clear:visible").click();
             }
 
             if ($(this).attr("role") == "image" || $(this).attr("role") == "doc") {
@@ -2699,8 +2696,8 @@ $(document).on({
             .find(`div.option-div div.input-group input[type="text"]`)
             .each(function(index, elem) {
                 counter = index + 1;
-                Localizer.getString("enterTheChioce").then(function(result) {
-                    enterTheChioceKey = result;
+                Localizer.getString("enterTheChoice").then(function(result) {
+                    enterTheChoiceKey = result;
                     $(elem).attr({ placeholder: result });
                 });
 
@@ -2772,50 +2769,6 @@ $(document).on("change", `input[name="expiry_date"], input[name="expiry_time"], 
 /********************************  Settings Ends ***********************/
 
 /***********************************  Methods ***************************/
-/**
- * Method to get date difference between two date
- * @param start datetime start date
- * @param end datetime end date
- */
-function calc_date_diff(start, end) {
-    let days = (end - start) / (1000 * 60 * 60 * 24);
-    let hourText = "";
-    let minuteText = "";
-
-    if (days > 6) {
-        let weeks = Math.ceil(days) / 7;
-        return Math.floor(weeks) + " week";
-    } else {
-        if (days < 1) {
-            let t1 = start.getTime();
-            let t2 = end.getTime();
-
-            let minsDiff = Math.floor((t2 - t1) / 1000 / 60);
-            let hourDiff = Math.floor(minsDiff / 60);
-            minsDiff = minsDiff % 60;
-
-            if (hourDiff > 1) {
-                hourText = "hours";
-            } else {
-                hourText = "hour";
-            }
-            if (hourDiff > 1) {
-                minuteText = "minutes";
-            } else {
-                minuteText = "minute";
-            }
-            if (hourDiff > 0 && minsDiff > 0) {
-                return hourDiff + " " + hourText + ", " + minsDiff + " " + minuteText;
-            } else if (hourDiff > 0 && minsDiff <= 0) {
-                return hourDiff + " " + hourText;
-            } else if (hourDiff <= 0 && minsDiff > 0) {
-                return minsDiff + " " + minuteText;
-            }
-        } else {
-            return Math.ceil(days) + " days";
-        }
-    }
-}
 
 /**
  * Method to get base64 data of file
@@ -2883,7 +2836,7 @@ let trainingSectionView = UxUtils.getTrainingContentArea(backKey, submitKey, add
 /**
  * Variable contains question section
  */
-let questionsSection = UxUtils.getQuestionArea(questionKey, questionTitleKey, checkMeKey , enterTheChioceKey , addMoreOptionsKey);
+let questionsSection = UxUtils.getQuestionArea(questionKey, questionTitleKey, checkMeKey , enterTheChoiceKey , addMoreOptionsKey);
 
 /**
  * Variable contains add button section

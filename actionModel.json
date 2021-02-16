@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "properties": {
-        "canAddMore": true,
+        "canAddMore": false,
         "values": [
             {
                 "name": "Locale",
