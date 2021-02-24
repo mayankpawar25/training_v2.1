@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import { Constants } from "./Constants";
+import {
+    Constants
+} from "./Constants";
 
 export class UxUtils {
 
@@ -35,7 +37,7 @@ export class UxUtils {
                                 <span class="tap-upload-label upload-cover-image-key">${uploadCoverImageKey}</span>
                             </div>
                             <!-- show this div after img added -->
-                            <div class="training-updated-img quiz-updated-img max-min-220 card-bg card-border updated-img bdr-none bg-none fixed-ar fixed-ar-16-9 relative" style="display:none">
+                            <div class="training-updated-img quiz-updated-img max-min-220 card-bg card-border updated-img bdr-none bg-none fixed-ar fixed-ar-16-9 relative text-center" style="display:none">
                                 <img src="" id="training-img-preview" class=" training-updated-img quiz-updated-img card-bg card-border heightfit" >
                             </div>
                         </div>
@@ -75,7 +77,7 @@ export class UxUtils {
             <div class="container">
                 <div id="root" class="">
                     <div class="training-card-section">
-                        <div class="quiz-updated-img max-min-220 bdr-none bg-none cover-img mb--16" style="display:none;">
+                        <div class="quiz-updated-img max-min-220 bdr-none bg-none cover-img mb--16 text-center" style="display:none;">
                             <img src="" id="training-title-image" style="" class="quiz-updated-img card-bg card-border" style="display:none;">
                         </div>
                         <div class="row">
@@ -370,7 +372,7 @@ export class UxUtils {
     /**
      * @Method to get Text Footer Area
      */
-    static getTextContentFooter() {
+    static getTextContentFooter(doneKey) {
         return `<div class="footer text-footer" >
             <div class="footer-padd bt">
                 <div class="container ">
@@ -383,7 +385,7 @@ export class UxUtils {
                             </a>
                         </div>
                         <div class="col-3 text-right">
-                            <button type="button" class="btn btn-primary btn-sm pull-right done-label" id="text-done"  tabindex="0" role="button" data-id="text-done"> Done</button>
+                            <button type="button" class="btn btn-primary btn-sm pull-right done-label" id="text-done"  tabindex="0" role="button" data-id="text-done"> ${doneKey}</button>
                         </div>
                     </div>
                 </div>
@@ -435,7 +437,7 @@ export class UxUtils {
     /**
      * @Method to get Image Footer Area
      */
-    static getImageContentFooter() {
+    static getImageContentFooter(doneKey) {
         return `<div class="footer text-footer" >
             <div class="footer-padd bt">
                 <div class="container ">
@@ -447,7 +449,7 @@ export class UxUtils {
                                 </span>
                             </a>
                         </div>
-                        <div class="col-3 text-right"> <button type="button" tabindex="0" role="button" data-id="photo-done" class="btn btn-primary btn-sm pull-right done-label" id="photo-done"> Done</button></div>
+                        <div class="col-3 text-right"> <button type="button" tabindex="0" role="button" data-id="photo-done" class="btn btn-primary btn-sm pull-right done-label" id="photo-done"> ${doneKey}</button></div>
                     </div>
                 </div>
             </div>
@@ -497,7 +499,7 @@ export class UxUtils {
     /**
      * @Method to get Video Form Section Footer Area
      */
-    static getVideoContentFooter() {
+    static getVideoContentFooter(doneKey) {
         return `<div class="footer text-footer" >
             <div class="footer-padd bt">
                 <div class="container ">
@@ -509,7 +511,7 @@ export class UxUtils {
                                 </span>
                             </a>
                         </div>
-                        <div class="col-3 text-right"> <button type="button" class="btn btn-primary btn-sm pull-right done-label" tabindex="0" role="button" data-id="video-done" id="video-done"> Done</button></div>
+                        <div class="col-3 text-right"> <button type="button" class="btn btn-primary btn-sm pull-right done-label" tabindex="0" role="button" data-id="video-done" id="video-done"> ${doneKey}</button></div>
                     </div>
                 </div>
             </div>
@@ -556,7 +558,7 @@ export class UxUtils {
     /**
      * @Method to get Document Form Footer Section Area
      */
-    static getDocumentContentFooter() {
+    static getDocumentContentFooter(doneKey) {
         return `<div class="footer text-footer" >
             <div class="footer-padd bt">
                 <div class="container ">
@@ -569,7 +571,7 @@ export class UxUtils {
                             </a>
                         </div>
                         <div class="col-3 text-right">
-                            <button type="button" class="btn btn-primary btn-sm pull-right done-label" id="document-done"  tabindex="0" role="button" data-id="document-done"> Done</button>
+                            <button type="button" class="btn btn-primary btn-sm pull-right done-label" id="document-done"  tabindex="0" role="button" data-id="document-done"> ${doneKey}</button>
                         </div>
                     </div>
                 </div>
@@ -1742,7 +1744,7 @@ export class UxUtils {
      * @param url string contains image url
      */
     static getQuizBannerImageWithLoader(url) {
-        return `<div class="quiz-updated-img relative max-min-220 card-bg card-border cover-img upvj cursor-pointer mb--16 bg-none bdr-none">
+        return `<div class="quiz-updated-img relative max-min-220 card-bg card-border cover-img upvj cursor-pointer mb--16 bg-none bdr-none text-center">
             ${Constants.getLoaderCover("d-table")}
             <img src="${url}" class="image-responsive quiz-template-image" crossorigin="anonymous">
         </div>`;
@@ -1775,7 +1777,7 @@ export class UxUtils {
     /**
      * @Method for response Header view
      */
-    static getResponseHeader() {
+    static getResponseHeader(trainingContentKey) {
         return `<div class="container"
         ><div class="d-none quiz-updated-img max-min-220 card-bg bdr-none bg-none card-border cover-img  mb--16 updated-img relative carousel-single-img" id="response-cover-img">
             ${Constants.getLoaderCover("d-table")}
@@ -1794,7 +1796,7 @@ export class UxUtils {
             <div class="clearfix"></div>
                 <div class="col-12">
                         <div class="card-box card-bg card-border mt--16">
-                            <h4 class="font-16 bold">Training Contents</h4>
+                            <h4 class="font-16 bold">${trainingContentKey}</h4>
                             <div id="desc-section"></div>
                             <P class="font-16 semi-bold mt--16" id="question-msg"></P>
                         </div>
@@ -1846,7 +1848,8 @@ export class UxUtils {
                                 </path>
                                 <path class="ui-icon__filled" d="M16.74 21.21l7-7c.19-.19.29-.43.29-.71 0-.14-.03-.26-.08-.38-.06-.12-.13-.23-.22-.32s-.2-.17-.32-.22a.995.995 0 0 0-.38-.08c-.13 0-.26.02-.39.07a.85.85 0 0 0-.32.21l-6.29 6.3-6.29-6.3a.988.988 0 0 0-.32-.21 1.036 1.036 0 0 0-.77.01c-.12.06-.23.13-.32.22s-.17.2-.22.32c-.05.12-.08.24-.08.38 0 .28.1.52.29.71l7 7c.19.19.43.29.71.29.28 0 .52-.1.71-.29z">
                                 </path>
-                            </svg> <span class="prev-key">${previousKey}</span></button></div>
+                            </svg>
+                            <span class="prev-key">${previousKey}</span></button></div>
                                         <div class="col-2 pl-0 pr-0 text-center" id="xofy"> <span id="x">1</span> of <span id="y">4</span></div>
                                         <div class="col-5 text-right"> <button type="button" class="tpt-btn pull-right" id="next"> <span class="check-key next-btn-sec">${nextKey}</span>
                             <svg role="presentation" focusable="false" viewBox="8 8 16 16 " class="next-btn">
@@ -2197,7 +2200,7 @@ export class UxUtils {
      * @param optionAttachments string contains option images attachments
      * @param correctInputs sting contains correct input checkbox values
      */
-    static getQuestionSection(questionNo, optionChecked, questionImage, hideQuestionImage, questionText, optionText, questionInput, questionImagearray, optionAttachments, correctInputs = "") {
+    static getQuestionSection(questionKey, questionNo, optionChecked, questionImage, hideQuestionImage, questionText, optionText, questionInput, questionImagearray, optionAttachments, correctInputs = "") {
         return `<div class="card-box-question card-box card-border card-bg training-card-section section-div question-section-div"  data-id="${questionNo}" id="question${questionNo}">
             ${optionChecked}
             <div id="quest-text-${questionNo}" class="d-none">${correctInputs}</div>
@@ -2205,7 +2208,7 @@ export class UxUtils {
                 <label class="font-12">
                     <strong class="question-number-title bold">
                         <label class="font-12">
-                            <span class="question-number">Question # </span><span class="counter">${questionNo}</span>
+                            <span class="question-number">${questionKey} # </span><span class="counter">${questionNo}</span>
                         </label>
                     </strong>
                 </label>
@@ -2353,12 +2356,12 @@ export class UxUtils {
      * @param questionNumber contains question counter
      * @param questiondisplayName contains question display name text
      */
-    static getQuestionHeadingSection(questionNumber, questiondisplayName) {
+    static getQuestionHeadingSection(questionKey, questionNumber, questiondisplayName) {
         return `<div class="d-table mb--4 pre-none">
                         <label class="font-12">
                             <strong class="question-number-title bold" id="question-number-title">
                                 <label class="font-12">
-                                    <span class="training-type question-number">Question</span>&nbsp;#&nbsp;
+                                    <span class="training-type question-number">${questionKey}</span>&nbsp;#&nbsp;
                                     <span class="">${questionNumber}</span>
                                 </label>
                             </strong>

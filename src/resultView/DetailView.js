@@ -58,6 +58,7 @@ let trainingContentKey = "";
 let contentSection = "";
 let theme = "";
 let subscriberResponse = "";
+let isGetResult = false;
 
 loadDetailView(request);
 
@@ -247,6 +248,7 @@ async function createBody() {
     if (myUserId == dataResponse.context.userId && myUserId == actionInstance.creatorId) {
         isCreator = true;
     }
+    isGetResult = false;
     head();
     if (isCreator === true) {
         if (actionInstance.status == "Closed") {
@@ -372,7 +374,9 @@ function head() {
     if (isCreator === true) {
         $titleDiv = $(UxUtils.divTemplate("d-table mb--4", ""));
         $titleSec = $(UxUtils.getQuizTitle(title));
-        $creatorButtons = $(UxUtils.creatorQuizDateManageSection(changeDueByKey, closeTrainingKey, deleteTrainingKey));
+        if(isGetResult === false){
+            $creatorButtons = $(UxUtils.creatorQuizDateManageSection(changeDueByKey, closeTrainingKey, deleteTrainingKey));
+        }
     } else {
         $titleSec = $(UxUtils.getQuizTitleResponders(title));
     }
@@ -543,6 +547,7 @@ function getNonresponders() {
 $(document).on("click", ".getresult", function() {
     let userId = $(this).attr("id");
     UxUtils.clearHtml("#root");
+    isGetResult = true;
     head();
     UxUtils.setAppend("#root", $(".question-content").clone());
 

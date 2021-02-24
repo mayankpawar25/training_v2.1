@@ -23,6 +23,8 @@
     "_checkMe.comment": "Check me if correct label",
     "next": "Next",
     "_next.comment": "Next button label",
+    "check": "Check",
+    "_check.comment": "Check button label",
     "back": "Back",
     "_back.comment": "Back button label",
     "required": "Required",

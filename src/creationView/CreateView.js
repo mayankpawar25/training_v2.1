@@ -10,11 +10,22 @@ import "bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css";
 import "bootstrap-datetime-picker/css/bootstrap-datetimepicker.min.css";
 import "ekko-lightbox/dist/ekko-lightbox.js";
 import "ekko-lightbox/dist/ekko-lightbox.css";
-import { Localizer, ActionHelper } from "../common/ActionSdkHelper";
-import { UxUtils } from "../common/utils/UxUtils";
-import { Utils } from "../common/utils/Utils";
-import { Constants } from "../common/utils/Constants";
-import { KeyboardUtils } from "../common/utils/KeyboardUtils";
+import {
+    Localizer,
+    ActionHelper
+} from "../common/ActionSdkHelper";
+import {
+    UxUtils
+} from "../common/utils/UxUtils";
+import {
+    Utils
+} from "../common/utils/Utils";
+import {
+    Constants
+} from "../common/utils/Constants";
+import {
+    KeyboardUtils
+} from "../common/utils/KeyboardUtils";
 import "../../assets/css/style-custom";
 import "../../assets/css/style-default";
 
@@ -92,10 +103,14 @@ $(document).on("click", ".moreless-button", function() {
     $(".more-text").slideToggle();
     if ($(this).text() == loadMoreKey) {
         UxUtils.setText(this, loadLessKey);
-        $(this).parent().find(".show-text").css({ "-webkit-line-clamp": "" });
+        $(this).parent().find(".show-text").css({
+            "-webkit-line-clamp": ""
+        });
     } else {
         UxUtils.setText(this, loadMoreKey);
-        $(this).parent().find(".show-text").css({ "-webkit-line-clamp": Constants.webkitLineClampCssCount() });
+        $(this).parent().find(".show-text").css({
+            "-webkit-line-clamp": Constants.webkitLineClampCssCount()
+        });
     }
 });
 
@@ -156,7 +171,7 @@ $(document).on("click", "#add-questions", function() {
         questionCounter = index + 1;
         $(elem)
             .find("span.question-number")
-            .text("Question # " + questionCounter);
+            .text(questionKey + "# " + questionCounter);
         $(elem).attr({
             id: "question" + questionCounter
         });
@@ -266,7 +281,9 @@ $(document).on("click", ".remove-option", function() {
                 let counter = index + 1;
                 Localizer.getString("enterTheChoice").then(function(result) {
                     enterTheChoiceKey = result;
-                    $(elem).attr({ placeholder: result });
+                    $(elem).attr({
+                        placeholder: result
+                    });
                 });
                 $(elem).attr({
                     id: "option" + counter
@@ -341,7 +358,9 @@ $(document).on("click", "#question-done", function() {
                     if ($(element).parents("div.radio-outer").find("img.option-preview-image").attr("src") != "") {
                         // Do nothing
                     } else {
-                        if ($(this).find("div.card-box").length > 0) { $(this).parents("div.card-box").removeClass("card-box").addClass("card-box-alert"); }
+                        if ($(this).find("div.card-box").length > 0) {
+                            $(this).parents("div.card-box").removeClass("card-box").addClass("card-box-alert");
+                        }
                         $(this).addClass("danger");
                         UxUtils.setPrepend($(this).parents("div.col-12").parents("div.option-div"), UxUtils.createLabelWithFontBox(requiredKey, "label-alert d-block mb--4", "required-key", ""));
                         errorText += UxUtils.createParagraphBox(requiredKey, "", "");
@@ -373,7 +392,9 @@ $(document).on("click", "#question-done", function() {
                     let optionValue = ($(elem).find("#option" + count).val()) ? $(elem).find("#option" + count).val() : "&nbsp;";
                     let questionOptionId = `question${j}option${count}`;
 
-                    if ($(elem).find("div.option-preview:visible").html()) { styleOptionImage = ""; }
+                    if ($(elem).find("div.option-preview:visible").html()) {
+                        styleOptionImage = "";
+                    }
 
                     if (
                         $(e)
@@ -402,7 +423,7 @@ $(document).on("click", "#question-done", function() {
                 hideQuestionImage = "";
             }
             let questionImagearray = ($(e).find("textarea#question-attachment-set").val()) ? $(e).find("textarea#question-attachment-set").val() : "";
-            UxUtils.setAfter("div#root div.training-card-section:last", UxUtils.getQuestionSection(j, optionChecked, questionImage, hideQuestionImage, questionText, optionText, questionInput, questionImagearray, optionAttachments));
+            UxUtils.setAfter("div#root div.training-card-section:last", UxUtils.getQuestionSection(questionKey, j, optionChecked, questionImage, hideQuestionImage, questionText, optionText, questionInput, questionImagearray, optionAttachments));
             UxUtils.setHtml("#quest-text-" + textNumber, questionInputs);
         });
 
@@ -486,6 +507,7 @@ $(document).on("click", ".discard-success", function() {
  * @Event to add text when click on content area button
  */
 $(document).on("click", "#add-text", function() {
+    getStringKeys();
     $(".error-msg").remove();
     $("#submit").attr("disabled", false);
     $(".loader-overlay").remove();
@@ -509,6 +531,8 @@ $(document).on("click", "#add-text", function() {
     }
 
     addTextSection = UxUtils.getTextContentArea(addTitlePlaceholderKey, addTextDescriptionPlaceholderKey);
+    addTextFooter = UxUtils.getTextContentFooter(doneKey);
+
     UxUtils.setAppend("form.sec1", addTextSection);
     UxUtils.setAppend("form.sec1", addTextFooter);
     UxUtils.setText($(".back-key"), backKey);
@@ -570,7 +594,9 @@ $(document).on("click", "#text-done", function() {
         $("#section-" + textNumber).find(".textarea-text-description").val(textTrainingDesc);
         if (textTrainingDesc && (textTrainingDesc.split(/\r\n|\r|\n/).length > 2 || textTrainingDesc.length > 180)) {
             $("#section-" + textNumber).find(".text-description-preview").addClass("show-text");
-            $("#section-" + textNumber).find(".text-description-preview").css({ "-webkit-line-clamp": `${Constants.webkitLineClampCssCount()}` });
+            $("#section-" + textNumber).find(".text-description-preview").css({
+                "-webkit-line-clamp": `${Constants.webkitLineClampCssCount()}`
+            });
             UxUtils.setAfter($("#section-" + textNumber).find(".text-description-preview"), Constants.getLoadMoreLink(loadMoreKey));
         }
 
@@ -581,6 +607,7 @@ $(document).on("click", "#text-done", function() {
  * @Event to show photo section when click on add content button
  */
 $(document).on("click", "#add-photo", function() {
+    getStringKeys();
     $("form.sec1").find("div.content-limit-exceed").remove();
     let textData = "";
     let textNumber = parseInt($("div.training-card-section").length);
@@ -603,6 +630,7 @@ $(document).on("click", "#add-photo", function() {
     }
 
     addPhotoSection = UxUtils.getImageContentArea(addTitlePlaceholderKey, addDescriptionPlaceholderKey, uploadImageLabelKey);
+    addPhotoFooter = UxUtils.getImageContentFooter(doneKey);
     UxUtils.setAfter("form.sec1 div.section-2 div#root div.training-card-section:last", UxUtils.getAddImageSection(textNumber, textData));
     UxUtils.setAppend("form.sec1", addPhotoSection);
     UxUtils.setAppend("form.sec1", addPhotoFooter);
@@ -664,7 +692,9 @@ $(document).on("click", "#photo-done", function() {
         }
         if (photoDesc && (photoDesc.split(/\r\n|\r|\n/).length > 2 || photoDesc.length > 180)) {
             $("#section-" + textNumber).find(".photo-description-preview").addClass("show-text");
-            $("#section-" + textNumber).find(".photo-description-preview").css({ "-webkit-line-clamp": Constants.webkitLineClampCssCount() });
+            $("#section-" + textNumber).find(".photo-description-preview").css({
+                "-webkit-line-clamp": Constants.webkitLineClampCssCount()
+            });
             UxUtils.setAfter($("#section-" + textNumber).find(".photo-description-preview"), Constants.getLoadMoreLink(loadMoreKey));
         }
         $("#section-" + textNumber).find("textarea.textarea-photo-attachments").val(photoAttachments);
@@ -679,6 +709,7 @@ $(document).on("click", "#photo-done", function() {
  * @Event to show video section
  */
 $(document).on("click", "#add-video", function() {
+    getStringKeys();
     let textNumber = parseInt($("div.training-card-section").length);
     $("form.sec1").find("div.content-limit-exceed").remove();
     if (textNumber > 29) {
@@ -701,6 +732,7 @@ $(document).on("click", "#add-video", function() {
         $("form.sec1 > div.text-footer").remove();
     }
     addVideoSection = UxUtils.getVideoContentArea(addTitlePlaceholderKey, addDescriptionPlaceholderKey, uploadVideoLabelKey);
+    addVideoFooter = UxUtils.getVideoContentFooter(doneKey);
     UxUtils.setAppend("form.sec1", addVideoSection);
     UxUtils.setAppend("form.sec1", addVideoFooter);
     UxUtils.setText($(".back-key"), backKey);
@@ -760,7 +792,9 @@ $(document).on("click", "#video-done", function() {
         }
         if (videoDesc && (videoDesc.split(/\r\n|\r|\n/).length > 2 || videoDesc.length > 180)) {
             $("#section-" + textNumber).find(".video-description-preview").addClass("show-text");
-            $("#section-" + textNumber).find(".video-description-preview").css({ "-webkit-line-clamp": Constants.webkitLineClampCssCount() });
+            $("#section-" + textNumber).find(".video-description-preview").css({
+                "-webkit-line-clamp": Constants.webkitLineClampCssCount()
+            });
             UxUtils.setAfter($("#section-" + textNumber).find(".video-description-preview"), Constants.getLoadMoreLink(loadMoreKey));
         }
         $("#section-" + textNumber).find(".textarea-video-attachments").val(videoAttachment);
@@ -772,6 +806,7 @@ $(document).on("click", "#video-done", function() {
  * Even to shwo document upload section
  */
 $(document).on("click", "#add-document", function() {
+    getStringKeys();
     let textNumber = parseInt($("div.training-card-section").length);
     $("form.sec1").find("div.content-limit-exceed").remove();
     if (textNumber > 29) {
@@ -792,6 +827,7 @@ $(document).on("click", "#add-document", function() {
     }
     UxUtils.setAfter("form.sec1 div.section-2 div#root div.training-card-section:last", UxUtils.getAddDownloadSection(textNumber, textData));
     addDocumentSection = UxUtils.getDocumentContentArea(addTitlePlaceholderKey, addDescriptionPlaceholderKey, uploadFileLabelKey);
+    addDocumentFooter = UxUtils.getDocumentContentFooter(doneKey);
     UxUtils.setAppend("form.sec1", addDocumentSection);
     UxUtils.setAppend("form.sec1", addDocumentFooter);
     UxUtils.setText($(".back-key"), backKey);
@@ -846,7 +882,9 @@ $(document).on("click", "#document-done", function() {
 
                 if (docDescription && (docDescription.split(/\r\n|\r|\n/).length > 2 || docDescription.length > 180)) {
                     $("#section-" + textNumber).find(".document-description-preview").addClass("show-text");
-                    $("#section-" + textNumber).find(".document-description-preview").css({ "-webkit-line-clamp": Constants.webkitLineClampCssCount() });
+                    $("#section-" + textNumber).find(".document-description-preview").css({
+                        "-webkit-line-clamp": Constants.webkitLineClampCssCount()
+                    });
                     UxUtils.setAfter($("#section-" + textNumber).find(".document-description-preview"), Constants.getLoadMoreLink(loadMoreKey));
                 }
                 $("#section-" + textNumber).find("textarea.textarea-document-attachment").val($("#document-attachment").val());
@@ -1187,7 +1225,7 @@ $(document).on("click", "#next", function() {
             if (element.attr("id").startsWith("question-title")) {
                 if (questionNumber != element.parents("div.form-group").find("span.question-number").text()) {
                     questionNumber = element.parents("div.form-group").find("span.question-number").text();
-                    errorText += "<h6><u>Question " + questionNumber + "</u> </h6>";
+                    errorText += "<h6><u>" + questionKey + questionNumber + "</u> </h6>";
                 }
                 errorText += `<p>${questionIsRequiredKey}</p>`;
             } else if (element.attr("id").startsWith("option")) {
@@ -1196,7 +1234,7 @@ $(document).on("click", "#next", function() {
                         .parents("div.card")
                         .find("span.question-number")
                         .text();
-                    errorText += "<h6><u>Question " + questionNumber + "</u> </h6>";
+                    errorText += "<h6><u>" + questionKey+" "+ questionNumber + "</u> </h6>";
                 }
                 errorText += "<p>Blank option not allowed for " + element.attr("placeholder") + ".</p>";
             }
@@ -2190,7 +2228,7 @@ async function loadCreationView(request) {
                             hideQuestionImage = "";
                             questionImage = UxUtils.createImageLightBox(imageQuestionURL, "question" + countQuestionno ,countQuestionno, `question-preview-image` , data.attachments[0].id);
                         }
-                        let questSection1 = UxUtils.getQuestionSection(countQuestionno, optionChecked, questionImage, hideQuestionImage, data.displayName, optionText, questionInput, questionImagearray, optionAttachments, correctInputs);
+                        let questSection1 = UxUtils.getQuestionSection(questionKey, countQuestionno, optionChecked, questionImage, hideQuestionImage, data.displayName, optionText, questionInput, questionImagearray, optionAttachments, correctInputs);
                         UxUtils.setAppend("div.section-2 div#root" , questSection1);
                         countQuestion++;
                         countQuestionno++;
@@ -2650,7 +2688,7 @@ $(document).on({
                 let questionCounter;
                 $("div.question-container:visible").each(function(index, elem) {
                     questionCounter = index + 1;
-                    $(elem).find("span.question-number").text("Question # " + questionCounter);
+                    $(elem).find("span.question-number").text(questionKey+" # " + questionCounter);
                     $(elem).find(`input[name="question_image"]`).attr({
                         id: "question-image-" + questionCounter
                     });

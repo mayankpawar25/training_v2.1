@@ -4,10 +4,19 @@ import "../common/utils/JqueryGlobal";
 import "bootstrap/dist/js/bootstrap";
 import "ekko-lightbox/dist/ekko-lightbox.js";
 import "ekko-lightbox/dist/ekko-lightbox.css";
-import { Localizer, ActionHelper } from "../common/ActionSdkHelper";
-import { Constants } from "../common/utils/Constants";
-import { UxUtils } from "../common/utils/UxUtils";
-import { Utils } from "../common/utils/Utils";
+import {
+    Localizer,
+    ActionHelper
+} from "../common/ActionSdkHelper";
+import {
+    Constants
+} from "../common/utils/Constants";
+import {
+    UxUtils
+} from "../common/utils/UxUtils";
+import {
+    Utils
+} from "../common/utils/Utils";
 import "../../assets/css/style-custom";
 import "../../assets/css/style-default";
 
@@ -103,6 +112,10 @@ async function getStringKeys() {
 
     Localizer.getString("questions").then(function(result) {
         questionsKey = result;
+    });
+
+    Localizer.getString("close").then(function(result) {
+        closeKey = result;
     });
 
 }
@@ -239,6 +252,7 @@ function createBody() {
         UxUtils.setAppend($root, $card);
     } else {
         $("div.section-1").show();
+        headSection1 = UxUtils.getResponseHeader(questionKey);
         UxUtils.setAppend("div.section-1", headSection1);
         $("#section1-training-title").html(actionInstance.displayName);
         $("#section1-training-description").html(actionInstance.customProperties[0].value);
@@ -447,7 +461,7 @@ function createQuestionView(indexNum, questionNumber) {
         dataTable.dataColumns.forEach((question, ind) => {
             if (ind == indexNum) {
                 let $card = $(UxUtils.getQuestionCardBoxSection());
-                let $questionHeading = UxUtils.getQuestionHeadingSection(questionNumber, question.displayName);
+                let $questionHeading = UxUtils.getQuestionHeadingSection(questionKey, questionNumber, question.displayName);
                 UxUtils.setAppend($card, $questionHeading);
                 //add radio button
                 if (question.valueType == "SingleOption") {
@@ -519,6 +533,7 @@ function loadSummaryView() {
     $("div.section-2").hide();
     $("div.section-2-footer").hide();
     if ($(".section-3").length <= 0) {
+        headSection1 = UxUtils.getResponseHeader(questionKey);
         UxUtils.setAfter("div.section-2", UxUtils.getTrainingSummaryViewSection(trainingSummary));
         UxUtils.setAppend("div.section-3 .container:first", headSection1);
         /* Main Heading and Description */
@@ -580,6 +595,7 @@ function loadSummaryView() {
                         });
                     }
                 } else if (data.valueType == "SingleOption" || data.valueType == "MultiOption") {
+
                     /* Call Question Section 1 */
                     let textTitle = data.displayName;
                     let counterDescbox = $("div.desc-box").length;
@@ -665,7 +681,6 @@ function loadSummaryView() {
                     } else {
                         userAnswerString = userAnswerArray;
                     }
-
                     if (correctAnswerString == userAnswerString) {
                         score++;
                         $(cardQuestion).find(".result-status").html(UxUtils.getCorrectArea(correctKey));
@@ -689,6 +704,7 @@ function loadSummaryView() {
                 $(".summary-section").find(".option-sec .card-box").removeClass("alert-success");
             }
         });
+        footerSection3 = UxUtils.getSummarySectionFooter(closeKey);
         UxUtils.setAfter("div.section-3 .container:first", footerSection3);
     }
 
@@ -718,7 +734,9 @@ function submitForm() {
  */
 function getDataRow(actionId) {
     if (Object.keys(row).length <= 0) {
-        row = { "": "" };
+        row = {
+            "": ""
+        };
     }
     let data = {
         id: Utils.generateGUID(),
@@ -969,11 +987,14 @@ $(document).on("click", "#check", function() {
             data.push($(this).attr("id"));
             isChecked = true;
             allOptions.push($.trim($(this).attr("id")));
+            if (!row[rowIndex]) {
+                row[rowIndex] = [];
+            }
+            row[rowIndex] = JSON.stringify(data);
         }
     });
 
     $("div.card-box:visible").find("input[type='radio']:checked").each(function(ind, ele) {
-        data = "";
         checkCounter++;
         selectedAnswer.push($.trim($(ele).attr("id")));
         attrName = $(ele).attr("name");
@@ -981,14 +1002,14 @@ $(document).on("click", "#check", function() {
         quesIndex = $(this).parents(".card-box-question").attr("id");
         quesIndexArr = quesIndex.split("quiz-");
         rowIndex = quesIndexArr[quesIndexArr.length - 1];
-        data = $(this).attr("id");
+        data.push($(this).attr("id"));
         isChecked = true;
+        if (!row[rowIndex]) {
+            row[rowIndex] = [];
+        }
+        row[rowIndex] = $(this).attr("id");
     });
 
-    if (!row[rowIndex]) {
-        row[rowIndex] = [];
-    }
-    row[rowIndex] = JSON.stringify(data);
 
     if (checkCounter <= 0) {
         $("#next").prop("disabled", true).addClass("disabled");
@@ -1041,7 +1062,7 @@ $(document).on("click", "#check", function() {
                         $("div.option-sec").find("div#" + val).parent().addClass("alert-success");
                     }
                 });
-                $("#check").text("Next").attr("id", "next").append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
+                $("#check").text(nextKey).attr("id", "next").append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
 
             } else {
                 $("div.card-box:visible").find("label.result-status span:last").remove();
@@ -1056,7 +1077,7 @@ $(document).on("click", "#check", function() {
                         $("div.option-sec").find("div#" + val).parent().addClass("alert-danger");
                     }
                 });
-                $("#check").text("Next").attr("id", "next").append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
+                $("#check").text(nextKey).attr("id", "next").append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
             }
 
             $("div.section-2").find("div.card-box:visible").find("input").each(function(ind, ele) {
@@ -1113,7 +1134,6 @@ $(document).on("click", "#next", function() {
         let correctAnswer = false;
         let attrName = "";
         let isChecked = false;
-
         $("div.card-box:visible").find("input[type='checkbox']:checked").each(function(ind, ele) {
             if ($(ele).is(":checked")) {
                 checkCounter++;
@@ -1314,6 +1334,7 @@ $(document).on("click", "#next", function() {
             loadSummaryView();
         }
     }
+    console.log("row ", row);
     if ($("#x").text() == $("#y").text()) {
         $(".footer.section-2-footer .check-key").text(doneKey).append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
         $(".footer.section-2-footer #next").text(doneKey).append(`<span class="next-btn-sec"></span> ${Constants.getNextCaratIcon()}`);
@@ -1330,8 +1351,8 @@ $(document).on("click", "#next", function() {
 $(document).on("click", "#back", function() {
     let $countn = 0;
     if ($countn >= 1) {
-        $("#next").after(UxUtils.getNextBtnSpan).find(".next-btn-sec").text("Next");
-        $("#check").after(UxUtils.getNextBtnSpan).find(".next-btn-sec").text("Next");
+        $("#next").after(UxUtils.getNextBtnSpan).find(".next-btn-sec").text(nextKey);
+        $("#check").after(UxUtils.getNextBtnSpan).find(".next-btn-sec").text(nextKey);
         $countn++;
     }
     if ($("#next").hasClass("done-key")) {
@@ -1339,7 +1360,7 @@ $(document).on("click", "#back", function() {
         $("#next").removeClass("done-key");
 
         $("#next").text("");
-        $("#next").append(`<span class="next-btn-sec"></span>${Constants.getNextCaratIcon()}`).find(".next-btn-sec").text("Next");
+        $("#next").append(`<span class="next-btn-sec"></span>${Constants.getNextCaratIcon()}`).find(".next-btn-sec").text(nextKey);
     }
     $("#next").removeClass("done-key");
     $("#next").removeClass("done-key");
@@ -1451,10 +1472,7 @@ Localizer.getString("next").then(function(result) {
 /**
  * @description Variable contains footer section
  */
-Localizer.getString("close").then(function(result) {
-    closeKey = result;
-    footerSection3 = UxUtils.getSummarySectionFooter(closeKey);
-});
+footerSection3 = UxUtils.getSummarySectionFooter(closeKey);
 
 /**
  * Variable contains Loader
