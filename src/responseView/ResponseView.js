@@ -49,6 +49,7 @@ let previousKey = "";
 let footerSection1 = "";
 let footerSection2 = "";
 let footerSection3 = "";
+let trainingContentKey = "";
 
 /* Async method for fetching localization strings */
 /**
@@ -95,6 +96,10 @@ async function getStringKeys() {
 
     Localizer.getString("trainingSummary").then(function(result) {
         trainingSummary = result;
+    });
+
+    Localizer.getString("trainingContent").then(function(result) {
+        trainingContentKey = result;
     });
 
     Localizer.getString("trainingExpired").then(function(result) {
@@ -252,7 +257,7 @@ function createBody() {
         UxUtils.setAppend($root, $card);
     } else {
         $("div.section-1").show();
-        headSection1 = UxUtils.getResponseHeader(questionKey);
+        headSection1 = UxUtils.getResponseHeader(trainingContentKey);
         UxUtils.setAppend("div.section-1", headSection1);
         $("#section1-training-title").html(actionInstance.displayName);
         $("#section1-training-description").html(actionInstance.customProperties[0].value);
@@ -533,7 +538,7 @@ function loadSummaryView() {
     $("div.section-2").hide();
     $("div.section-2-footer").hide();
     if ($(".section-3").length <= 0) {
-        headSection1 = UxUtils.getResponseHeader(questionKey);
+        headSection1 = UxUtils.getResponseHeader(trainingContentKey);
         UxUtils.setAfter("div.section-2", UxUtils.getTrainingSummaryViewSection(trainingSummary));
         UxUtils.setAppend("div.section-3 .container:first", headSection1);
         /* Main Heading and Description */
@@ -1428,7 +1433,7 @@ $(document).on("click", '[data-toggle="lightbox"]', function(event) {
 /**
  * @description Variable contains head section
  */
-let headSection1 = UxUtils.getResponseHeader();
+let headSection1 = UxUtils.getResponseHeader(trainingContentKey);
 
 /**
  * @description Variable contains text Landing section
