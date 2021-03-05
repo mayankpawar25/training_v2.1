@@ -53,8 +53,7 @@ guide](./wiki/Deployment-guide.md).
 
 Thoughts? Questions? Ideas? Share them with us on [Teams UserVoice](https://microsoftteams.uservoice.com/forums/555103-public)!
 
-Please report bugs and other code issues [here]{.ul}.
-
+Please report bugs and other code issues [here](https://github.com/OfficeDev/Microsoft-Teams-Training-app/issues/new).
 ## Legal Notice
 
 This app template is provided under the [MIT

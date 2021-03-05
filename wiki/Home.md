@@ -16,6 +16,6 @@ your existing Microsoft 365 subscription.
     * [Troubleshooting](Troubleshooting.md)
     * [Continuous Deployment](Continuous-deployment.md)
 * [Extending Training App Template](Taking-it-further.md)
-* [Architecture](#architecture)
-* [Costing](#costing)
+* [Architecture](Solution-overview.md)
+* [Costing](Costing.md)
 * [FAQs](Frequently-asked-questions.md)
