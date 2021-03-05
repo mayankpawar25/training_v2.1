@@ -9,7 +9,7 @@ Training app is supported across all platforms -- Teams desktop,
 browser, iOS, and Android clients. It is ready for deployment as part of
 your existing Microsoft 365 subscription.
 
-![Poll Template compose message screen](./images/PollTemplateCompose.gif)
+![Training Template Compose screen](./images/TrainingTemplateCompose.gif)
 * [Solution overview](Solution-overview.md)
 * Deploying the app
     * [Deployment guide](Deployment-guide.md)
