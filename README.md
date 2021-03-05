@@ -9,8 +9,8 @@ for offline knowledge sharing and upskilling. The app is supported
 across all Teams platform clients - desktop, browser, iOS, and Android and is ready for deployment as part of your Microsoft 365
 subscription.
 
+![Training Template Compose screen](./wiki/images/TrainingTemplateCompose.gif)
 
-## ![](media/image1.gif){width="6.5in" height="3.65625in"}Key features
 ## Key features
 -   **Training creation:** To easily create Training, click **Menu
     (...)** below the box where you type your message to find your
@@ -20,14 +20,14 @@ subscription.
     quiz based content for the training. When you are done,
     click **Send** to publish your Training.
 
-> \<Insert Image here\>
+>![Training Template create screen](./wiki/images/TrainingTemplateCreation.png)
 
 -   **Training response:** To respond to a Training, click **Start** on
     the card. Read description of the training and go through the
     contents in subsequent screens.
 
-> \<Insert Image here\>
-
+>![Training Template response start screen](./wiki/images/TrainingTemplateResponseStart.png)
+![Training Template response content screen](./wiki/images/TrainingTemplateResponseContent.png)
 -   **Training Results:** To see the results of your Training,
     click **View Result** on the card. You can view content summary of
     the training as well as question wise result of the quiz content. As
@@ -38,7 +38,7 @@ subscription.
     Also, download an image of your Training's results as an image or a
     .csv file by selecting **Download**.
 
-\<Insert Image here\>
+![Training Template create screen](./wiki/images/TrainingResult.png)
 
 ## Get started
 
