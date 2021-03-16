@@ -10,12 +10,12 @@ browser, iOS, and Android clients. It is ready for deployment as part of
 your existing Microsoft 365 subscription.
 
 ![Training Template Compose screen](./images/TrainingTemplateCompose.gif)
-* [Solution overview](Solution-overview.md)
+* [Solution overview](Solution-overview)
 * Deploying the app
-    * [Deployment guide](Deployment-guide.md)
-    * [Troubleshooting](Troubleshooting.md)
-    * [Continuous Deployment](Continuous-deployment.md)
-* [Extending Training App Template](Taking-it-further.md)
-* [Architecture](Solution-overview.md)
-* [Costing](Costing.md)
-* [FAQs](Frequently-asked-questions.md)
+    * [Deployment guide](Deployment-guide)
+    * [Troubleshooting](Troubleshooting)
+    * [Continuous Deployment](Continuous-deployment)
+* [Extending Training App Template](Taking-it-further)
+* [Architecture](Solution-overview)
+* [Costing](Costing)
+* [FAQs](Frequently-asked-questions)

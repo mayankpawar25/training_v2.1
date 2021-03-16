@@ -84,4 +84,4 @@ functionality -
 
 # Troubleshooting
 
-Please see our [Troubleshooting](Troubleshooting.md) page.
+Please see our [Troubleshooting](Troubleshooting) page.
