@@ -1884,7 +1884,7 @@ $(function() {
 async function loadCreationView(request) {
     getStringKeys();
     let response = await ActionHelper.executeApi(request);
-    let context = response.context;
+    context = response.context;
     let langObj = Utils.getLocaleForCalendar(context.locale);
     ActionHelper.executeApi(request).then(function(res) {
         response = res;
