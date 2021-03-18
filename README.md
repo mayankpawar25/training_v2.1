@@ -1,5 +1,5 @@
 # Training App Teamplate
-| [Documentation](https://github.com/mayankpawar25/training_v2.1/wiki/Home.md) | [Deployment guide](https://github.com/mayankpawar25/training_v2.1/wiki/Deployment-guide.md) | [Architecture](https://github.com/mayankpawar25/training_v2.1/wiki/Solution-overview.md) |
+| [Documentation](https://github.com/mayankpawar25/training_v2.1/wiki/Home) | [Deployment guide](https://github.com/mayankpawar25/training_v2.1/wiki/Deployment-guide) | [Architecture](https://github.com/mayankpawar25/training_v2.1/wiki/Solution-overview) |
 | ---- | ---- | ---- |
 
 Training is a custom [Teams messaging
@@ -42,7 +42,7 @@ subscription.
 
 ## Get started
 
-Begin with the [Solution overview ](https://github.com/mayankpawar25/training_v2.1/wiki/Solution-overview.md) to read about
+Begin with the [Solution overview ](https://github.com/mayankpawar25/training_v2.1/wiki/Solution-overview) to read about
 what the app does and how it works.
 
 When you're ready to try out Training, or to use it in your own
