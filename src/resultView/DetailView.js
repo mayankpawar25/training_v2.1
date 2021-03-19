@@ -335,7 +335,7 @@ async function createBody() {
     }
 
     if (isCreator == true) {
-        if (context.hostClientType == "web") {
+        if (context.hostClientType == "web" || context.hostClientType == "desktop") {
             footerDownload();
         }
     } else {
